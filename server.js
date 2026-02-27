@@ -45,7 +45,9 @@ app.post('/api/verify', (req, res) => {
     record.lastLogin = new Date().toISOString();
     
     saveDB(db);
-    res.json({ success: true, message: '验证成功' });
+    // Format expiry date to YYYY-MM-DD
+    const expiryDate = new Date(record.expiry).toISOString().split('T')[0];
+    res.json({ success: true, message: '验证成功', expiry: expiryDate });
 });
 
 // --- Management APIs (Add basic password protection for prod) ---

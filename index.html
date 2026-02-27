@@ -958,6 +958,12 @@
       <div id="user-tag"
         style="padding:4px 12px;border:1px solid #222;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#555;text-transform:uppercase;background:#0d0d0f">
         Free</div>
+      <div id="license-status"
+        style="padding:4px 12px;border:1px solid #222;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#555;text-transform:uppercase;background:#0d0d0f;display:none">
+        已授权</div>
+      <div id="expiry-date"
+        style="padding:4px 12px;border:1px solid #222;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#555;text-transform:uppercase;background:#0d0d0f;display:none">
+        到期时间: 2026-12-31</div>
       <button onclick="showModal('activate')"
         style="font-size:10px;font-family:'JetBrains Mono';color:var(--orange);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.12em;font-weight:700;"
         id="activate-btn">激活 Pro</button>
@@ -1298,13 +1304,19 @@
   <script>
     // ===== State =====
     const AUTH_SERVER = "http://localhost:3000/api";
-    let isPro = false;
+    let isPro = localStorage.getItem('cine_pro') === 'true';
     let blazefaceModel = null;
     let audioEnergyData = []; // Store RMS energy levels per second
     let isAIInitializing = false;
     let currentMode = 'simple';
     let currentStyle = 'cinema';
     let currentRatio = '16:9';
+
+    // Check license status on page load
+    if (isPro) {
+      const expiryDate = localStorage.getItem('cine_expiry');
+      applyProStatus(expiryDate);
+    }
     let videoFile = null;
     let videoReady = false;
     let isRendering = false;
@@ -1347,12 +1359,26 @@
     }
 
     // ===== Pro =====
-    function applyProStatus() {
+    function applyProStatus(expiryDate) {
       isPro = true; localStorage.setItem('cine_pro', 'true');
       const tag = document.getElementById('user-tag');
-      tag.innerText = 'Dev Auth'; tag.style.color = '#4ade80'; tag.style.borderColor = '#166534';
+      tag.innerText = 'Pro'; tag.style.color = '#4ade80'; tag.style.borderColor = '#166534';
       document.getElementById('activate-btn').style.display = 'none';
       document.getElementById('noir-lbl').style.color = '#e2e2e2';
+      document.getElementById('cyber-lbl').style.color = '#e2e2e2';
+
+      // Show license status and expiry date
+      document.getElementById('license-status').style.display = 'block';
+      document.getElementById('license-status').style.color = '#4ade80';
+      document.getElementById('license-status').style.borderColor = '#166534';
+      
+      if (expiryDate) {
+        document.getElementById('expiry-date').style.display = 'block';
+        document.getElementById('expiry-date').style.color = '#4ade80';
+        document.getElementById('expiry-date').style.borderColor = '#166534';
+        document.getElementById('expiry-date').innerText = '到期时间: ' + expiryDate;
+        localStorage.setItem('cine_expiry', expiryDate);
+      }
 
       // Reveal Pro elements
       if (currentMode === 'pro') document.getElementById('pro-controls').style.display = 'flex';
@@ -1385,7 +1411,7 @@
         const data = await res.json();
         
         if (data.success) {
-          applyProStatus(); 
+          applyProStatus(data.expiry); 
           hideModal('activate'); 
           toast('专业授权成功！欢迎回来');
           if (currentMode === 'pro') switchMode('pro');
