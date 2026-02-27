@@ -1110,47 +1110,16 @@
         </div>
       </div>
 
-      <!-- Introduction Section -->
+      <!-- About Button -->
       <div class="blk" style="margin-top:30px;">
-        <p class="sec-lbl"><span class="step-tag">关于</span>视频帧探</p>
-        <div style="padding:14px;background:#0d0d12;border-radius:8px;border:1px solid #1a1a1a;">
-          <h3 style="font-family:'Noto Serif SC';font-size:14px;margin-bottom:10px;">功能介绍</h3>
-          <ul style="list-style:none;padding:0;margin:0;">
-            <li style="font-size:10px;color:#777;margin-bottom:8px;display:flex;align-items:center;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              视频抽帧 - 间隔抽帧和AI智能抽帧
-            </li>
-            <li style="font-size:10px;color:#777;margin-bottom:8px;display:flex;align-items:center;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              电影级渲染 - 多种视觉风格可选
-            </li>
-            <li style="font-size:10px;color:#777;margin-bottom:8px;display:flex;align-items:center;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              多种比例支持 - 横屏、竖屏、方形等
-            </li>
-            <li style="font-size:10px;color:#777;margin-bottom:8px;display:flex;align-items:center;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              专业参数调整 - FPS、快门角、色温等
-            </li>
-            <li style="font-size:10px;color:#777;display:flex;align-items:center;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              高质量视频导出 - 支持多种格式
-            </li>
-          </ul>
-          <div style="margin-top:15px;padding-top:15px;border-top:1px solid #1a1a1a;">
-            <p style="font-size:9px;color:#444;line-height:1.4;">视频帧探是一款专业的视频抽帧工具，帮助您从视频中提取高质量帧并渲染成电影级视频。</p>
-          </div>
-        </div>
+        <button class="btn btn-secondary" style="width:100%;" onclick="showModal('about')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          关于视频帧探
+        </button>
       </div>
 
       <div
@@ -1356,6 +1325,58 @@
       
       <button onclick="hideModal('activate')"
         style="display:block;margin:10px auto 0;font-size:8px;font-family:'JetBrains Mono';color:#333;background:none;border:none;cursor:pointer;">取消</button>
+    </div>
+  </div>
+
+  <!-- About Modal -->
+  <div class="modal-bg" id="about-modal">
+    <div class="modal-box">
+      <h2 style="font-family:'Noto Serif SC';font-size:18px;margin-bottom:5px;">关于视频帧探</h2>
+      <p
+        style="font-size:8px;font-family:'JetBrains Mono';color:#555;text-transform:uppercase;letter-spacing:.15em;margin-bottom:20px;">
+        功能介绍</p>
+      
+      <div style="padding:14px;background:#0d0d12;border-radius:8px;border:1px solid #1a1a1a;">
+        <h3 style="font-family:'Noto Serif SC';font-size:14px;margin-bottom:10px;">核心功能</h3>
+        <ul style="list-style:none;padding:0;margin:0;">
+          <li style="font-size:10px;color:#777;margin-bottom:8px;display:flex;align-items:center;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            视频抽帧 - 间隔抽帧和AI智能抽帧
+          </li>
+          <li style="font-size:10px;color:#777;margin-bottom:8px;display:flex;align-items:center;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            电影级渲染 - 多种视觉风格可选
+          </li>
+          <li style="font-size:10px;color:#777;margin-bottom:8px;display:flex;align-items:center;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            多种比例支持 - 横屏、竖屏、方形等
+          </li>
+          <li style="font-size:10px;color:#777;margin-bottom:8px;display:flex;align-items:center;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            专业参数调整 - FPS、快门角、色温等
+          </li>
+          <li style="font-size:10px;color:#777;display:flex;align-items:center;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            高质量视频导出 - 支持多种格式
+          </li>
+        </ul>
+        <div style="margin-top:15px;padding-top:15px;border-top:1px solid #1a1a1a;">
+          <p style="font-size:9px;color:#444;line-height:1.4;">视频帧探是一款专业的视频抽帧工具，帮助您从视频中提取高质量帧并渲染成电影级视频。</p>
+        </div>
+      </div>
+      
+      <button onclick="hideModal('about')"
+        style="display:block;margin:10px auto 0;font-size:8px;font-family:'JetBrains Mono';color:#333;background:none;border:none;cursor:pointer;">关闭</button>
     </div>
   </div>
 
