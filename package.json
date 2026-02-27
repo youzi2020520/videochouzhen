@@ -1,7 +1,7 @@
 {
-  "name": "cinemagic-auth-server",
+  "name": "视频帧探",
   "version": "1.0.0",
-  "description": "Auth Server for CineMagic Pro",
+  "description": "视频帧探 - 视频抽帧工具",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

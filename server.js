@@ -100,5 +100,5 @@ app.post('/api/admin/toggle', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Auth Server running at http://localhost:${PORT}`);
+    console.log(`视频帧探服务运行在 http://localhost:${PORT}`);
 });
