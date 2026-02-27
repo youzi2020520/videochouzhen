@@ -1346,16 +1346,19 @@
 
     // ===== Mode =====
     function switchMode(mode) {
+      // If switching to pro mode and not authorized, show modal and don't switch
+      if (mode === 'pro' && !isPro) {
+        showModal('activate');
+        return;
+      }
+      
       currentMode = mode;
       document.getElementById('btn-simple').classList.toggle('active', mode === 'simple');
       document.getElementById('btn-pro').classList.toggle('active', mode === 'pro');
       document.getElementById('mode-label').innerText = mode === 'simple' ? 'Simple Mode' : 'Pro Mode';
 
       // Update sidebar sections
-      const isP = isPro;
-      document.getElementById('pro-controls').style.display = (mode === 'pro' && isP) ? 'flex' : 'none';
-
-      if (mode === 'pro' && !isP) showModal('activate');
+      document.getElementById('pro-controls').style.display = (mode === 'pro' && isPro) ? 'flex' : 'none';
     }
 
     // ===== Pro =====
