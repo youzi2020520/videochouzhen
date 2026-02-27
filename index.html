@@ -1394,7 +1394,14 @@
         document.getElementById('expiry-date').style.display = 'block';
         document.getElementById('expiry-date').style.color = '#4ade80';
         document.getElementById('expiry-date').style.borderColor = '#166534';
-        document.getElementById('expiry-date').innerText = '到期时间: ' + expiryDate;
+        
+        // Calculate remaining days
+        const today = new Date();
+        const expiry = new Date(expiryDate);
+        const diffTime = expiry - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        document.getElementById('expiry-date').innerText = '剩余: ' + diffDays + '天';
         localStorage.setItem('cine_expiry', expiryDate);
       }
 
