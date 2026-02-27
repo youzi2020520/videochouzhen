@@ -1118,99 +1118,94 @@
         </div>
       </div>
 
-      <!-- About Button with Popup -->
-      <div class="blk" style="margin-top:30px;position:relative;">
-        <button class="btn btn-secondary" style="width:100%;" onclick="toggleAboutPopup()">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-          </svg>
-          关于视频帧探
-        </button>
-        
-        <!-- About Popup -->
-        <div id="about-popup" style="position:absolute;bottom:100%;left:0;right:0;margin-bottom:10px;background:#0d0d12;border:1px solid #1a1a1a;border-radius:8px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.6);z-index:1000;display:none;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-            <h3 style="font-family:'Noto Serif SC';font-size:16px;margin:0;">关于视频帧探</h3>
-            <button onclick="toggleAboutPopup()" style="background:none;border:none;color:#555;cursor:pointer;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
+      <!-- About Section -->
+      <div class="blk" style="margin-top:30px;">
+        <details style="background:#0d0d12;border:1px solid #1a1a1a;border-radius:8px;overflow:hidden;">
+          <summary style="padding:12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
               </svg>
-            </button>
-          </div>
-          
-          <div style="margin-bottom:20px;">
-            <h4 style="font-family:'Noto Serif SC';font-size:14px;margin-bottom:12px;color:#e2e2e2;">核心功能</h4>
-            <div style="display:grid;grid-template-columns:1fr;gap:12px;">
-              <div style="display:flex;align-items:flex-start;">
-                <div style="background:#166534;border-radius:6px;padding:8px;margin-right:12px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
+              <span>关于视频帧探</span>
+            </div>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform 0.3s ease;">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </summary>
+          <div style="padding:0 12px 12px 12px;">
+            <div style="margin-bottom:16px;">
+              <h4 style="font-family:'Noto Serif SC';font-size:14px;margin-bottom:12px;color:#e2e2e2;">核心功能</h4>
+              <div style="display:grid;grid-template-columns:1fr;gap:12px;">
+                <div style="display:flex;align-items:flex-start;">
+                  <div style="background:#166534;border-radius:6px;padding:8px;margin-right:12px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                  <div>
+                    <p style="font-size:12px;font-weight:500;color:#e2e2e2;margin:0 0 4px 0;">视频抽帧</p>
+                    <p style="font-size:10px;color:#777;margin:0;">支持间隔抽帧和AI智能抽帧，精准捕捉精彩瞬间</p>
+                  </div>
                 </div>
-                <div>
-                  <p style="font-size:12px;font-weight:500;color:#e2e2e2;margin:0 0 4px 0;">视频抽帧</p>
-                  <p style="font-size:10px;color:#777;margin:0;">支持间隔抽帧和AI智能抽帧，精准捕捉精彩瞬间</p>
+                
+                <div style="display:flex;align-items:flex-start;">
+                  <div style="background:#166534;border-radius:6px;padding:8px;margin-right:12px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                  <div>
+                    <p style="font-size:12px;font-weight:500;color:#e2e2e2;margin:0 0 4px 0;">电影级渲染</p>
+                    <p style="font-size:10px;color:#777;margin:0;">多种视觉风格可选，专业级色彩调整</p>
+                  </div>
                 </div>
-              </div>
-              
-              <div style="display:flex;align-items:flex-start;">
-                <div style="background:#166534;border-radius:6px;padding:8px;margin-right:12px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
+                
+                <div style="display:flex;align-items:flex-start;">
+                  <div style="background:#166534;border-radius:6px;padding:8px;margin-right:12px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                  <div>
+                    <p style="font-size:12px;font-weight:500;color:#e2e2e2;margin:0 0 4px 0;">多种比例支持</p>
+                    <p style="font-size:10px;color:#777;margin:0;">横屏、竖屏、方形等多种比例适配</p>
+                  </div>
                 </div>
-                <div>
-                  <p style="font-size:12px;font-weight:500;color:#e2e2e2;margin:0 0 4px 0;">电影级渲染</p>
-                  <p style="font-size:10px;color:#777;margin:0;">多种视觉风格可选，专业级色彩调整</p>
+                
+                <div style="display:flex;align-items:flex-start;">
+                  <div style="background:#166534;border-radius:6px;padding:8px;margin-right:12px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                  <div>
+                    <p style="font-size:12px;font-weight:500;color:#e2e2e2;margin:0 0 4px 0;">专业参数调整</p>
+                    <p style="font-size:10px;color:#777;margin:0;">FPS、快门角、色温等专业参数精细调整</p>
+                  </div>
                 </div>
-              </div>
-              
-              <div style="display:flex;align-items:flex-start;">
-                <div style="background:#166534;border-radius:6px;padding:8px;margin-right:12px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                </div>
-                <div>
-                  <p style="font-size:12px;font-weight:500;color:#e2e2e2;margin:0 0 4px 0;">多种比例支持</p>
-                  <p style="font-size:10px;color:#777;margin:0;">横屏、竖屏、方形等多种比例适配</p>
-                </div>
-              </div>
-              
-              <div style="display:flex;align-items:flex-start;">
-                <div style="background:#166534;border-radius:6px;padding:8px;margin-right:12px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                </div>
-                <div>
-                  <p style="font-size:12px;font-weight:500;color:#e2e2e2;margin:0 0 4px 0;">专业参数调整</p>
-                  <p style="font-size:10px;color:#777;margin:0;">FPS、快门角、色温等专业参数精细调整</p>
-                </div>
-              </div>
-              
-              <div style="display:flex;align-items:flex-start;">
-                <div style="background:#166534;border-radius:6px;padding:8px;margin-right:12px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                </div>
-                <div>
-                  <p style="font-size:12px;font-weight:500;color:#e2e2e2;margin:0 0 4px 0;">高质量视频导出</p>
-                  <p style="font-size:10px;color:#777;margin:0;">支持MP4、WebM等多种格式，高质量输出</p>
+                
+                <div style="display:flex;align-items:flex-start;">
+                  <div style="background:#166534;border-radius:6px;padding:8px;margin-right:12px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                  <div>
+                    <p style="font-size:12px;font-weight:500;color:#e2e2e2;margin:0 0 4px 0;">高质量视频导出</p>
+                    <p style="font-size:10px;color:#777;margin:0;">支持MP4、WebM等多种格式，高质量输出</p>
+                  </div>
                 </div>
               </div>
             </div>
+            
+            <div style="padding-top:16px;border-top:1px solid #1a1a1a;">
+              <p style="font-size:10px;color:#444;line-height:1.4;">视频帧探是一款专业的视频抽帧工具，帮助您从视频中提取高质量帧并渲染成电影级视频。</p>
+              <p style="font-size:10px;color:#444;line-height:1.4;margin-top:8px;">版本：v4.1.0</p>
+            </div>
           </div>
-          
-          <div style="padding-top:16px;border-top:1px solid #1a1a1a;">
-            <p style="font-size:10px;color:#444;line-height:1.4;">视频帧探是一款专业的视频抽帧工具，帮助您从视频中提取高质量帧并渲染成电影级视频。</p>
-            <p style="font-size:10px;color:#444;line-height:1.4;margin-top:8px;">版本：v4.1.0</p>
-          </div>
-        </div>
+        </details>
       </div>
 
       <div
@@ -1438,20 +1433,7 @@
     let currentStyle = 'cinema';
     let currentRatio = '16:9';
 
-    // About popup functions
-    function toggleAboutPopup() {
-      const popup = document.getElementById('about-popup');
-      popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
-    }
-    
-    // Close popup when clicking outside
-    document.addEventListener('click', function(event) {
-      const popup = document.getElementById('about-popup');
-      const button = document.querySelector('.btn-secondary');
-      if (popup && popup.style.display === 'block' && !popup.contains(event.target) && !button.contains(event.target)) {
-        popup.style.display = 'none';
-      }
-    });
+
 
     // Check license status on page load
     if (isPro) {
