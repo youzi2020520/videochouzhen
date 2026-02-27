@@ -1118,9 +1118,9 @@
         </div>
       </div>
 
-      <!-- About Button -->
-      <div class="blk" style="margin-top:30px;">
-        <button class="btn btn-secondary" style="width:100%;" onclick="showModal('about')">
+      <!-- About Button with Popup -->
+      <div class="blk" style="margin-top:30px;position:relative;">
+        <button class="btn btn-secondary" style="width:100%;" onclick="toggleAboutPopup()">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -1128,6 +1128,46 @@
           </svg>
           关于视频帧探
         </button>
+        
+        <!-- About Popup -->
+        <div id="about-popup" style="position:absolute;bottom:100%;left:0;right:0;margin-bottom:10px;background:#0d0d12;border:1px solid #1a1a1a;border-radius:8px;padding:14px;box-shadow:0 10px 20px rgba(0,0,0,0.5);z-index:1000;display:none;">
+          <h3 style="font-family:'Noto Serif SC';font-size:14px;margin-bottom:10px;">核心功能</h3>
+          <ul style="list-style:none;padding:0;margin:0;">
+            <li style="font-size:10px;color:#777;margin-bottom:8px;display:flex;align-items:center;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              视频抽帧 - 间隔抽帧和AI智能抽帧
+            </li>
+            <li style="font-size:10px;color:#777;margin-bottom:8px;display:flex;align-items:center;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              电影级渲染 - 多种视觉风格可选
+            </li>
+            <li style="font-size:10px;color:#777;margin-bottom:8px;display:flex;align-items:center;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              多种比例支持 - 横屏、竖屏、方形等
+            </li>
+            <li style="font-size:10px;color:#777;margin-bottom:8px;display:flex;align-items:center;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              专业参数调整 - FPS、快门角、色温等
+            </li>
+            <li style="font-size:10px;color:#777;display:flex;align-items:center;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              高质量视频导出 - 支持多种格式
+            </li>
+          </ul>
+          <div style="margin-top:15px;padding-top:15px;border-top:1px solid #1a1a1a;">
+            <p style="font-size:9px;color:#444;line-height:1.4;">视频帧探是一款专业的视频抽帧工具，帮助您从视频中提取高质量帧并渲染成电影级视频。</p>
+          </div>
+        </div>
       </div>
 
       <div
@@ -1342,57 +1382,7 @@
     </div>
   </div>
 
-  <!-- About Modal -->
-  <div class="modal-bg" id="about-modal">
-    <div class="modal-box">
-      <h2 style="font-family:'Noto Serif SC';font-size:18px;margin-bottom:5px;">关于视频帧探</h2>
-      <p
-        style="font-size:8px;font-family:'JetBrains Mono';color:#555;text-transform:uppercase;letter-spacing:.15em;margin-bottom:20px;">
-        功能介绍</p>
-      
-      <div style="padding:14px;background:#0d0d12;border-radius:8px;border:1px solid #1a1a1a;">
-        <h3 style="font-family:'Noto Serif SC';font-size:14px;margin-bottom:10px;">核心功能</h3>
-        <ul style="list-style:none;padding:0;margin:0;">
-          <li style="font-size:10px;color:#777;margin-bottom:8px;display:flex;align-items:center;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            视频抽帧 - 间隔抽帧和AI智能抽帧
-          </li>
-          <li style="font-size:10px;color:#777;margin-bottom:8px;display:flex;align-items:center;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            电影级渲染 - 多种视觉风格可选
-          </li>
-          <li style="font-size:10px;color:#777;margin-bottom:8px;display:flex;align-items:center;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            多种比例支持 - 横屏、竖屏、方形等
-          </li>
-          <li style="font-size:10px;color:#777;margin-bottom:8px;display:flex;align-items:center;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            专业参数调整 - FPS、快门角、色温等
-          </li>
-          <li style="font-size:10px;color:#777;display:flex;align-items:center;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" style="margin-right:8px;">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            高质量视频导出 - 支持多种格式
-          </li>
-        </ul>
-        <div style="margin-top:15px;padding-top:15px;border-top:1px solid #1a1a1a;">
-          <p style="font-size:9px;color:#444;line-height:1.4;">视频帧探是一款专业的视频抽帧工具，帮助您从视频中提取高质量帧并渲染成电影级视频。</p>
-        </div>
-      </div>
-      
-      <button onclick="hideModal('about')"
-        style="display:block;margin:10px auto 0;font-size:8px;font-family:'JetBrains Mono';color:#333;background:none;border:none;cursor:pointer;">关闭</button>
-    </div>
-  </div>
+
 
   <script>
     // ===== State =====
@@ -2489,6 +2479,21 @@
     function toast(msg, err = false) { const t = document.createElement('div'); t.className = 'toast'; t.style.background = err ? '#991b1b' : '#14532d'; t.style.color = err ? '#fca5a5' : '#4ade80'; t.style.border = `1px solid ${err ? '#7f1d1d' : '#166534'}`; t.innerText = msg; document.body.appendChild(t); t.style.animation = 'toastIn .3s ease'; setTimeout(() => t.remove(), 2800); }
     function showModal(id) { document.getElementById(id + '-modal').style.display = 'flex'; }
     function hideModal(id) { document.getElementById(id + '-modal').style.display = 'none'; }
+    
+    // About popup functions
+    function toggleAboutPopup() {
+      const popup = document.getElementById('about-popup');
+      popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+    }
+    
+    // Close popup when clicking outside
+    document.addEventListener('click', function(event) {
+      const popup = document.getElementById('about-popup');
+      const button = document.querySelector('.btn-secondary');
+      if (popup && popup.style.display === 'block' && !popup.contains(event.target) && !button.contains(event.target)) {
+        popup.style.display = 'none';
+      }
+    });
 
     // Init
     switchMode('simple');
