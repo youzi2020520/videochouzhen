@@ -1395,6 +1395,21 @@
     let currentStyle = 'cinema';
     let currentRatio = '16:9';
 
+    // About popup functions
+    function toggleAboutPopup() {
+      const popup = document.getElementById('about-popup');
+      popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+    }
+    
+    // Close popup when clicking outside
+    document.addEventListener('click', function(event) {
+      const popup = document.getElementById('about-popup');
+      const button = document.querySelector('.btn-secondary');
+      if (popup && popup.style.display === 'block' && !popup.contains(event.target) && !button.contains(event.target)) {
+        popup.style.display = 'none';
+      }
+    });
+
     // Check license status on page load
     if (isPro) {
       const expiryDate = localStorage.getItem('cine_expiry');
@@ -2479,21 +2494,6 @@
     function toast(msg, err = false) { const t = document.createElement('div'); t.className = 'toast'; t.style.background = err ? '#991b1b' : '#14532d'; t.style.color = err ? '#fca5a5' : '#4ade80'; t.style.border = `1px solid ${err ? '#7f1d1d' : '#166534'}`; t.innerText = msg; document.body.appendChild(t); t.style.animation = 'toastIn .3s ease'; setTimeout(() => t.remove(), 2800); }
     function showModal(id) { document.getElementById(id + '-modal').style.display = 'flex'; }
     function hideModal(id) { document.getElementById(id + '-modal').style.display = 'none'; }
-    
-    // About popup functions
-    function toggleAboutPopup() {
-      const popup = document.getElementById('about-popup');
-      popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
-    }
-    
-    // Close popup when clicking outside
-    document.addEventListener('click', function(event) {
-      const popup = document.getElementById('about-popup');
-      const button = document.querySelector('.btn-secondary');
-      if (popup && popup.style.display === 'block' && !popup.contains(event.target) && !button.contains(event.target)) {
-        popup.style.display = 'none';
-      }
-    });
 
     // Init
     switchMode('simple');
