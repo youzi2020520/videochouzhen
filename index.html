@@ -1,0 +1,2360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineMagic Pro - 专业视频帧工作台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
+  <style>
+    :root {
+      --orange: #f97316;
+      --orange-dim: rgba(249, 115, 22, .12);
+      --border: rgba(255, 255, 255, .06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #08080c;
+      color: #e2e2e2;
+      font-family: 'Inter', sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .font-movie {
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .jm {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 3px;
+      height: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #222;
+      border-radius: 3px;
+    }
+
+    /* Header */
+    header {
+      height: 56px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: #060608;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    /* Mode pill */
+    .mode-pill {
+      display: flex;
+      background: #111;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .mode-btn {
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: 'JetBrains Mono';
+      border: none;
+      color: #777;
+      background: transparent;
+    }
+
+    .mode-btn.active {
+      background: var(--orange);
+      color: #000;
+    }
+
+    /* Layout */
+    .workspace {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    #sidebar {
+      width: 400px;
+      min-width: 400px;
+      border-right: 1px solid var(--border);
+      background: #07070a;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      box-shadow: 10px 0 30px rgba(0, 0, 0, .3);
+      z-index: 5;
+    }
+
+    .blk {
+      padding: 24px 28px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sec-lbl {
+      font-size: 11px;
+      font-family: 'JetBrains Mono';
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: #777;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sec-lbl .step-tag {
+      background: #1a1a1a;
+      color: #555;
+      font-size: 8px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #222;
+      letter-spacing: .1em;
+    }
+
+    .sec-lbl::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, #222, transparent);
+      margin-left: 10px;
+    }
+
+    /* Upload */
+    .upload-zone {
+      border: 1px dashed #222;
+      border-radius: 12px;
+      padding: 32px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .3s;
+      position: relative;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: var(--orange);
+      background: var(--orange-dim);
+    }
+
+    .upload-zone input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Ratio btns */
+    .ratio-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+
+    .ratio-btn {
+      border: 1px solid #1e1e1e;
+      border-radius: 8px;
+      padding: 12px 6px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono';
+      cursor: pointer;
+      transition: all .2s;
+      color: #666;
+      background: transparent;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .ratio-btn.active {
+      border-color: var(--orange);
+      color: var(--orange);
+      background: var(--orange-dim);
+    }
+
+    .ratio-btn:hover:not(.active) {
+      border-color: #333;
+      color: #aaa;
+    }
+
+    /* Style cards */
+    .style-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all .25s;
+      margin-bottom: 5px;
+      background: rgba(255, 255, 255, .015);
+    }
+
+    .style-card.active {
+      border-color: var(--orange);
+      background: var(--orange-dim);
+    }
+
+    .style-card:hover:not(.active) {
+      border-color: #2a2a2a;
+    }
+
+    .style-card:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Sliders */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: #1a1a1a;
+      height: 2px;
+      border-radius: 2px;
+      width: 100%;
+      display: block;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 14px;
+      width: 14px;
+      border-radius: 50%;
+      background: var(--orange);
+      cursor: pointer;
+      border: 2px solid #000;
+    }
+
+    /* Text input */
+    .mono-input {
+      background: #0e0e12;
+      border: 1px solid #1e1e1e;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'JetBrains Mono';
+      font-size: 13px;
+      color: #ccc;
+      width: 100%;
+      outline: none;
+      transition: border .2s;
+    }
+
+    .mono-input:focus {
+      border-color: var(--orange);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 24px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      font-family: 'JetBrains Mono';
+      cursor: pointer;
+      transition: all .2s;
+      border: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--orange);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: #fb923c;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid #1e1e1e;
+      color: #666;
+    }
+
+    .btn-ghost:hover {
+      border-color: #444;
+      color: #ccc;
+    }
+
+    .btn-green {
+      background: #166534;
+      color: #4ade80;
+      border: 1px solid #15803d;
+    }
+
+    .btn-green:hover {
+      background: #15803d;
+    }
+
+    .btn-purple {
+      background: linear-gradient(135deg, #7c3aed, #f97316);
+      color: #fff;
+    }
+
+    /* ===== MAIN AREA ===== */
+    #main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    /* Preview canvas area — DOMINANT */
+    #preview-wrap {
+      flex: 1;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #canvas-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      background: radial-gradient(circle at center, #0a0a0f 0%, #000 100%);
+    }
+
+    #preview-stage {
+      position: relative;
+      max-width: 90%;
+      max-height: 90%;
+      box-shadow: 0 30px 100px rgba(0, 0, 0, .8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+      background: #000;
+    }
+
+    #preview-canvas,
+    #video-el {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      /* Important for ratio preview */
+      display: none;
+      border-radius: 2px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Play/Pause overlay */
+    #play-overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    #play-btn-wrap {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, .55);
+      backdrop-filter: blur(8px);
+      border: 1.5px solid rgba(255, 255, 255, .15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .2s;
+      cursor: pointer;
+      pointer-events: all;
+      opacity: 0;
+      transform: scale(0.85);
+    }
+
+    #canvas-area:hover #play-btn-wrap {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    #play-btn-wrap:hover {
+      background: rgba(249, 115, 22, .4);
+      border-color: var(--orange);
+    }
+
+    #play-btn-wrap svg {
+      margin-left: 2px;
+    }
+
+    #play-btn-wrap.playing svg.play-icon {
+      display: none;
+    }
+
+    #play-btn-wrap:not(.playing) svg.pause-icon {
+      display: none;
+    }
+
+    #placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    /* Timeline strip */
+    #timeline-wrap {
+      padding: 6px 16px 8px;
+      background: #000;
+      border-top: 1px solid #0e0e0e;
+      flex-shrink: 0;
+      display: none;
+    }
+
+    #tc-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #timeline {
+      width: 100%;
+      height: 3px;
+      -webkit-appearance: none;
+      background: #1a1a1a;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    #timeline::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 14px;
+      width: 14px;
+      border-radius: 50%;
+      background: var(--orange);
+      cursor: pointer;
+      border: 2px solid #000;
+      box-shadow: 0 0 0 2px rgba(249, 115, 22, .3);
+    }
+
+    /* ===== FILMSTRIP GALLERY (horizontal) ===== */
+    #filmstrip-wrap {
+      border-top: 1px solid var(--border);
+      background: #050508;
+      flex-shrink: 0;
+    }
+
+    #filmstrip-header {
+      padding: 10px 16px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 1px solid #0e0e0e;
+    }
+
+    #filmstrip-header span {
+      font-size: 11px;
+      font-weight: 700;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      font-family: 'JetBrains Mono';
+    }
+
+    #filmstrip {
+      display: flex;
+      gap: 6px;
+      padding: 8px 12px;
+      overflow-x: auto;
+      height: 130px;
+      align-items: center;
+    }
+
+    #filmstrip-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 130px;
+      color: #1a1a1a;
+      font-size: 9px;
+      font-family: 'JetBrains Mono';
+      text-transform: uppercase;
+      letter-spacing: .2em;
+    }
+
+    /* Frame card in filmstrip */
+    .frame-card {
+      flex-shrink: 0;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      position: relative;
+      transition: all .2s;
+      background: #111;
+      width: auto;
+      height: 100px;
+      aspect-ratio: 16/9;
+    }
+
+    .frame-card:hover {
+      border-color: #444;
+      transform: translateY(-2px);
+    }
+
+    .frame-card.active-preview {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 1px var(--orange), 0 6px 20px rgba(249, 115, 22, .3);
+      transform: translateY(-3px);
+    }
+
+    .frame-card.selected {
+      border-color: var(--orange);
+    }
+
+    .frame-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .frame-card .tc-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+      padding: 6px 6px 4px;
+      font-size: 10px;
+      font-family: 'JetBrains Mono';
+      color: #eee;
+      font-weight: 700;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    }
+
+    .frame-card .sel-dot {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, .3);
+      background: rgba(0, 0, 0, .4);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+    }
+
+    .frame-card .card-actions {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      display: flex;
+      gap: 3px;
+      opacity: 0;
+      transition: opacity .15s;
+    }
+
+    .frame-card:hover .card-actions {
+      opacity: 1;
+    }
+
+    .card-act-btn {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(6px);
+      transition: background .15s;
+    }
+
+    .card-act-btn.dl {
+      background: rgba(0, 0, 0, .55);
+      color: #aaa;
+    }
+
+    .card-act-btn.dl:hover {
+      background: rgba(249, 115, 22, .7);
+      color: #fff;
+    }
+
+    .card-act-btn.del {
+      background: rgba(0, 0, 0, .55);
+      color: #aaa;
+    }
+
+    .card-act-btn.del:hover {
+      background: rgba(220, 38, 38, .7);
+      color: #fff;
+    }
+
+
+    .frame-card.selected .sel-dot {
+      background: var(--orange);
+      border-color: var(--orange);
+    }
+
+    /* Gallery Header Actions */
+    .gallery-action-btn {
+      background: none;
+      border: none;
+      font-family: 'JetBrains Mono';
+      font-size: 11px;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-weight: 700;
+      transition: color .2s;
+    }
+
+    .btn-sel-all {
+      color: #555;
+    }
+
+    .btn-sel-all:hover {
+      color: #aaa;
+    }
+
+    .btn-del-sel {
+      color: #555;
+    }
+
+    .btn-del-sel.has-selection {
+      color: var(--orange);
+    }
+
+    .btn-del-sel.has-selection:hover {
+      color: #fb923c;
+    }
+
+    .btn-clear {
+      color: #7f1d1d;
+    }
+
+    .btn-clear:hover {
+      color: #ef4444;
+    }
+
+    /* Lightbox */
+    #lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .95);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    #lightbox img {
+      max-width: 90vw;
+      max-height: 80vh;
+      border-radius: 4px;
+      object-fit: contain;
+    }
+
+    #lightbox video {
+      max-width: 90vw;
+      max-height: 80vh;
+      border-radius: 4px;
+      display: none;
+      outline: none;
+    }
+
+    #lightbox-tc {
+      font-family: 'JetBrains Mono';
+      font-size: 11px;
+      color: #555;
+    }
+
+    /* Bottom toolbar */
+    #toolbar {
+      padding: 8px 12px;
+      border-top: 1px solid var(--border);
+      background: #060608;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Render overlay */
+    #render-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .93);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .prog-wrap {
+      width: 240px;
+      height: 2px;
+      background: #1a1a1a;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .prog {
+      height: 100%;
+      background: var(--orange);
+      width: 0;
+      transition: width .3s;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .spin {
+      animation: spin 1s linear infinite;
+    }
+
+
+
+    /* Modal */
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .88);
+      backdrop-filter: blur(14px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-box {
+      background: #111;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      max-width: 340px;
+      width: 90%;
+      text-align: center;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 8px 20px;
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      z-index: 999;
+      font-family: 'JetBrains Mono';
+      pointer-events: none;
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0)
+      }
+    }
+
+    /* CTR row util */
+    .cr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    .lbl {
+      font-size: 10px;
+      font-family: 'JetBrains Mono';
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      color: #444;
+      display: block;
+      margin-bottom: 8px;
+    }
+    /* Timeline & Controls Redesign */
+    #timeline-wrap {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(10, 10, 12, 0.6);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+    }
+    .timeline-container {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    #timeline {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 4px;
+      background: #222;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    #timeline::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      background: var(--orange);
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+      transition: all 0.2s;
+    }
+    #timeline:hover::-webkit-slider-thumb {
+      transform: scale(1.2);
+      box-shadow: 0 0 15px rgba(249, 115, 22, 0.6);
+    }
+    
+    .controls-main-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    
+    .time-display-box {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #888;
+      min-width: 60px;
+    }
+    
+    .btn-group-center {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(0,0,0,0.2);
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    
+    .control-btn {
+      background: none;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
+    .control-btn:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .control-btn.primary {
+      color: #fff;
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .control-btn.capture-main {
+      width: 44px;
+      height: 44px;
+      background: var(--orange);
+      color: #fff;
+      border-radius: 50%;
+      box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+    }
+    .control-btn.capture-main:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header>
+    <div style="display:flex;align-items:center;gap:20px;">
+      <div style="display:flex;flex-direction:column;">
+        <h1
+          style="font-size:18px;font-family:'Noto Serif SC';font-weight:700;letter-spacing:.05em;background:linear-gradient(90deg,#fff,#888);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+          CINEMAGIC PRO</h1>
+        <p id="mode-label"
+          style="font-size:9px;font-family:'JetBrains Mono';color:rgba(249,115,22,.8);text-transform:uppercase;letter-spacing:.2em;font-weight:700;margin-top:2px;">
+          Standard Mode</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="mode-pill">
+        <button class="mode-btn active" id="btn-simple" onclick="switchMode('simple')">标准模式</button>
+        <button class="mode-btn" id="btn-pro" onclick="switchMode('pro')">PRO 模式</button>
+      </div>
+      <div id="user-tag"
+        style="padding:4px 12px;border:1px solid #222;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#555;text-transform:uppercase;background:#0d0d0f">
+        Free</div>
+      <button onclick="showModal('activate')"
+        style="font-size:10px;font-family:'JetBrains Mono';color:var(--orange);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.12em;font-weight:700;"
+        id="activate-btn">激活 Pro</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+
+    <!-- Sidebar -->
+    <aside id="sidebar">
+
+      <!-- STEP 01: Setup -->
+      <div class="blk">
+        <p class="sec-lbl"><span class="step-tag">Step 01</span>素材准备</p>
+
+        <label class="lbl">上传源视频</label>
+        <div class="upload-zone" id="upload-zone">
+          <input type="file" id="video-input" accept="video/*">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            style="margin:0 auto 12px;color:#333;display:block;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6 5 5 0 0117 15.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+          <p id="file-label"
+            style="font-size:12px;font-family:'JetBrains Mono';color:#444;text-transform:uppercase;letter-spacing:.12em;font-weight:700;">
+            拖入或点击上传</p>
+          <p style="font-size:9px;color:#2a2a2a;margin-top:6px;font-family:'JetBrains Mono'">MP4 · MOV · WebM · AVI</p>
+        </div>
+
+        <div style="margin-top:24px;">
+          <label class="lbl">画幅比例 <span
+              style="font-size:10px;color:#2a2a2a;text-transform:none;letter-spacing:0;margin-left:4px;">(影响预览与导出)</span></label>
+          <div class="ratio-grid">
+            <button class="ratio-btn" onclick="setRatio('9:16')" id="r-916">9:16<br><span
+                style="font-size:6px;opacity:.5">竖屏</span></button>
+            <button class="ratio-btn active" onclick="setRatio('16:9')" id="r-169">16:9<br><span
+                style="font-size:6px;opacity:.5">横屏</span></button>
+            <button class="ratio-btn" onclick="setRatio('1:1')" id="r-11">1:1<br><span
+                style="font-size:6px;opacity:.5">方形</span></button>
+            <button class="ratio-btn" onclick="setRatio('2.35:1')" id="r-235">2.35<br><span
+                style="font-size:6px;opacity:.5">电影</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 02: Extraction -->
+      <div class="blk" id="extract-group">
+        <p class="sec-lbl"><span class="step-tag">Step 02</span>序列抽帧</p>
+
+        <div id="simple-extract">
+          <div class="cr" style="margin-bottom:8px;"><span style="font-size:11px;color:#777">抽帧间隔</span><span
+              style="font-size:12px;font-family:'JetBrains Mono';color:var(--orange)" id="interval-val">1 秒</span></div>
+          <input type="range" id="interval-slider" min="0.5" max="10" step="0.5" value="1" style="margin-bottom:20px;">
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-primary" style="flex:1;" onclick="startExtract()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21" />
+              </svg>
+              间隔抽帧
+            </button>
+            <button class="btn btn-purple" style="flex:1; background:linear-gradient(135deg,#7c3aed,#4f46e5); border:none;" onclick="handleProAction('ai-extract')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" />
+              </svg>
+              AI 智能抽帧 <span style="font-size:7px;background:rgba(255,255,255,.2);padding:1px 3px;border-radius:2px;margin-left:3px;">PRO</span>
+            </button>
+          </div>
+        </div>
+
+
+      </div>
+
+      <!-- STEP 03: Rendering -->
+      <div class="blk" id="render-group">
+        <p class="sec-lbl"><span class="step-tag">Step 03</span>电影级渲染</p>
+
+        <div id="render-settings-wrap">
+          <label class="lbl">视觉风格 <span style="font-size:9px;color:#2a2a2a;text-transform:none;letter-spacing:0;margin-left:4px;">(对标主流创作预设)</span></label>
+          
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:10px;">
+            <div class="style-card active" id="sc-cinema" onclick="setStyle('cinema')" style="padding:10px;">
+              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">经典电影</div>
+              <div style="font-size:8px;color:#444;margin-top:2px;">行业基准 · 叙事感</div>
+            </div>
+            <div class="style-card" id="sc-film" onclick="setStyle('film')" style="padding:10px;">
+              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">复古胶片</div>
+              <div style="font-size:8px;color:#444;margin-top:2px;">暖调回忆 · 颗粒感</div>
+            </div>
+            <div class="style-card" id="sc-vibe" onclick="setStyle('vibe')" style="padding:10px;">
+              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">法式浪漫</div>
+              <div style="font-size:8px;color:#444;margin-top:2px;">氛围感 · 清冷调</div>
+            </div>
+            <div class="style-card" id="sc-vlog" onclick="setStyle('vlog')" style="padding:10px;">
+              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">极简 VLOG</div>
+              <div style="font-size:8px;color:#444;margin-top:2px;">通透自然 · 记录</div>
+            </div>
+          </div>
+
+          <div class="style-card" id="sc-noir" onclick="handleProStyle('noir')" style="margin-top:0;">
+            <div class="style-card" id="sc-noir" onclick="handleProStyle('noir')" style="margin-top:0;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:14px;font-family:'Noto Serif SC';font-weight:700;color:#666" id="noir-lbl">黑白叙事</span>
+                <span style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:3px;font-family:'JetBrains Mono';">PRO</span>
+              </div>
+              <div style="font-size:8px;color:#333;margin-top:2px;">极致冲突 · 艺术表达力</div>
+            </div>
+            
+            <div class="style-card" id="sc-cyber" onclick="handleProStyle('cyber')" style="margin-top:6px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:14px;font-family:'Noto Serif SC';font-weight:700;color:#666" id="cyber-lbl">赛博未来</span>
+                <span style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:3px;font-family:'JetBrains Mono';">PRO</span>
+              </div>
+              <div style="font-size:8px;color:#333;margin-top:2px;">霓虹都市 · 幻想感</div>
+            </div>
+          </div>
+
+          <div id="pro-controls" style="display:none;margin-top:20px;flex-direction:column;gap:15px;">
+            <div style="padding:12px;background:#0d0d12;border-radius:8px;border:1px solid #1a1a1a;">
+              <p
+                style="font-size:9px;font-family:'JetBrains Mono';color:#444;margin-bottom:12px;text-transform:uppercase">
+                Advanced Parameters</p>
+              <div class="cr"><span style="font-size:10px;color:#555">FPS</span><span
+                  style="font-size:11px;font-family:'JetBrains Mono';color:var(--orange)" id="pro-fps-val">12</span>
+              </div>
+              <input type="range" id="pro-fps" min="1" max="30" value="12" style="margin-bottom:12px;">
+
+              <div class="cr"><span style="font-size:10px;color:#555">快门角</span><span
+                  style="font-size:11px;font-family:'JetBrains Mono';color:var(--orange)"
+                  id="pro-shutter-val">180°</span></div>
+              <input type="range" id="pro-shutter" min="0" max="360" value="180" style="margin-bottom:12px;">
+
+              <div class="cr"><span style="font-size:10px;color:#555">色温偏移</span><span
+                  style="font-size:11px;font-family:'JetBrains Mono';color:var(--orange)" id="pro-temp-val">0</span>
+              </div>
+              <input type="range" id="pro-temp" min="-100" max="100" value="0">
+            </div>
+
+            <div style="margin-top:20px;">
+              <label class="lbl">Pro 精确制导 <span
+                  style="font-size:9px;color:#2a2a2a;text-transform:none;letter-spacing:0;margin-left:4px;">(输入并回车)</span></label>
+              <div style="display:flex;gap:5px;">
+                <input class="mono-input" id="tc-input" value="00:00:00" style="flex:1;">
+                <button class="btn btn-ghost" onclick="seekToTimecode()" style="padding:10px 15px;">GO</button>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-purple" style="width:100%;margin-top:24px;box-shadow:0 10px 20px rgba(124,58,237,.2)"
+            onclick="startCinematicRender()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              style="margin-right:4px;">
+              <path d="M23 7l-7 5 7 5V7z"></path>
+              <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+            </svg>
+            生成电影视频
+          </button>
+        </div>
+      </div>
+
+      <div
+        style="padding:10px 14px;font-size:6px;color:#1a1a1a;font-family:'JetBrains Mono';text-transform:uppercase;letter-spacing:.15em;margin-top:auto;">
+        Build v4.1.0 · PLATFORM</div>
+    </aside>
+
+    <!-- Main -->
+    <main id="main">
+
+      <!-- Video Preview (DOMINANT) -->
+      <div id="preview-wrap">
+        <div id="canvas-area">
+          <div id="preview-stage" style="aspect-ratio: 16/9;">
+            <video id="video-el" preload="auto" crossorigin="anonymous"></video>
+            <canvas id="preview-canvas"></canvas>
+          </div>
+          <div id="play-overlay">
+            <div id="play-btn-wrap" onclick="togglePlay()">
+              <svg class="play-icon" width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <polygon points="5 3 19 12 5 21" />
+              </svg>
+              <svg class="pause-icon" width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <rect x="6" y="4" width="4" height="16" />
+                <rect x="14" y="4" width="4" height="16" />
+              </svg>
+            </div>
+          </div>
+          <div id="placeholder">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+              <line x1="8" y1="21" x2="16" y2="21" />
+              <line x1="12" y1="17" x2="12" y2="21" />
+            </svg>
+            <p
+              style="font-size:10px;font-family:'JetBrains Mono';color:#1a1a1a;text-transform:uppercase;letter-spacing:.4em;font-weight:700;">
+              Cinematic Workspace</p>
+            <p style="font-size:8px;color:#0a0a0d;margin-top:4px;">从左侧加载视频后开始创作</p>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div id="timeline-wrap">
+          <div class="timeline-container">
+            <input type="range" id="timeline" min="0" max="100" step="0.01" value="0">
+          </div>
+          
+          <div class="controls-main-row">
+            <div class="time-display-box" id="tc-current">00:00:00</div>
+            
+            <div class="btn-group-center">
+              <button class="control-btn" onclick="stepFrame(-1)" title="后退一帧 (左方向键)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="11 19 2 12 11 5 11 19"></polygon>
+                  <polygon points="22 19 13 12 22 5 22 19"></polygon>
+                </svg>
+              </button>
+              
+              <button class="control-btn primary" onclick="togglePlay()" id="play-btn-main" title="播放/暂停 (空格)">
+                <svg id="pbs-play" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5 3 19 12 5 21" />
+                </svg>
+                <svg id="pbs-pause" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+                  <rect x="6" y="4" width="4" height="16" />
+                  <rect x="14" y="4" width="4" height="16" />
+                </svg>
+              </button>
+
+              <button class="control-btn capture-main" onclick="captureCurrentFrame()" title="AI 精准截帧 (C)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+              </button>
+              
+              <button class="control-btn" onclick="stepFrame(1)" title="前进一帧 (右方向键)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="13 19 22 12 13 5 13 19"></polygon>
+                  <polygon points="2 19 11 12 2 5 2 19"></polygon>
+                </svg>
+              </button>
+            </div>
+            
+            <div class="time-display-box" style="text-align: right;" id="tc-duration">00:00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="filmstrip-wrap">
+        <div id="filmstrip-header">
+          <div class="mode-pill" style="padding:2px; background:#000; width:fit-content;">
+            <button id="tab-frames" class="mode-btn active" style="padding:4px 10px; font-size:10px;"
+              onclick="switchGalleryTab('frames')">帧</button>
+            <button id="tab-videos" class="mode-btn" style="padding:4px 10px; font-size:10px;"
+              onclick="switchGalleryTab('videos')">视频</button>
+          </div>
+          <span style="font-size:11px; font-weight:700; color:#666; font-family:'JetBrains Mono'; white-space:nowrap;">
+            已选 <span id="sel-count" style="color:#fff;">0</span> / <span id="frame-count">0</span>
+          </span>
+          <div style="display:flex; gap:15px; align-items:center;">
+            <button id="btn-sel-all" class="gallery-action-btn btn-sel-all" onclick="selAll()">全选</button>
+            <button id="btn-del-sel" class="gallery-action-btn btn-del-sel" onclick="deleteSelected()">删除选中</button>
+            <button class="gallery-action-btn btn-clear" onclick="clearGallery()">清空</button>
+          </div>
+        </div>
+        <div id="filmstrip-empty">NO ITEMS</div>
+        <div id="filmstrip" style="display:none;"></div>
+        <div id="videostrip"
+          style="display:none; gap:6px; padding:8px 12px; overflow-x:auto; height:130px; align-items:center;"></div>
+      </div>
+
+      <!-- Toolbar -->
+      <div id="toolbar">
+
+        <button class="btn btn-ghost" onclick="exportZip()">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 15V3m-4 8l4 4 4-4m-9 8h10a2 2 0 002-2v-2H3v2a2 2 0 002 2z" />
+          </svg>
+          ZIP 下载
+        </button>
+        <div style="display:flex;align-items:center;gap:6px;background:#0d0d0f;padding:2px;border-radius:6px;border:1px solid #1a1a1a;">
+          <select id="pdf-template" style="background:none;border:none;color:#555;font-size:8px;font-family:'JetBrains Mono';padding:0 6px;cursor:pointer;outline:none;">
+            <option value="classic">标准网格 (3x2)</option>
+            <option value="script">导演脚本 (1xH)</option>
+            <option value="banner">艺术海报 (Banner)</option>
+          </select>
+          <button class="btn btn-ghost" onclick="handleProAction('pdf')" style="padding:8px 12px;border:none;">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            分镜表 PDF <span style="background:var(--orange);color:#000;font-size:6px;padding:1px 3px;border-radius:2px;margin-left:3px;font-weight:900;">PRO</span>
+          </button>
+        </div>
+        <div style="flex:1;"></div>
+        <div id="download-zone" style="display:none;">
+          <button class="btn btn-green" id="btn-download">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            保存电影视频
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Lightbox (click frame to full preview) -->
+  <div id="lightbox" onclick="closeLightbox(event)">
+    <img id="lightbox-img" src="" alt="">
+    <video id="lightbox-video" controls></video>
+    <div id="lightbox-tc"></div>
+    <div style="font-size:7px;font-family:'JetBrains Mono';color:#333;text-transform:uppercase;letter-spacing:.15em;">
+      点击任意处关闭</div>
+  </div>
+
+  <!-- Render Overlay -->
+  <div id="render-overlay">
+    <svg class="spin" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2">
+      <circle cx="12" cy="12" r="10" stroke-opacity=".15" />
+      <path d="M12 2a10 10 0 0110 10" stroke-linecap="round" />
+    </svg>
+    <div
+      style="font-size:9px;font-family:'JetBrains Mono';color:var(--orange);text-transform:uppercase;letter-spacing:.25em;"
+      id="render-status">Processing...</div>
+    <div class="prog-wrap">
+      <div class="prog" id="progress-bar"></div>
+    </div>
+    <div style="font-size:11px;font-family:'JetBrains Mono';color:#444;" id="render-percent">0%</div>
+    <button onclick="cancelRender()"
+      style="margin-top:4px;padding:5px 16px;border:1px solid #2a2a2a;border-radius:999px;font-size:8px;font-family:'JetBrains Mono';color:#444;background:none;cursor:pointer;text-transform:uppercase;">取消</button>
+  </div>
+
+  <!-- Activate Modal -->
+  <div class="modal-bg" id="activate-modal">
+    <div class="modal-box">
+      <h2 style="font-family:'Noto Serif SC';font-size:18px;margin-bottom:5px;">解锁专业授权</h2>
+      <p
+        style="font-size:8px;font-family:'JetBrains Mono';color:#555;text-transform:uppercase;letter-spacing:.15em;margin-bottom:20px;">
+        输入作者授权码</p>
+      <input class="mono-input" id="license-input" placeholder="XXXXXXXXXX"
+        style="text-align:center;letter-spacing:.25em;margin-bottom:10px;">
+      <button onclick="validateLicense()"
+        style="width:100%;padding:11px;background:#fff;color:#000;border:none;border-radius:9px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.15em;cursor:pointer;"
+        onmouseover="this.style.background='var(--orange)';this.style.color='#000'"
+        onmouseout="this.style.background='#fff'">即刻解锁</button>
+      <button onclick="hideModal('activate')"
+        style="display:block;margin:10px auto 0;font-size:8px;font-family:'JetBrains Mono';color:#333;background:none;border:none;cursor:pointer;">取消</button>
+    </div>
+  </div>
+
+  <script>
+    // ===== State =====
+    const AUTH_SERVER = "http://localhost:3000/api";
+    let isPro = false;
+    let blazefaceModel = null;
+    let audioEnergyData = []; // Store RMS energy levels per second
+    let isAIInitializing = false;
+    let currentMode = 'simple';
+    let currentStyle = 'cinema';
+    let currentRatio = '16:9';
+    let videoFile = null;
+    let videoReady = false;
+    let isRendering = false;
+    let capturedFrames = [];
+    let selectedFrames = new Set();
+    let generatedVideos = [];
+    let selectedVideos = new Set();
+    let activePreviewIdx = -1;
+    let currentGalleryTab = 'frames';
+    let renderChunks = [];
+    let masteredFiles = [];
+
+    const videoEl = document.getElementById('video-el');
+    const pvCanvas = document.getElementById('preview-canvas');
+    const pvCtx = pvCanvas.getContext('2d');
+
+    const presets = {
+      cinema: { name: '经典电影', sub: '行业基准 · 叙事感', fps: 12, shutter: 180, filter: 'contrast(1.15) saturate(0.85) brightness(0.95) sepia(0.05)', emotionProfile: 'wave' },
+      film: { name: '复古胶片', sub: '暖调回忆 · 颗粒感', fps: 8, shutter: 240, filter: 'contrast(1.1) saturate(1.2) sepia(0.3) brightness(1.05)', emotionProfile: 'constant' },
+      vibe: { name: '法式浪漫', sub: '清冷氛围 · 情绪拉满', fps: 20, shutter: 120, filter: 'contrast(0.9) saturate(0.7) brightness(1.1) hue-rotate(-10deg) opacity(0.9)', emotionProfile: 'wave' },
+      vlog: { name: '极简 VLOG', sub: '清爽通透 · 记录生活', fps: 24, shutter: 90, filter: 'contrast(1.1) saturate(1.1) brightness(1.15)', emotionProfile: 'burst' },
+      noir: { name: '黑白叙事', sub: '极致冲突 · 艺术表达', fps: 10, shutter: 320, filter: 'grayscale(1) contrast(1.7) brightness(0.9)', emotionProfile: 'constant', isPro: true },
+      cyber: { name: '赛博未来', sub: '霓虹都市 · 幻想感', fps: 22, shutter: 180, filter: 'contrast(1.3) saturate(1.8) hue-rotate(180deg) brightness(1.1)', emotionProfile: 'burst', isPro: true }
+    };
+
+    if (isPro) applyProStatus();
+
+    // ===== Mode =====
+    function switchMode(mode) {
+      currentMode = mode;
+      document.getElementById('btn-simple').classList.toggle('active', mode === 'simple');
+      document.getElementById('btn-pro').classList.toggle('active', mode === 'pro');
+      document.getElementById('mode-label').innerText = mode === 'simple' ? 'Simple Mode' : 'Pro Mode';
+
+      // Update sidebar sections
+      const isP = isPro;
+      document.getElementById('pro-controls').style.display = (mode === 'pro' && isP) ? 'flex' : 'none';
+
+      if (mode === 'pro' && !isP) showModal('activate');
+    }
+
+    // ===== Pro =====
+    function applyProStatus() {
+      isPro = true; localStorage.setItem('cine_pro', 'true');
+      const tag = document.getElementById('user-tag');
+      tag.innerText = 'Dev Auth'; tag.style.color = '#4ade80'; tag.style.borderColor = '#166534';
+      document.getElementById('activate-btn').style.display = 'none';
+      document.getElementById('noir-lbl').style.color = '#e2e2e2';
+
+      // Reveal Pro elements
+      if (currentMode === 'pro') document.getElementById('pro-controls').style.display = 'flex';
+    }
+
+    async function validateLicense() {
+      const code = document.getElementById('license-input').value.trim().toUpperCase();
+      if (!code) return toast('请输入授权码', true);
+
+      toast('正在验证授权...');
+      
+      try {
+        // 尝试获取 IP 和 地理位置 (使用公共 API)
+        let ipInfo = { ip: 'unknown', city: '未知' };
+        try {
+          const ipRes = await fetch('https://ipapi.co/json/');
+          ipInfo = await ipRes.json();
+        } catch (e) { console.warn("AI: Location fetch failed", e); }
+
+        const res = await fetch(`${AUTH_SERVER}/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            code, 
+            ip: ipInfo.ip, 
+            location: ipInfo.city + ' (自动识别)'
+          })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+          applyProStatus(); 
+          hideModal('activate'); 
+          toast('专业授权成功！欢迎回来');
+          if (currentMode === 'pro') switchMode('pro');
+        } else {
+          toast(data.message || '授权码无效', true);
+        }
+      } catch (err) {
+        console.error(err);
+        toast('服务器连接失败，请检查后端是否运行', true);
+      }
+    }
+
+    // ===== Style =====
+    function setStyle(id) {
+      currentStyle = id;
+      document.querySelectorAll('.style-card').forEach(c => c.classList.remove('active'));
+      document.getElementById('sc-' + id).classList.add('active');
+      if (videoReady) drawVideoFrame();
+    }
+    function handleProStyle(id) { if (!isPro) { showModal('activate'); return; } setStyle(id); }
+
+    // ===== Ratio =====
+    const ratioIds = { '9:16': 'r-916', '16:9': 'r-169', '1:1': 'r-11', '2.35:1': 'r-235' };
+    const ratioValues = { '9:16': 9 / 16, '16:9': 16 / 9, '1:1': 1, '2.35:1': 2.35 };
+
+    function setRatio(r) {
+      currentRatio = r;
+      document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(ratioIds[r]).classList.add('active');
+
+      // Update preview stage aspect Ratio
+      const stage = document.getElementById('preview-stage');
+      const val = ratioValues[r];
+      stage.style.aspectRatio = r.replace(':', '/');
+
+      toast(`画幅已切至 ${r}`);
+    }
+
+    // ===== Video Load =====
+    document.getElementById('video-input').onchange = e => { loadVideoFile(e.target.files[0]); };
+    const uzone = document.getElementById('upload-zone');
+    uzone.addEventListener('dragover', e => { e.preventDefault(); uzone.classList.add('dragover'); });
+    uzone.addEventListener('dragleave', () => uzone.classList.remove('dragover'));
+    uzone.addEventListener('drop', e => {
+      e.preventDefault(); uzone.classList.remove('dragover');
+      const f = e.dataTransfer.files[0];
+      if (f && f.type.startsWith('video/')) loadVideoFile(f);
+    });
+
+    let isVideoMode = true; // true = showing live video, false = showing captured frame on canvas
+
+    function showVideoView() {
+      isVideoMode = true;
+      videoEl.style.display = 'block';
+      pvCanvas.style.display = 'none';
+      document.getElementById('play-overlay').style.display = 'flex';
+      activePreviewIdx = -1;
+      document.querySelectorAll('.frame-card').forEach(el => el.classList.remove('active-preview'));
+    }
+
+    function showCanvasView() {
+      isVideoMode = false;
+      pvCanvas.style.display = 'block';
+      videoEl.style.display = 'none';
+      document.getElementById('play-overlay').style.display = 'none';
+    }
+
+    function onCanvasAreaClick(e) {
+      // If clicking canvas-area background (not overlay btn), and in canvas mode → back to video
+      if (!isVideoMode && e.target === document.getElementById('canvas-area')) {
+        showVideoView();
+      }
+    }
+
+    function loadVideoFile(file) {
+      if (!file) return;
+      videoFile = file;
+      document.getElementById('file-label').innerText = file.name.length > 22 ? file.name.slice(0, 20) + '…' : file.name;
+      const url = URL.createObjectURL(file);
+      videoEl.src = url;
+      videoEl.onloadedmetadata = () => {
+        videoReady = true;
+        document.getElementById('placeholder').style.display = 'none';
+        document.getElementById('timeline-wrap').style.display = 'block';
+        loadAIModel();
+        document.getElementById('tc-duration').innerText = fmtTime(videoEl.duration);
+        document.getElementById('timeline').max = videoEl.duration;
+        showVideoView();
+        // Auto-play
+        videoEl.play().catch(() => { });
+        updatePlayBtn(true);
+        toast('视频加载成功 — ' + fmtTime(videoEl.duration));
+      };
+      videoEl.load();
+    }
+
+    function drawVideoFrame() {
+      if (!videoReady) return;
+      pvCanvas.width = videoEl.videoWidth || 1280;
+      pvCanvas.height = videoEl.videoHeight || 720;
+      pvCtx.filter = presets[currentStyle]?.filter || 'none';
+      pvCtx.drawImage(videoEl, 0, 0);
+      pvCtx.filter = 'none';
+    }
+
+    // ===== Play / Pause =====
+    async function loadAIModel() {
+      if (blazefaceModel || isAIInitializing) return;
+      isAIInitializing = true;
+      console.log("AI: Loading BlazeFace model...");
+      try {
+        blazefaceModel = await blazeface.load();
+        console.log("AI: BlazeFace loaded successfully.");
+      } catch (e) {
+        console.error("AI: Model load failed", e);
+      } finally {
+        isAIInitializing = false;
+      }
+    }
+
+    async function analyzeAudioEnergy() {
+      if (!videoEl || !videoEl.src) return;
+      console.log("AI: Starting Audio Waveform Analysis...");
+      try {
+        const response = await fetch(videoEl.src);
+        const arrayBuffer = await response.arrayBuffer();
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const tempCtx = new AudioContext();
+        const audioBuffer = await tempCtx.decodeAudioData(arrayBuffer);
+        
+        const rawData = audioBuffer.getChannelData(0); // Use first channel
+        const samplesPerSecond = audioBuffer.sampleRate;
+        audioEnergyData = [];
+        
+        for (let s = 0; s < audioBuffer.duration; s++) {
+          let sum = 0;
+          const start = Math.floor(s * samplesPerSecond);
+          const end = Math.floor((s + 1) * samplesPerSecond);
+          for (let i = start; i < end && i < rawData.length; i++) {
+            sum += rawData[i] * rawData[i];
+          }
+          audioEnergyData.push(Math.sqrt(sum / (end - start))); // RMS
+        }
+        console.log("AI: Audio Analysis completed.");
+      } catch (e) {
+        console.warn("AI: Audio analysis skipped (no track or error)", e);
+      }
+    }
+
+    function togglePlay() {
+      if (!videoReady) return;
+      if (videoEl.paused) {
+        if (!isVideoMode) showVideoView();
+        videoEl.play();
+        updatePlayBtn(true);
+      } else {
+        videoEl.pause();
+        updatePlayBtn(false);
+      }
+    }
+
+    function updatePlayBtn(playing) {
+      const wrap = document.getElementById('play-btn-main');
+      if (playing) wrap.classList.add('playing'); else wrap.classList.remove('playing');
+      document.getElementById('pbs-play').style.display = playing ? 'none' : 'block';
+      document.getElementById('pbs-pause').style.display = playing ? 'block' : 'none';
+    }
+
+    videoEl.onplay = () => updatePlayBtn(true);
+    videoEl.onpause = () => updatePlayBtn(false);
+    videoEl.onended = () => updatePlayBtn(false);
+
+    // ===== Timeline =====
+    let isScrubbing = false;
+    document.getElementById('timeline').oninput = e => {
+      if (!videoReady) return;
+      isScrubbing = true;
+      const t = parseFloat(e.target.value);
+      videoEl.currentTime = t;
+      document.getElementById('tc-current').innerText = fmtTime(t);
+    };
+    document.getElementById('timeline').onchange = () => { isScrubbing = false; };
+
+    videoEl.onseeked = () => { if (isVideoMode) { } }; // video element renders itself
+    videoEl.ontimeupdate = () => {
+      if (isScrubbing) return;
+      const cur = videoEl.currentTime;
+      document.getElementById('tc-current').innerText = fmtTime(cur);
+      document.getElementById('timeline').value = cur;
+
+      // Sync Sidebar TC Input (only if not focused)
+      const tci = document.getElementById('tc-input');
+      if (document.activeElement !== tci) {
+        tci.value = fmtTimeFull(cur);
+      }
+    };
+
+    // ===== Navigation & Shortcuts =====
+    function stepFrame(dir) {
+      if (!videoReady) return;
+      const fps = presets[currentStyle]?.fps || 24;
+      const frameTime = 1 / fps;
+      videoEl.currentTime = Math.max(0, Math.min(videoEl.duration, videoEl.currentTime + (dir * frameTime)));
+    }
+
+    window.addEventListener('keydown', e => {
+      if (document.activeElement.tagName === 'INPUT') return;
+      if (e.key === 'ArrowLeft') { e.preventDefault(); stepFrame(-1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); stepFrame(1); }
+      if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+      if (e.key.toLowerCase() === 'c') { e.preventDefault(); captureCurrentFrame(); }
+    });
+
+    // ===== Timecode =====
+    function seekToTimecode() {
+      if (!videoReady) return;
+      const raw = document.getElementById('tc-input').value.trim();
+      const parts = raw.split(':').map(Number);
+      let s = 0;
+      if (parts.length === 3) s = parts[0] * 3600 + parts[1] * 60 + parts[2];
+      else if (parts.length === 2) s = parts[0] * 60 + parts[1];
+      else s = parts[0];
+
+      if (isNaN(s)) { toast('无效的时间格式', true); return; }
+
+      if (s > videoEl.duration) {
+        toast(`时间超出视频范围 (Max: ${fmtTimeFull(videoEl.duration)})`, true);
+        return;
+      }
+
+      videoEl.currentTime = s;
+      toast('跳转至 ' + fmtTimeFull(s));
+    }
+    document.getElementById('tc-input').onkeydown = e => { if (e.key === 'Enter') seekToTimecode(); };
+
+    function handleProAction(action) {
+      if (!isPro) { showModal('activate'); return; }
+      if (action === 'pdf') exportPDF();
+      if (action === 'ai-extract') startAISceneExtract();
+    }
+
+    function fmtTimeFull(s) {
+      if (isNaN(s)) return '00:00:00';
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const sec = Math.floor(s % 60);
+      return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+    }
+
+    // ===== Sliders =====
+    document.getElementById('interval-slider').oninput = e => { document.getElementById('interval-val').innerText = e.target.value + ' 秒'; };
+    document.getElementById('pro-fps').oninput = e => { document.getElementById('pro-fps-val').innerText = e.target.value; };
+    document.getElementById('pro-shutter').oninput = e => { document.getElementById('pro-shutter-val').innerText = e.target.value + '°'; };
+    document.getElementById('pro-temp').oninput = e => { document.getElementById('pro-temp-val').innerText = e.target.value; };
+
+    // ===== Frame capture =====
+    function addFrame(dataUrl, timecode, silent = false) {
+      const idx = capturedFrames.length;
+      capturedFrames.push({ dataUrl, timecode, index: idx });
+      renderFilmstrip();
+      // Only auto-jump to frame in filmstrip when NOT silent
+      if (!silent) {
+        document.getElementById('fc-' + idx)?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+
+    function renderFilmstrip() {
+      const strip = document.getElementById('filmstrip');
+      const empty = document.getElementById('filmstrip-empty');
+      const vstrip = document.getElementById('videostrip');
+      const btnSelAll = document.getElementById('btn-sel-all');
+      const btnDelSel = document.getElementById('btn-del-sel');
+      const items = currentGalleryTab === 'frames' ? capturedFrames : generatedVideos;
+      const sel = currentGalleryTab === 'frames' ? selectedFrames : selectedVideos;
+
+      document.getElementById('frame-count').innerText = items.length;
+      document.getElementById('sel-count').innerText = sel.size;
+
+      if (sel.size > 0) {
+        btnDelSel.classList.add('has-selection');
+      } else {
+        btnDelSel.classList.remove('has-selection');
+      }
+
+      if (sel.size === 0) {
+        btnSelAll.innerText = '全选';
+      } else if (sel.size === items.length && items.length > 0) {
+        btnSelAll.innerText = '取消全选';
+      } else {
+        btnSelAll.innerText = '取消选中';
+      }
+
+      if (currentGalleryTab === 'frames') {
+        vstrip.style.display = 'none';
+        if (items.length === 0) {
+          strip.style.display = 'none';
+          empty.style.display = 'flex';
+          return;
+        }
+        empty.style.display = 'none';
+        strip.style.display = 'flex';
+
+        strip.innerHTML = items.map((f, i) => `
+        <div class="frame-card ${i === activePreviewIdx ? 'active-preview' : ''} ${sel.has(i) ? 'selected' : ''}" id="fc-${i}">
+          <img src="${f.dataUrl}" alt="frame ${i}" onclick="previewFrame(${i})">
+          <div class="sel-dot" onclick="toggleSel(event,${i})">
+            ${sel.has(i) ? '<svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+          </div>
+          <div class="card-actions">
+            <button class="card-act-btn dl" title="下载" onclick="downloadFrame(event,${i})">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M12 15V4m-4 7l4 4 4-4"/><path stroke-linecap="round" d="M4 20h16"/></svg>
+            </button>
+            <button class="card-act-btn del" title="删除" onclick="deleteFrame(event,${i})">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="tc-label">${f.timecode}</div>
+        </div>
+        `).join('');
+      } else {
+        // Videos tab
+        strip.style.display = 'none';
+        if (items.length === 0) {
+          vstrip.style.display = 'none';
+          empty.style.display = 'flex';
+          return;
+        }
+        vstrip.style.display = 'flex';
+        empty.style.display = 'none';
+
+        vstrip.innerHTML = items.map((vid, i) => `
+        <div class="frame-card ${sel.has(i) ? 'selected' : ''}" style="position:relative;" onclick="previewVideo(${i})">
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#222;color:#555;">
+            ${vid.cover ? `<img src="${vid.cover}" style="width:100%;height:100%;object-fit:cover;border-radius:2px;">` : `
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>`}
+          </div>
+          <div class="sel-dot" onclick="toggleSel(event,${i})">
+            ${sel.has(i) ? '<svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+          </div>
+          <div class="tc-label">Movie_${i + 1}.mp4</div>
+          <div class="card-actions">
+            <button class="card-act-btn dl" onclick="event.stopPropagation(); dlBlob(items[${i}].blob, 'CineMagic_Movie_${i + 1}.mp4')">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            </button>
+            <button class="card-act-btn del" onclick="event.stopPropagation(); deleteVideo(${i})">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+            </button>
+          </div>
+        </div>
+        `).join('');
+      }
+    }
+
+    function deleteVideo(i) {
+      const url = generatedVideos[i].url;
+      if (url) URL.revokeObjectURL(url);
+      generatedVideos.splice(i, 1);
+      toast('已删除视频');
+      renderFilmstrip();
+    }
+
+    function switchGalleryTab(tab) {
+      currentGalleryTab = tab;
+      document.getElementById('tab-frames').classList.toggle('active', tab === 'frames');
+      document.getElementById('tab-videos').classList.toggle('active', tab === 'videos');
+      renderFilmstrip();
+    }
+
+    function previewVideo(i) {
+      if (!generatedVideos[i]) return;
+      const lb = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-img');
+      const vid = document.getElementById('lightbox-video');
+      const tc = document.getElementById('lightbox-tc');
+
+      img.style.display = 'none';
+      vid.style.display = 'block';
+      if (!generatedVideos[i].url) {
+        generatedVideos[i].url = URL.createObjectURL(generatedVideos[i].blob);
+      }
+      vid.src = generatedVideos[i].url;
+
+      tc.innerText = `Movie_${i + 1}.mp4`;
+      lb.style.display = 'flex';
+      vid.play().catch(e => console.warn("Auto-play prevented", e));
+    }
+
+    function previewFrame(idx) {
+      activePreviewIdx = idx;
+      const f = capturedFrames[idx];
+      // Pause video and switch to canvas view
+      if (!videoEl.paused) { videoEl.pause(); updatePlayBtn(false); }
+      showCanvasView();
+      const img = new Image();
+      img.onload = () => {
+        pvCanvas.width = img.naturalWidth;
+        pvCanvas.height = img.naturalHeight;
+        pvCtx.drawImage(img, 0, 0);
+      };
+      img.src = f.dataUrl;
+      // Update filmstrip highlight
+      document.querySelectorAll('.frame-card').forEach((el, i) => el.classList.toggle('active-preview', i === idx));
+      // Scroll into view
+      document.getElementById('fc-' + idx)?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+
+    function openLightbox(idx) {
+      const f = capturedFrames[idx];
+      document.getElementById('lightbox-img').src = f.dataUrl;
+      document.getElementById('lightbox-tc').innerText = 'TC: ' + f.timecode + ' — Frame #' + String(f.index + 1).padStart(4, '0');
+      document.getElementById('lightbox').style.display = 'flex';
+    }
+    function closeLightbox() { document.getElementById('lightbox').style.display = 'none'; }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+
+
+    function downloadFrame(e, idx) {
+      e.stopPropagation();
+      const f = capturedFrames[idx];
+      const a = document.createElement('a');
+      a.href = f.dataUrl;
+      a.download = `frame_${String(idx + 1).padStart(4, '0')}_${f.timecode.replace(/:/g, '-')}.jpg`;
+      a.click();
+    }
+
+    function deleteFrame(e, idx) {
+      e.stopPropagation();
+      if (activePreviewIdx === idx && !isVideoMode) showVideoView();
+      capturedFrames.splice(idx, 1);
+      // Re-index
+      capturedFrames.forEach((f, i) => f.index = i);
+      // Rebuild selectedFrames with shifted indices
+      const newSel = new Set();
+      selectedFrames.forEach(s => { if (s < idx) newSel.add(s); else if (s > idx) newSel.add(s - 1); });
+      selectedFrames = newSel;
+      if (activePreviewIdx > idx) activePreviewIdx--;
+      else if (activePreviewIdx === idx) activePreviewIdx = -1;
+      renderFilmstrip();
+    }
+
+    function toggleSel(e, idx) {
+      e.stopPropagation();
+      if (currentGalleryTab === 'frames') {
+        if (selectedFrames.has(idx)) selectedFrames.delete(idx); else selectedFrames.add(idx);
+      } else {
+        if (selectedVideos.has(idx)) selectedVideos.delete(idx); else selectedVideos.add(idx);
+      }
+      renderFilmstrip();
+    }
+    function selAll() {
+      const items = currentGalleryTab === 'frames' ? capturedFrames : generatedVideos;
+      const sel = currentGalleryTab === 'frames' ? selectedFrames : selectedVideos;
+      
+      if (sel.size > 0) {
+        sel.clear();
+      } else {
+        items.forEach((_, i) => sel.add(i));
+      }
+      renderFilmstrip();
+    }
+    function deleteSelected() {
+      if (currentGalleryTab === 'frames') {
+        if (selectedFrames.size === 0) { toast('请先选择要删除的帧', true); return; }
+        const sortedIdx = [...selectedFrames].sort((a, b) => b - a);
+        sortedIdx.forEach(idx => capturedFrames.splice(idx, 1));
+        selectedFrames.clear();
+        activePreviewIdx = -1;
+        toast('已删除选中帧');
+        if (capturedFrames.length === 0) document.getElementById('download-zone').style.display = 'none';
+      } else {
+        if (selectedVideos.size === 0) { toast('请先选择要删除的视频', true); return; }
+        const sortedIdx = [...selectedVideos].sort((a, b) => b - a);
+        sortedIdx.forEach(idx => {
+          const url = generatedVideos[idx].url;
+          if (url) URL.revokeObjectURL(url);
+          generatedVideos.splice(idx, 1);
+        });
+        selectedVideos.clear();
+        toast('已删除选中视频');
+      }
+      renderFilmstrip();
+    }
+    function clearGallery() {
+      if (currentGalleryTab === 'frames') {
+        capturedFrames = []; selectedFrames = new Set(); activePreviewIdx = -1;
+        document.getElementById('download-zone').style.display = 'none';
+        if (videoReady) showVideoView();
+      } else {
+        generatedVideos.forEach(v => { if (v.url) URL.revokeObjectURL(v.url); });
+        generatedVideos = []; selectedVideos = new Set();
+      }
+      renderFilmstrip();
+    }
+
+    function captureCurrentFrame() {
+      if (!videoReady) { toast('请先加载视频', true); return; }
+      const tc = fmtTime(videoEl.currentTime);
+
+      // Offscreen canvas for actual capture
+      const tmpCvs = document.createElement('canvas');
+      const ctx = tmpCvs.getContext('2d');
+      const vw = videoEl.videoWidth, vh = videoEl.videoHeight;
+      const targetR = ratioValues[currentRatio];
+
+      // Calculate crop
+      let sw, sh, sx, sy;
+      if (vw / vh > targetR) {
+        // Source is wider than target
+        sh = vh; sw = vh * targetR;
+        sx = (vw - sw) / 2; sy = 0;
+      } else {
+        // Source is taller than target
+        sw = vw; sh = vw / targetR;
+        sx = 0; sy = (vh - sh) / 2;
+      }
+
+      // Final high-res export size
+      tmpCvs.width = targetR > 1 ? 1920 : (1080 * targetR);
+      tmpCvs.height = targetR > 1 ? (1920 / targetR) : 1080;
+
+      ctx.drawImage(videoEl, sx, sy, sw, sh, 0, 0, tmpCvs.width, tmpCvs.height);
+      const dataUrl = tmpCvs.toDataURL('image/jpeg', 0.92);
+
+      // Add frame silently
+      addFrame(dataUrl, tc, true);
+      toast('截帧 @ ' + tc);
+      if (isVideoMode && videoEl.paused) { videoEl.play().catch(() => { }); updatePlayBtn(true); }
+
+      // ===== Fly-to-gallery animation =====
+      const srcRect = document.getElementById('canvas-area').getBoundingClientRect();
+      const destEl = document.getElementById('filmstrip-wrap');
+      const destRect = destEl.getBoundingClientRect();
+
+      // Thumbnail aspect
+      const thumbW = 100, thumbH = Math.round(thumbW * offCanvas.height / offCanvas.width);
+
+      // Start position: center of video preview area, full-width mini version
+      const startW = Math.min(srcRect.width * 0.55, 320);
+      const startH = Math.round(startW * offCanvas.height / offCanvas.width);
+      const startX = srcRect.left + (srcRect.width - startW) / 2;
+      const startY = srcRect.top + (srcRect.height - startH) / 2;
+
+      // End position: left side of filmstrip
+      const endX = destRect.left + 12;
+      const endY = destRect.top + (destRect.height - thumbH) / 2;
+
+      const fly = document.createElement('img');
+      fly.src = dataUrl;
+      fly.style.cssText = [
+        'position:fixed',
+        `left:${startX}px`, `top:${startY}px`,
+        `width:${startW}px`, `height:${startH}px`,
+        'object-fit:cover',
+        'border-radius:6px',
+        'border:1.5px solid rgba(249,115,22,.7)',
+        'box-shadow:0 8px 32px rgba(0,0,0,.6)',
+        'z-index:300',
+        'pointer-events:none',
+        'transition:left .45s cubic-bezier(.4,0,.2,1),top .45s cubic-bezier(.4,0,.2,1),width .45s cubic-bezier(.4,0,.2,1),height .45s cubic-bezier(.4,0,.2,1),opacity .45s ease',
+        'will-change:transform'
+      ].join(';');
+      document.body.appendChild(fly);
+
+      // Trigger animation after paint
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        fly.style.left = endX + 'px';
+        fly.style.top = endY + 'px';
+        fly.style.width = thumbW + 'px';
+        fly.style.height = thumbH + 'px';
+        fly.style.opacity = '0';
+      }));
+
+      setTimeout(() => fly.remove(), 520);
+    }
+    function captureLastFrame() {
+      if (!videoReady) { toast('请先加载视频', true); return; }
+      videoEl.currentTime = videoEl.duration - 0.05;
+      setTimeout(() => { drawVideoFrame(); addFrame(pvCanvas.toDataURL('image/jpeg', 0.92), fmtTime(videoEl.duration)); toast('尾帧截取成功'); }, 300);
+    }
+
+    async function startAISceneExtract() {
+      if (!videoReady) { toast('请先加载视频', true); return; }
+      
+      switchGalleryTab('frames');
+      showRenderOverlay();
+      isRendering = true;
+      capturedFrames = []; selectedFrames = new Set(); activePreviewIdx = -1;
+      
+      // AI Brain: Start Audio Analysis in background if not done
+      if (audioEnergyData.length === 0) {
+        document.getElementById('render-status').innerText = 'AI 正在同步分析音频高能点...';
+        await analyzeAudioEnergy();
+      }
+
+      document.getElementById('render-status').innerText = 'AI 2.0 融合大脑开启扫描...';
+      
+      const smallCvs = document.createElement('canvas');
+      smallCvs.width = 48; smallCvs.height = 48;
+      const smallCtx = smallCvs.getContext('2d');
+      
+      let prevData = null;
+      const scanFps = 4; 
+      const interval = 1 / scanFps;
+      const totalSteps = Math.floor(videoEl.duration / interval);
+      let lastCaptureTime = -1;
+      
+      for (let i = 0; i < totalSteps && isRendering; i++) {
+        const t = i * interval;
+        await seekVideoTo(t);
+        
+        // 1. Visual Scene Analytics
+        smallCtx.drawImage(videoEl, 0, 0, 48, 48);
+        const currentData = smallCtx.getImageData(0, 0, 48, 48).data;
+        let visualScore = 0;
+        
+        if (prevData) {
+          let diffSum = 0;
+          for (let j = 0; j < currentData.length; j += 4) {
+            const dr = currentData[j] - prevData[j];
+            const dg = currentData[j+1] - prevData[j+1];
+            const db = currentData[j+2] - prevData[j+2];
+            diffSum += Math.sqrt(dr*dr + dg*dg + db*db);
+          }
+          visualScore = diffSum / (48 * 48);
+        }
+        prevData = currentData;
+        
+        // 2. Audio Peak Detection
+        const audioIdx = Math.floor(t);
+        const audioScore = (audioEnergyData[audioIdx] || 0) * 100; // RMS to score scale
+        
+        // 3. Face Identification (Pro Feature)
+        let faceFound = false;
+        if (blazefaceModel && i % 4 === 0) { // Check face every 1 second to save perf
+          const predictions = await blazefaceModel.estimateFaces(videoEl, false);
+          if (predictions.length > 0) faceFound = true;
+        }
+
+        // FUSION LOGIC
+        // Base threshold: 35 for visual cut.
+        // If face found, we are MUCH more interested.
+        // If audio peak, we are INTERESTED.
+        let isProWorthy = (visualScore > 38);
+        if (faceFound) isProWorthy = true; // Always capture face changes
+        if (audioScore > 15) isProWorthy = true; // Capture highlights
+
+        if (isProWorthy && (t - lastCaptureTime > 0.6)) {
+          drawVideoFrame();
+          addFrame(pvCanvas.toDataURL('image/jpeg', 0.92), fmtTime(t), true);
+          lastCaptureTime = t;
+          document.getElementById('render-status').innerText = `AI 2.0 已智选 ${capturedFrames.length} 个瞬间...`;
+        }
+        
+        const pct = Math.floor(i / totalSteps * 100);
+        document.getElementById('progress-bar').style.width = pct + '%';
+        document.getElementById('render-percent').innerText = pct + '%';
+        if (capturedFrames.length === 0) {
+          document.getElementById('render-status').innerText = `AI 正在深度理解视频流... ${pct}%`;
+        }
+      }
+      
+      hideRenderOverlay();
+      isRendering = false;
+      toast(`AI 2.0 创作完成：捕捉到 ${capturedFrames.length} 个高价值瞬间`);
+      renderFilmstrip();
+    }
+
+    // ===== Batch extract =====
+    async function startExtract() {
+      if (!videoReady) { toast('请先加载视频', true); return; }
+      const interval = currentMode === 'pro' ? videoEl.duration / Math.max(1, parseInt(document.getElementById('pro-fps').value)) : parseFloat(document.getElementById('interval-slider').value);
+      const total = Math.floor(videoEl.duration / interval);
+      if (total > 300) { toast(`帧数太多 (${total})，请调大间隔`, true); return; }
+      showRenderOverlay(); capturedFrames = []; selectedFrames = new Set(); activePreviewIdx = -1;
+      document.getElementById('render-status').innerText = 'Extracting Frames...';
+
+      for (let i = 0; i < total && isRendering; i++) {
+        await seekVideoTo(i * interval);
+        drawVideoFrame();
+        addFrame(pvCanvas.toDataURL('image/jpeg', 0.92), fmtTime(i * interval));
+        const pct = Math.floor(i / total * 100);
+        document.getElementById('progress-bar').style.width = pct + '%';
+        document.getElementById('render-percent').innerText = pct + '%';
+        document.getElementById('render-status').innerText = `${i + 1} / ${total} 帧`;
+      }
+      hideRenderOverlay();
+      toast(`抽帧完成：共 ${capturedFrames.length} 帧`);
+    }
+
+    function seekVideoTo(t) {
+      return new Promise(res => {
+        if (Math.abs(videoEl.currentTime - t) < 0.01) { res(); return; }
+        videoEl.currentTime = t;
+        const fn = () => { videoEl.removeEventListener('seeked', fn); res(); };
+        videoEl.addEventListener('seeked', fn);
+      });
+    }
+
+    // ===== Export ZIP =====
+    async function exportZip() {
+      const frames = getExportFrames();
+      if (!frames.length) { toast('没有可导出的帧', true); return; }
+      toast('正在打包...');
+      const zip = new JSZip(), folder = zip.folder('CineMagic_Frames');
+      frames.forEach((f, i) => {
+        const b64 = f.dataUrl.split(',')[1];
+        folder.file(`frame_${String(i + 1).padStart(4, '0')}_${f.timecode.replace(/:/g, '-')}.jpg`, b64, { base64: true });
+      });
+      dlBlob(await zip.generateAsync({ type: 'blob' }), `CineMagic_Frames_${Date.now()}.zip`);
+      toast('ZIP 下载完成');
+    }
+
+    // ===== Export PDF =====
+    async function exportPDF() {
+      const frames = getExportFrames();
+      if (!frames.length) { toast('没有可导出的帧', true); return; }
+      const template = document.getElementById('pdf-template').value;
+      toast('正在生成分镜表...');
+      const { jsPDF } = window.jspdf;
+      
+      const isLandscape = template !== 'script';
+      const doc = new jsPDF({ 
+        orientation: isLandscape ? 'landscape' : 'portrait', 
+        unit: 'mm', 
+        format: 'a4' 
+      });
+      
+      const W = isLandscape ? 297 : 210, H = isLandscape ? 210 : 297;
+      const mL = 10, mT = 18;
+      const addBg = () => { doc.setFillColor(8, 8, 12); doc.rect(0, 0, W, H, 'F'); };
+
+      if (template === 'classic') {
+        const cols = 3, rows = 2;
+        const cW = (W - 20) / cols, cH = (H - 30) / rows;
+        const perPage = cols * rows;
+
+        for (let p = 0; p < Math.ceil(frames.length / perPage); p++) {
+          if (p > 0) doc.addPage();
+          addBg();
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(249, 115, 22);
+          doc.text('CINEMAGIC PRO — STORYBOARD', mL, 10);
+          doc.setFontSize(5); doc.setTextColor(60, 60, 60);
+          doc.text(`Style: ${currentStyle.toUpperCase()}  ·  Ratio: ${currentRatio}  ·  Frames: ${frames.length}  ·  ${new Date().toLocaleString('zh-CN')}`, mL, 14);
+          
+          frames.slice(p * perPage, (p + 1) * perPage).forEach((f, i) => {
+            const col = i % cols, row = Math.floor(i / cols);
+            const x = mL + col * cW, y = mT + row * cH;
+            doc.setDrawColor(25, 25, 35); doc.setLineWidth(0.2); doc.rect(x, y, cW - 3, cH - 7, 'D');
+            doc.addImage(f.dataUrl, 'JPEG', x + 0.5, y + 0.5, cW - 4, cH - 9);
+            doc.setFontSize(5); doc.setTextColor(249, 115, 22);
+            doc.text('TC: ' + f.timecode, x + 1.5, y + cH - 7.5);
+            doc.setTextColor(50, 50, 50);
+            doc.text('#' + String(f.index + 1).padStart(3, '0'), x + cW - 9, y + cH - 7.5);
+          });
+        }
+      } else if (template === 'script') {
+        const rows = 4;
+        const cH = (H - 30) / rows;
+        const perPage = rows;
+
+        for (let p = 0; p < Math.ceil(frames.length / perPage); p++) {
+          if (p > 0) doc.addPage();
+          addBg();
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(249, 115, 22);
+          doc.text('CINEMAGIC — DIRECTOR\'S SCRIPT', mL, 10);
+          doc.setFontSize(5); doc.setTextColor(60, 60, 60);
+          doc.text(`Style: ${currentStyle.toUpperCase()}  ·  Ratio: ${currentRatio}  ·  Frames: ${frames.length}  ·  ${new Date().toLocaleString('zh-CN')}`, mL, 14);
+          
+          frames.slice(p * perPage, (p + 1) * perPage).forEach((f, i) => {
+            const y = mT + i * cH;
+            // Frame image on left
+            const imgW = (W - 20) * 0.4;
+            const imgH = imgW * 9 / 16;
+            doc.addImage(f.dataUrl, 'JPEG', mL, y + 5, imgW, imgH);
+            
+            // Script area on right
+            doc.setDrawColor(30, 30, 40);
+            doc.rect(mL + imgW + 5, y + 5, (W - 20) * 0.6 - 5, imgH);
+            
+            doc.setFontSize(6); doc.setTextColor(249, 115, 22);
+            doc.text(`SHOT ${p * perPage + i + 1} @ ${f.timecode}`, mL + imgW + 7, y + 10);
+            
+            doc.setDrawColor(20, 20, 25);
+            for(let line=0; line<3; line++) {
+              doc.line(mL + imgW + 7, y + 15 + line*6, W - 15, y + 15 + line*6);
+            }
+          });
+        }
+      } else if (template === 'banner') {
+        // Banner mode: Landscape, 1 big frame + style info
+        for (let i = 0; i < frames.length; i++) {
+          if (i > 0) doc.addPage();
+          addBg();
+          const f = frames[i];
+          const imgW = W - 40;
+          const imgH = imgW * 9 / 16;
+          doc.addImage(f.dataUrl, 'JPEG', 20, 20, imgW, imgH);
+          doc.setFontSize(16); doc.setTextColor(255, 255, 255);
+          doc.text(f.timecode, 20, imgH + 35);
+          doc.setFontSize(10); doc.setTextColor(249, 115, 22);
+          doc.text('CINEMAGIC PRO ARTISTIC MASTER', 20, imgH + 42);
+        }
+      }
+      
+      dlBlob(doc.output('blob'), `CineMagic_Storyboard_${template}_${Date.now()}.pdf`);
+      toast('PDF 下载成功');
+    }
+
+    function getExportFrames() { return selectedFrames.size > 0 ? [...selectedFrames].map(i => capturedFrames[i]) : capturedFrames; }
+
+    // ===== Cinematic render (Universal MediaRecorder Native Engine) =====
+    let _recordingVideo = null;
+    let _recorder = null;
+
+    async function startCinematicRender() {
+      if (!videoFile) { toast('请先加载视频', true); return; }
+      showRenderOverlay();
+      renderChunks = [];
+      isRendering = true;
+
+      const config = presets[currentStyle];
+      const fps = currentMode === 'pro' ? parseInt(document.getElementById('pro-fps').value) : config.fps;
+      const interval = 1 / fps;
+
+      try {
+        document.getElementById('render-status').innerText = 'Initializing Native Engine...';
+        
+        // Setup hidden rendering video
+        if (!_recordingVideo) _recordingVideo = document.createElement('video');
+        _recordingVideo.src = URL.createObjectURL(videoFile);
+        _recordingVideo.muted = true;
+        _recordingVideo.playsInline = true;
+        
+        await new Promise((r, j) => {
+          _recordingVideo.onloadedmetadata = r;
+          _recordingVideo.onerror = j;
+        });
+
+        const duration = _recordingVideo.duration;
+        if (!isFinite(duration)) throw new Error('无法读取视频时长，请尝试重新导出该视频或检查格式');
+        const totalFrames = Math.floor(duration * fps);
+        const cvs = document.createElement('canvas');
+        // Pro Resolution Support
+        const isMasterPro = isPro;
+        cvs.width = isMasterPro ? (videoEl.videoWidth || 1280) : Math.min(1280, videoEl.videoWidth || 1280);
+        cvs.height = isMasterPro ? (videoEl.videoHeight || 720) : Math.min(720, videoEl.videoHeight || 720);
+        const ctx = cvs.getContext('2d');
+        let firstFrameCover = null;
+
+        // Setup MediaRecorder
+        const stream = cvs.captureStream(fps);
+        const mimeType = [
+          'video/mp4;codecs=h264',
+          'video/webm;codecs=vp9',
+          'video/webm;codecs=h264',
+          'video/webm',
+          'video/ogg'
+        ].find(type => MediaRecorder.isTypeSupported(type)) || '';
+        _recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8000000 });
+        
+        _recorder.ondataavailable = e => { if (e.data.size > 0) renderChunks.push(e.data); };
+        _recorder.start();
+
+        const scaler = getEmotionScaler(config.emotionProfile, totalFrames);
+
+        for (let i = 0; i < totalFrames && isRendering; i++) {
+          const time = i * interval;
+          _recordingVideo.currentTime = time;
+          
+          await new Promise(r => {
+            const onSeeked = () => {
+              _recordingVideo.removeEventListener('seeked', onSeeked);
+              r();
+            };
+            _recordingVideo.addEventListener('seeked', onSeeked);
+          });
+
+          const sc = scaler(i);
+          const decay = 1 - ((config.shutter / 360) * 0.9 * sc);
+
+          // Draw with cinematic effects
+          ctx.fillStyle = `rgba(0,0,0,${Math.max(0.05, decay)})`;
+          ctx.fillRect(0, 0, cvs.width, cvs.height);
+          ctx.save();
+          ctx.filter = config.filter;
+          ctx.drawImage(_recordingVideo, 0, 0, cvs.width, cvs.height);
+          ctx.restore();
+
+          // Letterbox
+          const bh = cvs.height * 0.125;
+          ctx.fillStyle = 'black';
+          ctx.fillRect(0, cvs.height - bh, cvs.width, bh);
+
+          if (i === 0) {
+            firstFrameCover = cvs.toDataURL('image/jpeg', 0.8);
+          }
+
+          // Progress
+          const pct = Math.floor((i / totalFrames) * 100);
+          document.getElementById('render-status').innerText = `Mastering: ${i}/${totalFrames}`;
+          document.getElementById('progress-bar').style.width = pct + '%';
+          document.getElementById('render-percent').innerText = pct + '%';
+
+          // Micro-yield to keep encoder stable
+          if (i % 10 === 0) await new Promise(r => requestAnimationFrame(r));
+        }
+
+        if (!isRendering) {
+          _recorder.stop();
+          return;
+        }
+
+        document.getElementById('render-status').innerText = 'Finalizing...';
+        _recorder.stop();
+
+        await new Promise(r => _recorder.onstop = r);
+
+        hideRenderOverlay();
+
+        const outBlob = new Blob(renderChunks, { type: 'video/mp4' });
+        generatedVideos.push({ blob: outBlob, cover: firstFrameCover });
+
+        if (currentGalleryTab !== 'videos') switchGalleryTab('videos');
+        renderFilmstrip(true);
+
+        document.getElementById('download-zone').style.display = 'block';
+        document.getElementById('btn-download').onclick = () => dlBlob(outBlob, `CineMagic_${currentStyle}_${Date.now()}.mp4`);
+        toast('电影视频录制完成 (原生引擎)');
+        
+        URL.revokeObjectURL(_recordingVideo.src);
+      } catch (e) {
+        console.error("Native Render Error:", e);
+        toast('渲染失败：' + (e.message || "浏览器引擎异常"), true);
+        hideRenderOverlay();
+      }
+    }
+
+    function getEmotionScaler(profile, total) { return i => { const p = i / total; if (profile === 'wave') return 1 + Math.sin(p * Math.PI * 4) * 0.4; if (profile === 'burst') return 0.5 + Math.pow(p, 2) * 2; return 1; }; }
+    function loadImg(src) { return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; }); }
+    function cancelRender() { isRendering = false; hideRenderOverlay(); toast('已取消', true); }
+    function showRenderOverlay() { isRendering = true; document.getElementById('render-overlay').style.display = 'flex'; document.getElementById('progress-bar').style.width = '0'; document.getElementById('render-percent').innerText = '0%'; }
+    function hideRenderOverlay() { document.getElementById('render-overlay').style.display = 'none'; }
+
+    // ===== Utils =====
+    function fmtTime(s) { if (isNaN(s)) return '00:00'; const m = Math.floor(s / 60), sec = Math.floor(s % 60); return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0'); }
+    function dlBlob(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); }
+    function toast(msg, err = false) { const t = document.createElement('div'); t.className = 'toast'; t.style.background = err ? '#991b1b' : '#14532d'; t.style.color = err ? '#fca5a5' : '#4ade80'; t.style.border = `1px solid ${err ? '#7f1d1d' : '#166534'}`; t.innerText = msg; document.body.appendChild(t); t.style.animation = 'toastIn .3s ease'; setTimeout(() => t.remove(), 2800); }
+    function showModal(id) { document.getElementById(id + '-modal').style.display = 'flex'; }
+    function hideModal(id) { document.getElementById(id + '-modal').style.display = 'none'; }
+
+    // Init
+    switchMode('simple');
+  </script>
+</body>
+
+</html>
