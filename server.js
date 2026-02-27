@@ -10,6 +10,7 @@ const DB_PATH = path.join(__dirname, 'auth_db.json');
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, '.')));
 
 // Initialize "Database"
 if (!fs.existsSync(DB_PATH)) {
