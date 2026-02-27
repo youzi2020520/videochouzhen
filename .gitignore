@@ -1,0 +1,18 @@
+# Node.js dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Database files
+auth_db.json
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+
+# Log files
+*.log

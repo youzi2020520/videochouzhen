@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>CineMagic Pro - 授权中心</title>
+    <style>
+        :root { --orange: #f97316; --bg: #0a0a0c; }
+        body { background: var(--bg); color: #fff; font-family: system-ui; padding: 40px; }
+        .card { background: #121215; border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid #222; }
+        h1 { font-weight: 300; letter-spacing: 2px; color: var(--orange); }
+        input, select, button { padding: 10px; border-radius: 6px; border: 1px solid #333; background: #1a1a1f; color: #fff; }
+        button { background: var(--orange); border: none; font-weight: bold; cursor: pointer; }
+        button.toggle-btn { background: #333; }
+        button.disabled { background: #551a1a; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #222; font-size: 13px; }
+        th { color: #666; font-weight: normal; }
+        .status-on { color: #4ade80; }
+        .status-off { color: #f87171; }
+        .ip-info { font-family: monospace; font-size: 11px; color: #888; }
+    </style>
+</head>
+<body>
+    <h1>授权管理后台</h1>
+
+    <div class="card">
+        <h3>生成新授权码</h3>
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="wechat-id" placeholder="输入微信号">
+            <select id="expiry-days">
+                <option value="7">7 天 (试用)</option>
+                <option value="30" selected>30 天 (月度)</option>
+                <option value="365">365 天 (年度)</option>
+                <option value="9999">永久</option>
+            </select>
+            <button onclick="generateCode()">点击生成</button>
+        </div>
+        <p id="gen-result" style="color:var(--orange); font-weight: bold; margin-top: 10px;"></p>
+    </div>
+
+    <div class="card">
+        <h3>激活列表</h3>
+        <table id="code-table">
+            <thead>
+                <tr>
+                    <th>微信号</th>
+                    <th>授权码</th>
+                    <th>状态</th>
+                    <th>到期时间</th>
+                    <th>最后登录 IP/地点</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+
+        async function fetchCodes() {
+            const res = await fetch(`${API_BASE}/admin/list`);
+            const codes = await res.json();
+            const tbody = document.querySelector('#code-table tbody');
+            tbody.innerHTML = '';
+            
+            codes.forEach(c => {
+                const tr = document.createElement('tr');
+                const isExpired = new Date(c.expiry) < new Date();
+                tr.innerHTML = `
+                    <td>${c.wechatId}</td>
+                    <td style="font-family:monospace">${c.code}</td>
+                    <td class="${c.status === 1 ? 'status-on' : 'status-off'}">
+                        ${c.status === 1 ? (isExpired ? '已过期' : '启用中') : '已禁用'}
+                    </td>
+                    <td>${new Date(c.expiry).toLocaleDateString()}</td>
+                    <td class="ip-info">${c.lastIp || '无'}<br>${c.lastLocation || ''}</td>
+                    <td>
+                        <button class="toggle-btn ${c.status === 0 ? 'disabled' : ''}" onclick="toggleStatus('${c.code}')">
+                            ${c.status === 1 ? '禁用' : '启用'}
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function generateCode() {
+            const wechatId = document.getElementById('wechat-id').value;
+            const days = document.getElementById('expiry-days').value;
+            if (!wechatId) return alert('请输入微信号');
+
+            const res = await fetch(`${API_BASE}/admin/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ wechatId, days })
+            });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('gen-result').innerText = `生成成功: ${data.code}`;
+                fetchCodes();
+            } else {
+                alert(data.message);
+            }
+        }
+
+        async function toggleStatus(code) {
+            await fetch(`${API_BASE}/admin/toggle`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code })
+            });
+            fetchCodes();
+        }
+
+        fetchCodes();
+    </script>
+</body>
+</html>
