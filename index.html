@@ -1098,6 +1098,14 @@
 
           </div>
 
+          <div style="margin-top:16px;">
+            <label class="lbl">输出格式</label>
+            <select id="video-format" style="width:100%;padding:8px;background:#0d0d12;border:1px solid #1a1a1a;border-radius:6px;font-size:10px;color:#777;margin-top:4px;">
+              <option value="mp4">MP4 (推荐)</option>
+              <option value="webm">WebM</option>
+            </select>
+          </div>
+          
           <button class="btn btn-purple" style="width:100%;margin-top:24px;box-shadow:0 10px 20px rgba(124,58,237,.2)"
             onclick="startCinematicRender()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -1234,13 +1242,19 @@
       <!-- Toolbar -->
       <div id="toolbar">
 
-        <button class="btn btn-ghost" onclick="exportZip()">
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 15V3m-4 8l4 4 4-4m-9 8h10a2 2 0 002-2v-2H3v2a2 2 0 002 2z" />
-          </svg>
-          ZIP 下载
-        </button>
+        <div style="display:flex;align-items:center;gap:6px;background:#0d0d0f;padding:2px;border-radius:6px;border:1px solid #1a1a1a;">
+          <select id="frame-format" style="background:none;border:none;color:#555;font-size:8px;font-family:'JetBrains Mono';padding:0 6px;cursor:pointer;outline:none;">
+            <option value="jpg">JPG (推荐)</option>
+            <option value="png">PNG</option>
+          </select>
+          <button class="btn btn-ghost" onclick="exportZip()" style="padding:8px 12px;border:none;">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 15V3m-4 8l4 4 4-4m-9 8h10a2 2 0 002-2v-2H3v2a2 2 0 002 2z" />
+            </svg>
+            ZIP 下载
+          </button>
+        </div>
         <div style="display:flex;align-items:center;gap:6px;background:#0d0d0f;padding:2px;border-radius:6px;border:1px solid #1a1a1a;">
           <select id="pdf-template" style="background:none;border:none;color:#555;font-size:8px;font-family:'JetBrains Mono';padding:0 6px;cursor:pointer;outline:none;">
             <option value="classic">标准网格 (3x2)</option>
@@ -2208,10 +2222,30 @@
       if (!frames.length) { toast('没有可导出的帧', true); return; }
       toast('正在打包...');
       const zip = new JSZip(), folder = zip.folder('CineMagic_Frames');
-      frames.forEach((f, i) => {
-        const b64 = f.dataUrl.split(',')[1];
-        folder.file(`frame_${String(i + 1).padStart(4, '0')}_${f.timecode.replace(/:/g, '-')}.jpg`, b64, { base64: true });
-      });
+      const frameFormat = document.getElementById('frame-format').value;
+      const mimeType = frameFormat === 'jpg' ? 'image/jpeg' : 'image/png';
+      const quality = frameFormat === 'jpg' ? 0.8 : 1;
+      
+      for (let i = 0; i < frames.length; i++) {
+        const f = frames[i];
+        // Re-encode the image in the selected format
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.src = f.dataUrl;
+        
+        await new Promise((resolve) => {
+          img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            const dataUrl = canvas.toDataURL(mimeType, quality);
+            const b64 = dataUrl.split(',')[1];
+            folder.file(`frame_${String(i + 1).padStart(4, '0')}_${f.timecode.replace(/:/g, '-')}.${frameFormat}`, b64, { base64: true });
+            resolve();
+          };
+        });
+      }
       dlBlob(await zip.generateAsync({ type: 'blob' }), `CineMagic_Frames_${Date.now()}.zip`);
       toast('ZIP 下载完成');
     }
@@ -2423,14 +2457,16 @@
 
         hideRenderOverlay();
 
-        const outBlob = new Blob(renderChunks, { type: 'video/mp4' });
+        const videoFormat = document.getElementById('video-format').value;
+        const mimeType = videoFormat === 'mp4' ? 'video/mp4' : 'video/webm';
+        const outBlob = new Blob(renderChunks, { type: mimeType });
         generatedVideos.push({ blob: outBlob, cover: firstFrameCover });
 
         if (currentGalleryTab !== 'videos') switchGalleryTab('videos');
         renderFilmstrip(true);
 
         document.getElementById('download-zone').style.display = 'block';
-        document.getElementById('btn-download').onclick = () => dlBlob(outBlob, `CineMagic_${currentStyle}_${Date.now()}.mp4`);
+        document.getElementById('btn-download').onclick = () => dlBlob(outBlob, `CineMagic_${currentStyle}_${Date.now()}.${videoFormat}`);
         toast('电影视频录制完成 (原生引擎)');
         
         URL.revokeObjectURL(_recordingVideo.src);
