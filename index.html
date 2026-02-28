@@ -18,6 +18,7 @@
     // Predefine functions to avoid ReferenceError
     let currentStyle = 'cinema';
     let currentMode = 'simple';
+    let currentGalleryTab = 'frames';
     let videoReady = false;
     let isPro = localStorage.getItem('cine_pro') === 'true';
     
@@ -73,6 +74,14 @@
         default:
           break;
       }
+    }
+    
+    function switchGalleryTab(tab) {
+      currentGalleryTab = tab;
+      document.getElementById('tab-frames').classList.toggle('active', tab === 'frames');
+      document.getElementById('tab-videos').classList.toggle('active', tab === 'videos');
+      document.getElementById('filmstrip').style.display = tab === 'frames' ? 'flex' : 'none';
+      document.getElementById('videostrip').style.display = tab === 'videos' ? 'flex' : 'none';
     }
   </script>
   <style>
