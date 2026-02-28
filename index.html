@@ -517,9 +517,8 @@
         }
       }
 
-      // Reveal Pro elements
-      const proControls = document.getElementById('pro-controls');
-      if (proControls && currentMode === 'pro') proControls.style.display = 'flex';
+      // Auto switch to PRO mode after activation
+      switchMode('pro');
     }
 
     async function validateLicense() {
@@ -564,6 +563,15 @@
 
     // ===== Style =====
     function setStyle(id) {
+      const preset = presets[id];
+      if (preset?.isPro && !isPro) {
+        showModal('activate');
+        return;
+      }
+      if (preset?.isPro && currentMode !== 'pro') {
+        toast('请切换到 PRO 模式使用此滤镜', true);
+        return;
+      }
       currentStyle = id;
       document.querySelectorAll('.style-card').forEach(c => c.classList.remove('active'));
       document.getElementById('sc-' + id).classList.add('active');
@@ -785,6 +793,7 @@
 
     function handleProAction(action) {
       if (!isPro) { showModal('activate'); return; }
+      if (currentMode !== 'pro') { toast('请切换到 PRO 模式使用此功能', true); return; }
       if (action === 'pdf') exportPDF();
       if (action === 'ai-extract') startAISceneExtract();
     }
