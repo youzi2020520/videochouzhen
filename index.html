@@ -14,6 +14,34 @@
     rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
+  <script>
+    // Predefine functions to avoid ReferenceError
+    let currentStyle = 'cinema';
+    let videoReady = false;
+    
+    function setStyle(id) {
+      currentStyle = id;
+      document.querySelectorAll('.style-card').forEach(c => c.classList.remove('active'));
+      document.getElementById('sc-' + id).classList.add('active');
+      if (videoReady) drawVideoFrame();
+    }
+    
+    function handleProStyle(id) {
+      if (!isPro) {
+        showModal('activate');
+        return;
+      }
+      setStyle(id);
+    }
+    
+    function showModal(id) {
+      document.getElementById(id + '-modal').style.display = 'flex';
+    }
+    
+    function hideModal(id) {
+      document.getElementById(id + '-modal').style.display = 'none';
+    }
+  </script>
   <style>
     :root {
       --orange: #f97316;
