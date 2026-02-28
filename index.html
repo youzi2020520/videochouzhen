@@ -77,6 +77,23 @@
       document.getElementById('filmstrip').style.display = tab === 'frames' ? 'flex' : 'none';
       document.getElementById('videostrip').style.display = tab === 'videos' ? 'flex' : 'none';
     }
+    
+    // Predefine ratio variables and function
+    window.ratioIds = { '9:16': 'r-916', '16:9': 'r-169', '1:1': 'r-11', '2.35:1': 'r-235' };
+    window.ratioValues = { '9:16': 9 / 16, '16:9': 16 / 9, '1:1': 1, '2.35:1': 2.35 };
+    
+    function setRatio(r) {
+      window.currentRatio = r;
+      document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(window.ratioIds[r]).classList.add('active');
+
+      // Update preview stage aspect Ratio
+      const stage = document.getElementById('preview-stage');
+      const val = window.ratioValues[r];
+      stage.style.aspectRatio = r.replace(':', '/');
+
+      toast(`画幅已切至 ${r}`);
+    }
   </script>
   <style>
     :root {
@@ -1490,16 +1507,16 @@
   <script>
     // ===== State =====
     const AUTH_SERVER = "http://localhost:3000/api";
-    let isPro = localStorage.getItem('cine_pro') === 'true';
+    window.isPro = localStorage.getItem('cine_pro') === 'true';
     let blazefaceModel = null;
     let audioEnergyData = []; // Store RMS energy levels per second
     let isAIInitializing = false;
-    let currentMode = 'simple';
-    let currentStyle = 'cinema';
-    let currentRatio = '16:9';
+    window.currentMode = 'simple';
+    window.currentStyle = 'cinema';
+    window.currentRatio = '16:9';
 
     // Check license status on page load
-    if (isPro) {
+    if (window.isPro) {
       const expiryDate = localStorage.getItem('cine_expiry');
       applyProStatus(expiryDate);
     }
@@ -1518,14 +1535,14 @@
       }
     });
     let videoFile = null;
-    let videoReady = false;
+    window.videoReady = false;
     let isRendering = false;
     let capturedFrames = [];
     let selectedFrames = new Set();
     let generatedVideos = [];
     let selectedVideos = new Set();
     let activePreviewIdx = -1;
-    let currentGalleryTab = 'frames';
+    window.currentGalleryTab = 'frames';
     let renderChunks = [];
     let masteredFiles = [];
 
@@ -1542,28 +1559,28 @@
       cyber: { name: '赛博未来', sub: '霓虹都市 · 幻想感', fps: 22, shutter: 180, filter: 'contrast(1.3) saturate(1.8) hue-rotate(180deg) brightness(1.1)', emotionProfile: 'burst', isPro: true }
     };
 
-    if (isPro) applyProStatus();
+    if (window.isPro) applyProStatus();
 
     // ===== Mode =====
     function switchMode(mode) {
       // If switching to pro mode and not authorized, show modal and don't switch
-      if (mode === 'pro' && !isPro) {
+      if (mode === 'pro' && !window.isPro) {
         showModal('activate');
         return;
       }
       
-      currentMode = mode;
+      window.currentMode = mode;
       document.getElementById('btn-simple').classList.toggle('active', mode === 'simple');
       document.getElementById('btn-pro').classList.toggle('active', mode === 'pro');
       document.getElementById('mode-label').innerText = mode === 'simple' ? 'Simple Mode' : 'Pro Mode';
 
       // Update sidebar sections
-      document.getElementById('pro-controls').style.display = (mode === 'pro' && isPro) ? 'flex' : 'none';
+      document.getElementById('pro-controls').style.display = (mode === 'pro' && window.isPro) ? 'flex' : 'none';
     }
 
     // ===== Pro =====
     function applyProStatus(expiryDate) {
-      isPro = true; localStorage.setItem('cine_pro', 'true');
+      window.isPro = true; localStorage.setItem('cine_pro', 'true');
       const tag = document.getElementById('user-tag');
       tag.innerText = 'Pro'; tag.style.color = '#4ade80'; tag.style.borderColor = '#166534';
       document.getElementById('activate-btn').style.display = 'none';
@@ -1636,25 +1653,25 @@
 
     // ===== Style =====
     function setStyle(id) {
-      currentStyle = id;
+      window.currentStyle = id;
       document.querySelectorAll('.style-card').forEach(c => c.classList.remove('active'));
       document.getElementById('sc-' + id).classList.add('active');
-      if (videoReady) drawVideoFrame();
+      if (window.videoReady) drawVideoFrame();
     }
-    function handleProStyle(id) { if (!isPro) { showModal('activate'); return; } setStyle(id); }
+    function handleProStyle(id) { if (!window.isPro) { showModal('activate'); return; } setStyle(id); }
 
     // ===== Ratio =====
-    const ratioIds = { '9:16': 'r-916', '16:9': 'r-169', '1:1': 'r-11', '2.35:1': 'r-235' };
-    const ratioValues = { '9:16': 9 / 16, '16:9': 16 / 9, '1:1': 1, '2.35:1': 2.35 };
+    window.ratioIds = { '9:16': 'r-916', '16:9': 'r-169', '1:1': 'r-11', '2.35:1': 'r-235' };
+    window.ratioValues = { '9:16': 9 / 16, '16:9': 16 / 9, '1:1': 1, '2.35:1': 2.35 };
 
     function setRatio(r) {
-      currentRatio = r;
+      window.currentRatio = r;
       document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(ratioIds[r]).classList.add('active');
+      document.getElementById(window.ratioIds[r]).classList.add('active');
 
       // Update preview stage aspect Ratio
       const stage = document.getElementById('preview-stage');
-      const val = ratioValues[r];
+      const val = window.ratioValues[r];
       stage.style.aspectRatio = r.replace(':', '/');
 
       toast(`画幅已切至 ${r}`);
@@ -1703,7 +1720,7 @@
       const url = URL.createObjectURL(file);
       videoEl.src = url;
       videoEl.onloadedmetadata = () => {
-        videoReady = true;
+        window.videoReady = true;
         document.getElementById('placeholder').style.display = 'none';
         document.getElementById('timeline-wrap').style.display = 'block';
         loadAIModel();
@@ -1719,10 +1736,10 @@
     }
 
     function drawVideoFrame() {
-      if (!videoReady) return;
+      if (!window.videoReady) return;
       pvCanvas.width = videoEl.videoWidth || 1280;
       pvCanvas.height = videoEl.videoHeight || 720;
-      pvCtx.filter = presets[currentStyle]?.filter || 'none';
+      pvCtx.filter = presets[window.currentStyle]?.filter || 'none';
       pvCtx.drawImage(videoEl, 0, 0);
       pvCtx.filter = 'none';
     }
@@ -1772,7 +1789,7 @@
     }
 
     function togglePlay() {
-      if (!videoReady) return;
+      if (!window.videoReady) return;
       if (videoEl.paused) {
         if (!isVideoMode) showVideoView();
         videoEl.play();
@@ -1797,7 +1814,7 @@
     // ===== Timeline =====
     let isScrubbing = false;
     document.getElementById('timeline').oninput = e => {
-      if (!videoReady) return;
+      if (!window.videoReady) return;
       isScrubbing = true;
       const t = parseFloat(e.target.value);
       videoEl.currentTime = t;
@@ -1822,7 +1839,7 @@
     // ===== Navigation & Shortcuts =====
     function stepFrame(dir) {
       if (!videoReady) return;
-      const fps = presets[currentStyle]?.fps || 24;
+      const fps = presets[window.currentStyle]?.fps || 24;
       const frameTime = 1 / fps;
       videoEl.currentTime = Math.max(0, Math.min(videoEl.duration, videoEl.currentTime + (dir * frameTime)));
     }
@@ -2391,7 +2408,7 @@
           doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(249, 115, 22);
           doc.text('CINEMAGIC PRO — STORYBOARD', mL, 10);
           doc.setFontSize(5); doc.setTextColor(60, 60, 60);
-          doc.text(`Style: ${currentStyle.toUpperCase()}  ·  Ratio: ${currentRatio}  ·  Frames: ${frames.length}  ·  ${new Date().toLocaleString('zh-CN')}`, mL, 14);
+          doc.text(`Style: ${window.currentStyle.toUpperCase()}  ·  Ratio: ${window.currentRatio}  ·  Frames: ${frames.length}  ·  ${new Date().toLocaleString('zh-CN')}`, mL, 14);
           
           frames.slice(p * perPage, (p + 1) * perPage).forEach((f, i) => {
             const col = i % cols, row = Math.floor(i / cols);
@@ -2415,7 +2432,7 @@
           doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(249, 115, 22);
           doc.text('CINEMAGIC — DIRECTOR\'S SCRIPT', mL, 10);
           doc.setFontSize(5); doc.setTextColor(60, 60, 60);
-          doc.text(`Style: ${currentStyle.toUpperCase()}  ·  Ratio: ${currentRatio}  ·  Frames: ${frames.length}  ·  ${new Date().toLocaleString('zh-CN')}`, mL, 14);
+          doc.text(`Style: ${window.currentStyle.toUpperCase()}  ·  Ratio: ${window.currentRatio}  ·  Frames: ${frames.length}  ·  ${new Date().toLocaleString('zh-CN')}`, mL, 14);
           
           frames.slice(p * perPage, (p + 1) * perPage).forEach((f, i) => {
             const y = mT + i * cH;
@@ -2469,8 +2486,8 @@
       renderChunks = [];
       isRendering = true;
 
-      const config = presets[currentStyle];
-      const fps = currentMode === 'pro' ? parseInt(document.getElementById('pro-fps').value) : config.fps;
+      const config = presets[window.currentStyle];
+      const fps = window.currentMode === 'pro' ? parseInt(document.getElementById('pro-fps').value) : config.fps;
       const interval = 1 / fps;
 
       try {
@@ -2577,11 +2594,11 @@
         const outBlob = new Blob(renderChunks, { type: finalMimeType });
         generatedVideos.push({ blob: outBlob, cover: firstFrameCover });
 
-        if (currentGalleryTab !== 'videos') switchGalleryTab('videos');
+        if (window.currentGalleryTab !== 'videos') switchGalleryTab('videos');
         renderFilmstrip(true);
 
         document.getElementById('download-zone').style.display = 'block';
-        document.getElementById('btn-download').onclick = () => dlBlob(outBlob, `CineMagic_${currentStyle}_${Date.now()}.${selectedFormat}`);
+        document.getElementById('btn-download').onclick = () => dlBlob(outBlob, `CineMagic_${window.currentStyle}_${Date.now()}.${selectedFormat}`);
         toast('电影视频录制完成 (原生引擎)');
         
         URL.revokeObjectURL(_recordingVideo.src);
