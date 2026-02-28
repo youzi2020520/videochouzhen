@@ -513,7 +513,7 @@
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
           
           // Set hover tooltip
-          licenseStatus.title = '到期时间: ' + expiryDate + ' (剩余 ' + diffDays + ' 天)';
+          licenseStatus.title = '剩余 ' + diffDays + ' 天';
           localStorage.setItem('cine_expiry', expiryDate);
         }
       }
