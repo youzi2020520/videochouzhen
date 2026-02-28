@@ -239,7 +239,6 @@
     /* Sliders */
     input[type=range] {
       -webkit-appearance: none;
-      appearance: none;
       background: #1a1a1a;
       height: 2px;
       border-radius: 2px;
@@ -463,7 +462,6 @@
       width: 100%;
       height: 3px;
       -webkit-appearance: none;
-      appearance: none;
       background: #1a1a1a;
       border-radius: 3px;
       cursor: pointer;
@@ -823,53 +821,6 @@
       }
     }
 
-    /* Style Card Hover Effects */
-    .style-card:hover {
-      border-color: #2a2a2a;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      transform: translateY(-2px);
-    }
-
-    .style-card.active {
-      border-color: var(--orange);
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
-    }
-
-    /* Details Tag Styling */
-    details {
-      transition: all 0.3s ease;
-    }
-
-    details[open] summary {
-      border-bottom: 1px solid #1a1a1a;
-    }
-
-    details[open] summary svg {
-      transform: rotate(180deg);
-    }
-
-    details[open] > div {
-      animation: slideDown 0.3s ease;
-    }
-
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Feature Card Hover Effects */
-    .feature-card:hover {
-      border-color: #2a2a2a;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      transform: translateY(-2px);
-    }
-
     /* CTR row util */
     .cr {
       display: flex;
@@ -902,7 +853,6 @@
     }
     #timeline {
       -webkit-appearance: none;
-      appearance: none;
       width: 100%;
       height: 4px;
       background: #222;
@@ -993,7 +943,7 @@
     <div style="display:flex;align-items:center;gap:20px;">
       <div style="display:flex;flex-direction:column;">
         <h1
-          style="font-size:18px;font-family:'Noto Serif SC';font-weight:700;letter-spacing:.05em;background:linear-gradient(90deg,#fff,#888);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
+          style="font-size:18px;font-family:'Noto Serif SC';font-weight:700;letter-spacing:.05em;background:linear-gradient(90deg,#fff,#888);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
           视频帧探</h1>
         <p id="mode-label"
           style="font-size:9px;font-family:'JetBrains Mono';color:rgba(249,115,22,.8);text-transform:uppercase;letter-spacing:.2em;font-weight:700;margin-top:2px;">
@@ -1093,34 +1043,34 @@
         <div id="render-settings-wrap">
           <label class="lbl">视觉风格 <span style="font-size:9px;color:#2a2a2a;text-transform:none;letter-spacing:0;margin-left:4px;">(对标主流创作预设)</span></label>
           
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:12px;">
-            <div class="style-card active" id="sc-cinema" onclick="setStyle('cinema')" style="padding:14px;background:#0d0d12;border:1px solid #1a1a1a;border-radius:8px;cursor:pointer;transition:all 0.3s ease;">
-              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700;color:#e2e2e2;">经典电影</div>
-              <div style="font-size:8px;color:#666;margin-top:4px;">行业基准 · 叙事感</div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:10px;">
+            <div class="style-card active" id="sc-cinema" onclick="setStyle('cinema')" style="padding:10px;">
+              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">经典电影</div>
+              <div style="font-size:8px;color:#444;margin-top:2px;">行业基准 · 叙事感</div>
             </div>
-            <div class="style-card" id="sc-film" onclick="setStyle('film')" style="padding:14px;background:#0d0d12;border:1px solid #1a1a1a;border-radius:8px;cursor:pointer;transition:all 0.3s ease;">
-              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700;color:#e2e2e2;">复古胶片</div>
-              <div style="font-size:8px;color:#666;margin-top:4px;">暖调回忆 · 颗粒感</div>
+            <div class="style-card" id="sc-film" onclick="setStyle('film')" style="padding:10px;">
+              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">复古胶片</div>
+              <div style="font-size:8px;color:#444;margin-top:2px;">暖调回忆 · 颗粒感</div>
             </div>
-            <div class="style-card" id="sc-vibe" onclick="setStyle('vibe')" style="padding:14px;background:#0d0d12;border:1px solid #1a1a1a;border-radius:8px;cursor:pointer;transition:all 0.3s ease;">
-              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700;color:#e2e2e2;">法式浪漫</div>
-              <div style="font-size:8px;color:#666;margin-top:4px;">氛围感 · 清冷调</div>
+            <div class="style-card" id="sc-vibe" onclick="setStyle('vibe')" style="padding:10px;">
+              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">法式浪漫</div>
+              <div style="font-size:8px;color:#444;margin-top:2px;">氛围感 · 清冷调</div>
             </div>
-            <div class="style-card" id="sc-vlog" onclick="setStyle('vlog')" style="padding:14px;background:#0d0d12;border:1px solid #1a1a1a;border-radius:8px;cursor:pointer;transition:all 0.3s ease;">
-              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700;color:#e2e2e2;">极简 VLOG</div>
-              <div style="font-size:8px;color:#666;margin-top:4px;">通透自然 · 记录</div>
+            <div class="style-card" id="sc-vlog" onclick="setStyle('vlog')" style="padding:10px;">
+              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">极简 VLOG</div>
+              <div style="font-size:8px;color:#444;margin-top:2px;">通透自然 · 记录</div>
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-            <div class="style-card" id="sc-noir" onclick="handleProStyle('noir')" style="padding:14px;background:#0d0d12;border:1px solid #1a1a1a;border-radius:8px;cursor:pointer;transition:all 0.3s ease;">
-              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700;color:#e2e2e2;">黑白叙事<span style="background:linear-gradient(135deg,#F59E0D,#fbbf24);color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:3px;font-family:'JetBrains Mono';margin-left:8px;">PRO</span></div>
-              <div style="font-size:8px;color:#666;margin-top:4px;">极致冲突 · 艺术表达力</div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+            <div class="style-card" id="sc-noir" onclick="handleProStyle('noir')" style="padding:10px;">
+              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">黑白叙事<span style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:3px;font-family:'JetBrains Mono';margin-left:8px;">PRO</span></div>
+              <div style="font-size:8px;color:#444;margin-top:2px;">极致冲突 · 艺术表达力</div>
             </div>
             
-            <div class="style-card" id="sc-cyber" onclick="handleProStyle('cyber')" style="padding:14px;background:#0d0d12;border:1px solid #1a1a1a;border-radius:8px;cursor:pointer;transition:all 0.3s ease;">
-              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700;color:#e2e2e2;">赛博未来<span style="background:linear-gradient(135deg,#F59E0D,#fbbf24);color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:3px;font-family:'JetBrains Mono';margin-left:8px;">PRO</span></div>
-              <div style="font-size:8px;color:#666;margin-top:4px;">霓虹都市 · 幻想感</div>
+            <div class="style-card" id="sc-cyber" onclick="handleProStyle('cyber')" style="padding:10px;">
+              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">赛博未来<span style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:3px;font-family:'JetBrains Mono';margin-left:8px;">PRO</span></div>
+              <div style="font-size:8px;color:#444;margin-top:2px;">霓虹都市 · 幻想感</div>
             </div>
           </div>
 
@@ -1149,13 +1099,13 @@
           </div>
 
           <div style="margin-top:16px;">
-            <label class="lbl">输出格式</label>
-            <select id="video-format" style="width:100%;padding:8px;background:#0d0d12;border:1px solid #1a1a1a;border-radius:6px;font-size:10px;color:#777;margin-top:4px;">
-              <option value="mp4">MP4 (推荐)</option>
-              <option value="webm">WebM</option>
+            <label class="lbl">视频输出格式</label>
+            <select id="video-format" style="width:100%;padding:8px;background:#0d0d12;border:1px solid #1a1a1a;border-radius:6px;font-size:10px;font-family:'JetBrains Mono';color:#e2e2e2;">
+              <option value="mp4">MP4 (H.264)</option>
+              <option value="webm">WebM (VP9)</option>
             </select>
           </div>
-          
+
           <button class="btn btn-purple" style="width:100%;margin-top:24px;box-shadow:0 10px 20px rgba(124,58,237,.2)"
             onclick="startCinematicRender()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -1166,103 +1116,6 @@
             生成电影视频
           </button>
         </div>
-      </div>
-
-      <!-- About Section -->
-      <div class="blk" style="margin-top:30px;">
-        <details style="background:#0d0d12;border:1px solid #1a1a1a;border-radius:8px;overflow:hidden;transition:all 0.3s ease;">
-          <summary style="padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all 0.3s ease;">
-            <div style="display:flex;align-items:center;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="16" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-              </svg>
-              <span style="font-size:12px;font-weight:500;color:#e2e2e2;">关于视频帧探</span>
-            </div>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform 0.3s ease;">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </summary>
-          <div style="padding:0 14px 14px 14px;">
-            <div style="margin-bottom:20px;margin-top:20px;">
-              <h4 style="font-family:'Noto Serif SC';font-size:14px;margin-bottom:14px;color:#e2e2e2;">核心功能</h4>
-              <div style="display:grid;grid-template-columns:1fr;gap:14px;">
-                <div class="feature-card" style="display:flex;align-items:flex-start;background:#0f0f14;border:1px solid #1a1a1a;border-radius:8px;padding:14px;transition:all 0.3s ease;">
-                  <div style="background:#F59E0D;border-radius:6px;padding:8px;margin-right:14px;flex-shrink:0;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  </div>
-                  <div>
-                    <p style="font-size:12px;font-weight:500;color:#e2e2e2;margin:0 0 4px 0;">视频抽帧</p>
-                    <p style="font-size:10px;color:#777;margin:0;">支持间隔抽帧和AI智能抽帧，精准捕捉精彩瞬间</p>
-                  </div>
-                </div>
-                
-                <div class="feature-card" style="display:flex;align-items:flex-start;background:#0f0f14;border:1px solid #1a1a1a;border-radius:8px;padding:14px;transition:all 0.3s ease;">
-                  <div style="background:#F59E0D;border-radius:6px;padding:8px;margin-right:14px;flex-shrink:0;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2">
-                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                      <line x1="8" y1="21" x2="16" y2="21"></line>
-                      <line x1="12" y1="17" x2="12" y2="21"></line>
-                    </svg>
-                  </div>
-                  <div>
-                    <p style="font-size:12px;font-weight:500;color:#e2e2e2;margin:0 0 4px 0;">电影级渲染</p>
-                    <p style="font-size:10px;color:#777;margin:0;">多种视觉风格可选，专业级色彩调整</p>
-                  </div>
-                </div>
-                
-                <div class="feature-card" style="display:flex;align-items:flex-start;background:#0f0f14;border:1px solid #1a1a1a;border-radius:8px;padding:14px;transition:all 0.3s ease;">
-                  <div style="background:#F59E0D;border-radius:6px;padding:8px;margin-right:14px;flex-shrink:0;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2">
-                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                      <line x1="8" y1="12" x2="16" y2="12"></line>
-                      <line x1="12" y1="8" x2="12" y2="16"></line>
-                    </svg>
-                  </div>
-                  <div>
-                    <p style="font-size:12px;font-weight:500;color:#e2e2e2;margin:0 0 4px 0;">多种比例支持</p>
-                    <p style="font-size:10px;color:#777;margin:0;">横屏、竖屏、方形等多种比例适配</p>
-                  </div>
-                </div>
-                
-                <div class="feature-card" style="display:flex;align-items:flex-start;background:#0f0f14;border:1px solid #1a1a1a;border-radius:8px;padding:14px;transition:all 0.3s ease;">
-                  <div style="background:#F59E0D;border-radius:6px;padding:8px;margin-right:14px;flex-shrink:0;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2">
-                      <circle cx="12" cy="12" r="3"></circle>
-                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p style="font-size:12px;font-weight:500;color:#e2e2e2;margin:0 0 4px 0;">专业参数调整</p>
-                    <p style="font-size:10px;color:#777;margin:0;">FPS、快门角、色温等专业参数精细调整</p>
-                  </div>
-                </div>
-                
-                <div class="feature-card" style="display:flex;align-items:flex-start;background:#0f0f14;border:1px solid #1a1a1a;border-radius:8px;padding:14px;transition:all 0.3s ease;">
-                  <div style="background:#F59E0D;border-radius:6px;padding:8px;margin-right:14px;flex-shrink:0;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                      <polyline points="7 10 12 15 17 10"></polyline>
-                      <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                  </div>
-                  <div>
-                    <p style="font-size:12px;font-weight:500;color:#e2e2e2;margin:0 0 4px 0;">高质量视频导出</p>
-                    <p style="font-size:10px;color:#777;margin:0;">支持MP4、WebM等多种格式，高质量输出</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div style="padding-top:16px;border-top:1px solid #1a1a1a;">
-              <p style="font-size:10px;color:#666;line-height:1.4;">视频帧探是一款专业的视频抽帧工具，帮助您从视频中提取高质量帧并渲染成电影级视频。</p>
-              <p style="font-size:10px;color:#666;line-height:1.4;margin-top:8px;">版本：v4.1.0</p>
-            </div>
-          </div>
-        </details>
       </div>
 
       <div
@@ -1379,8 +1232,9 @@
 
         <div style="display:flex;align-items:center;gap:6px;background:#0d0d0f;padding:2px;border-radius:6px;border:1px solid #1a1a1a;">
           <select id="frame-format" style="background:none;border:none;color:#555;font-size:8px;font-family:'JetBrains Mono';padding:0 6px;cursor:pointer;outline:none;">
-            <option value="jpg">JPG (推荐)</option>
+            <option value="jpg">JPG</option>
             <option value="png">PNG</option>
+            <option value="webp">WebP</option>
           </select>
           <button class="btn btn-ghost" onclick="exportZip()" style="padding:8px 12px;border:none;">
             <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -1441,7 +1295,7 @@
     </div>
     <div style="font-size:11px;font-family:'JetBrains Mono';color:#444;" id="render-percent">0%</div>
     <button onclick="cancelRender()"
-      style="margin-top:4px;padding:5px 16px;border:1px solid #F59E0D;border-radius:999px;font-size:8px;font-family:'JetBrains Mono';color:#F59E0D;background:none;cursor:pointer;text-transform:uppercase;">取消</button>
+      style="margin-top:4px;padding:5px 16px;border:1px solid #2a2a2a;border-radius:999px;font-size:8px;font-family:'JetBrains Mono';color:#444;background:none;cursor:pointer;text-transform:uppercase;">取消</button>
   </div>
 
   <!-- Activate Modal -->
@@ -1473,11 +1327,9 @@
       </div>
       
       <button onclick="hideModal('activate')"
-        style="display:block;margin:10px auto 0;font-size:8px;font-family:'JetBrains Mono';color:#F59E0D;background:none;border:none;cursor:pointer;">取消</button>
+        style="display:block;margin:10px auto 0;font-size:8px;font-family:'JetBrains Mono';color:#333;background:none;border:none;cursor:pointer;">取消</button>
     </div>
   </div>
-
-
 
   <script>
     // ===== State =====
@@ -1489,8 +1341,6 @@
     let currentMode = 'simple';
     let currentStyle = 'cinema';
     let currentRatio = '16:9';
-
-
 
     // Check license status on page load
     if (isPro) {
@@ -2307,32 +2157,36 @@
     async function exportZip() {
       const frames = getExportFrames();
       if (!frames.length) { toast('没有可导出的帧', true); return; }
+      
+      const format = document.getElementById('frame-format').value;
+      const mimeType = format === 'jpg' ? 'image/jpeg' : format === 'png' ? 'image/png' : 'image/webp';
+      
       toast('正在打包...');
       const zip = new JSZip(), folder = zip.folder('CineMagic_Frames');
-      const frameFormat = document.getElementById('frame-format').value;
-      const mimeType = frameFormat === 'jpg' ? 'image/jpeg' : 'image/png';
-      const quality = frameFormat === 'jpg' ? 0.8 : 1;
       
       for (let i = 0; i < frames.length; i++) {
         const f = frames[i];
-        // Re-encode the image in the selected format
+        // 创建临时 canvas 来转换格式
         const canvas = document.createElement('canvas');
+        canvas.width = f.width || 1280;
+        canvas.height = f.height || 720;
         const ctx = canvas.getContext('2d');
+        
+        // 加载原始图像
         const img = new Image();
         img.src = f.dataUrl;
+        await new Promise(resolve => { img.onload = resolve; });
         
-        await new Promise((resolve) => {
-          img.onload = () => {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-            const dataUrl = canvas.toDataURL(mimeType, quality);
-            const b64 = dataUrl.split(',')[1];
-            folder.file(`frame_${String(i + 1).padStart(4, '0')}_${f.timecode.replace(/:/g, '-')}.${frameFormat}`, b64, { base64: true });
-            resolve();
-          };
-        });
+        // 绘制到 canvas
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        // 转换为指定格式
+        const dataUrl = canvas.toDataURL(mimeType, format === 'jpg' ? 0.8 : 0.9);
+        const b64 = dataUrl.split(',')[1];
+        
+        folder.file(`frame_${String(i + 1).padStart(4, '0')}_${f.timecode.replace(/:/g, '-')}.${format}`, b64, { base64: true });
       }
+      
       dlBlob(await zip.generateAsync({ type: 'blob' }), `CineMagic_Frames_${Date.now()}.zip`);
       toast('ZIP 下载完成');
     }
@@ -2476,13 +2330,18 @@
 
         // Setup MediaRecorder
         const stream = cvs.captureStream(fps);
-        let mimeType = [
+        const selectedFormat = document.getElementById('video-format').value;
+        
+        const mimeTypeCandidates = selectedFormat === 'mp4' ? [
           'video/mp4;codecs=h264',
+          'video/mp4'
+        ] : [
           'video/webm;codecs=vp9',
           'video/webm;codecs=h264',
-          'video/webm',
-          'video/ogg'
-        ].find(type => MediaRecorder.isTypeSupported(type)) || '';
+          'video/webm'
+        ];
+        
+        const mimeType = mimeTypeCandidates.find(type => MediaRecorder.isTypeSupported(type)) || '';
         _recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8000000 });
         
         _recorder.ondataavailable = e => { if (e.data.size > 0) renderChunks.push(e.data); };
@@ -2544,8 +2403,8 @@
 
         hideRenderOverlay();
 
-        const videoFormat = document.getElementById('video-format').value;
-        mimeType = videoFormat === 'mp4' ? 'video/mp4' : 'video/webm';
+        const selectedFormat = document.getElementById('video-format').value;
+        const mimeType = selectedFormat === 'mp4' ? 'video/mp4' : 'video/webm';
         const outBlob = new Blob(renderChunks, { type: mimeType });
         generatedVideos.push({ blob: outBlob, cover: firstFrameCover });
 
@@ -2553,7 +2412,7 @@
         renderFilmstrip(true);
 
         document.getElementById('download-zone').style.display = 'block';
-        document.getElementById('btn-download').onclick = () => dlBlob(outBlob, `CineMagic_${currentStyle}_${Date.now()}.${videoFormat}`);
+        document.getElementById('btn-download').onclick = () => dlBlob(outBlob, `CineMagic_${currentStyle}_${Date.now()}.${selectedFormat}`);
         toast('电影视频录制完成 (原生引擎)');
         
         URL.revokeObjectURL(_recordingVideo.src);
