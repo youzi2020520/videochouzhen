@@ -123,11 +123,92 @@
 
       <!-- STEP 03: Rendering -->
       <div class="blk" id="render-group">
-        <p class="sec-lbl"><span class="step-tag">Step 03</span>电影级渲染</p>
+        <p class="sec-lbl"><span class="step-tag">Step 03</span>AI 智能调色</p>
 
-        <div id="render-settings-wrap">
-          <label class="lbl">视觉风格 <span
-              style="font-size:9px;color:#2a2a2a;text-transform:none;letter-spacing:0;margin-left:4px;">(对标主流创作预设)</span></label>
+        <!-- AI 分析按钮 -->
+        <button class="btn btn-purple" style="width:100%;margin-bottom:20px;" onclick="analyzeVideo()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+          </svg>
+          AI 智能分析视频
+        </button>
+
+        <!-- AI 分析报告 -->
+        <div id="ai-analysis-result" style="display:none;margin-bottom:20px;padding:16px;background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(249,115,22,0.05));border:1px solid rgba(124,58,237,0.3);border-radius:8px;">
+          <div style="font-size:10px;font-family:'JetBrains Mono';color:#888;margin-bottom:12px;text-transform:uppercase;">AI 分析报告</div>
+          
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+            <div>
+              <div style="font-size:9px;color:#666;margin-bottom:4px;">场景类型</div>
+              <div style="font-size:12px;font-family:'Noto Serif SC';color:#fff;" id="analysis-scene">-</div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:#666;margin-bottom:4px;">光线条件</div>
+              <div style="font-size:12px;font-family:'Noto Serif SC';color:#fff;" id="analysis-lighting">-</div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:#666;margin-bottom:4px;">色彩基调</div>
+              <div style="font-size:12px;font-family:'Noto Serif SC';color:#fff;" id="analysis-color">-</div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:#666;margin-bottom:4px;">情绪氛围</div>
+              <div style="font-size:12px;font-family:'Noto Serif SC';color:#fff;" id="analysis-mood">-</div>
+            </div>
+          </div>
+
+          <!-- 智能推荐 -->
+          <div style="margin-top:16px;">
+            <div style="font-size:10px;font-family:'JetBrains Mono';color:#888;margin-bottom:8px;text-transform:uppercase;">智能推荐风格</div>
+            
+            <div id="recommendations-free" style="display:none;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+              <!-- 免费用户看到的模糊推荐 -->
+              <div class="style-card-blur" onclick="showModal('activate')" style="padding:12px;position:relative;cursor:pointer;background:#0d0d0f;border:1px solid #1a1a1a;border-radius:6px;">
+                <div style="filter:blur(3px);opacity:0.5;">
+                  <div style="font-size:11px;font-family:'Noto Serif SC';font-weight:700;">推荐风格 1</div>
+                  <div style="font-size:7px;color:#666;margin-top:2px;">匹配度 92%</div>
+                </div>
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);border-radius:6px;">
+                  <div style="text-align:center;">
+                    <div style="font-size:16px;margin-bottom:4px;">🔒</div>
+                    <div style="font-size:8px;font-family:'JetBrains Mono';color:#f97316;">PRO 解锁</div>
+                  </div>
+                </div>
+              </div>
+              <div class="style-card-blur" onclick="showModal('activate')" style="padding:12px;position:relative;cursor:pointer;background:#0d0d0f;border:1px solid #1a1a1a;border-radius:6px;">
+                <div style="filter:blur(3px);opacity:0.5;">
+                  <div style="font-size:11px;font-family:'Noto Serif SC';font-weight:700;">推荐风格 2</div>
+                  <div style="font-size:7px;color:#666;margin-top:2px;">匹配度 87%</div>
+                </div>
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);border-radius:6px;">
+                  <div style="text-align:center;">
+                    <div style="font-size:16px;margin-bottom:4px;">🔒</div>
+                    <div style="font-size:8px;font-family:'JetBrains Mono';color:#f97316;">PRO 解锁</div>
+                  </div>
+                </div>
+              </div>
+              <div class="style-card-blur" onclick="showModal('activate')" style="padding:12px;position:relative;cursor:pointer;background:#0d0d0f;border:1px solid #1a1a1a;border-radius:6px;">
+                <div style="filter:blur(3px);opacity:0.5;">
+                  <div style="font-size:11px;font-family:'Noto Serif SC';font-weight:700;">推荐风格 3</div>
+                  <div style="font-size:7px;color:#666;margin-top:2px;">匹配度 81%</div>
+                </div>
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);border-radius:6px;">
+                  <div style="text-align:center;">
+                    <div style="font-size:16px;margin-bottom:4px;">🔒</div>
+                    <div style="font-size:8px;font-family:'JetBrains Mono';color:#f97316;">PRO 解锁</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PRO 用户看到的真实推荐 -->
+            <div id="recommendations-pro" style="display:none;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+              <!-- 动态生成 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 手动选择风格 -->
+        <label class="lbl">或手动选择风格</label>
 
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:10px;">
             <div class="style-card active" id="sc-cinema" onclick="setStyle('cinema')" style="padding:10px;">
@@ -202,6 +283,300 @@
             生成电影视频
           </button>
         </div>
+
+        <script>
+        // ===== AI Video Analysis =====
+        async function analyzeVideo() {
+          if (!videoReady) {
+            toast('请先上传视频', true);
+            return;
+          }
+
+          const analysisResult = document.getElementById('ai-analysis-result');
+          analysisResult.style.display = 'block';
+          
+          // Show analyzing state
+          document.getElementById('analysis-scene').innerText = '分析中...';
+          document.getElementById('analysis-lighting').innerText = '分析中...';
+          document.getElementById('analysis-color').innerText = '分析中...';
+          document.getElementById('analysis-mood').innerText = '分析中...';
+
+          // Analyze video
+          const analysis = await performVideoAnalysis();
+
+          // Update UI based on user type
+          if (isPro) {
+            showProAnalysis(analysis);
+          } else {
+            showFreeAnalysis(analysis);
+          }
+        }
+
+        async function performVideoAnalysis() {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = 320;
+          canvas.height = 180;
+
+          // Sample frames from video
+          const samples = [];
+          const sampleCount = 10;
+          const duration = videoEl.duration;
+          
+          for (let i = 0; i < sampleCount; i++) {
+            const time = (i / (sampleCount - 1)) * duration;
+            videoEl.currentTime = time;
+            await new Promise(resolve => {
+              const onSeeked = () => {
+                videoEl.removeEventListener('seeked', onSeeked);
+                resolve();
+              };
+              videoEl.addEventListener('seeked', onSeeked);
+            });
+            
+            ctx.drawImage(videoEl, 0, 0, 320, 180);
+            const imageData = ctx.getImageData(0, 0, 320, 180);
+            samples.push(imageData.data);
+          }
+
+          // Analyze each sample
+          const brightness = samples.map(s => analyzeBrightness(s)).reduce((a, b) => a + b, 0) / sampleCount;
+          const saturation = samples.map(s => analyzeSaturation(s)).reduce((a, b) => a + b, 0) / sampleCount;
+          const temperature = samples.map(s => analyzeColorTemperature(s)).reduce((a, b) => a + b, 0) / sampleCount;
+          const contrast = samples.map(s => analyzeContrast(s)).reduce((a, b) => a + b, 0) / sampleCount;
+
+          // Classify scene
+          const sceneType = classifySceneType(brightness, saturation, temperature);
+          const lighting = classifyLighting(brightness, contrast);
+          const colorTone = classifyColorTone(temperature, saturation);
+          const mood = classifyMood(brightness, temperature, saturation);
+
+          return {
+            brightness,
+            saturation,
+            temperature,
+            contrast,
+            sceneType,
+            lighting,
+            colorTone,
+            mood
+          };
+        }
+
+        function analyzeBrightness(imageData) {
+          let sum = 0;
+          const step = 4 * 100; // Sample every 100 pixels
+          for (let i = 0; i < imageData.length; i += step) {
+            const r = imageData[i];
+            const g = imageData[i + 1];
+            const b = imageData[i + 2];
+            sum += (r * 0.299 + g * 0.587 + b * 0.114) / 255;
+          }
+          return sum / (imageData.length / step);
+        }
+
+        function analyzeSaturation(imageData) {
+          let sum = 0;
+          const step = 4 * 100;
+          for (let i = 0; i < imageData.length; i += step) {
+            const r = imageData[i] / 255;
+            const g = imageData[i + 1] / 255;
+            const b = imageData[i + 2] / 255;
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const s = max === 0 ? 0 : (max - min) / max;
+            sum += s;
+          }
+          return sum / (imageData.length / step);
+        }
+
+        function analyzeColorTemperature(imageData) {
+          let rSum = 0, bSum = 0;
+          const step = 4 * 100;
+          let count = 0;
+          for (let i = 0; i < imageData.length; i += step) {
+            rSum += imageData[i];
+            bSum += imageData[i + 2];
+            count++;
+          }
+          const avgR = rSum / count;
+          const avgB = bSum / count;
+          // > 0.5 = warm, < 0.5 = cool
+          return avgR / (avgR + avgB);
+        }
+
+        function analyzeContrast(imageData) {
+          let min = 255, max = 0;
+          const step = 4 * 50;
+          for (let i = 0; i < imageData.length; i += step) {
+            const r = imageData[i];
+            const g = imageData[i + 1];
+            const b = imageData[i + 2];
+            const luma = r * 0.299 + g * 0.587 + b * 0.114;
+            if (luma < min) min = luma;
+            if (luma > max) max = luma;
+          }
+          return (max - min) / 255;
+        }
+
+        function classifySceneType(brightness, saturation, temperature) {
+          if (brightness > 0.7 && saturation > 0.6) return { type: 'outdoor', name: '室外日景' };
+          if (brightness < 0.4) return { type: 'night', name: '夜景/暗光' };
+          if (saturation < 0.3) return { type: 'portrait', name: '人像特写' };
+          if (temperature > 0.55) return { type: 'indoor_warm', name: '室内暖调' };
+          return { type: 'general', name: '一般场景' };
+        }
+
+        function classifyLighting(brightness, contrast) {
+          if (brightness > 0.7 && contrast > 0.5) return { type: 'bright_contrast', name: '明亮高对比' };
+          if (brightness > 0.7) return { type: 'bright_soft', name: '明亮柔和' };
+          if (brightness < 0.4) return { type: 'dark', name: '昏暗' };
+          return { type: 'normal', name: '正常光线' };
+        }
+
+        function classifyColorTone(temperature, saturation) {
+          if (temperature > 0.55 && saturation > 0.5) return { type: 'warm_vibrant', name: '暖调鲜艳' };
+          if (temperature > 0.55) return { type: 'warm_muted', name: '暖调柔和' };
+          if (temperature < 0.45 && saturation > 0.5) return { type: 'cool_vibrant', name: '冷调鲜艳' };
+          if (temperature < 0.45) return { type: 'cool_muted', name: '冷调柔和' };
+          return { type: 'neutral', name: '中性色调' };
+        }
+
+        function classifyMood(brightness, temperature, saturation) {
+          if (brightness > 0.7 && temperature > 0.55) return { type: 'cheerful', name: '温暖积极' };
+          if (brightness < 0.4 && temperature < 0.45) return { type: 'melancholic', name: '忧郁沉静' };
+          if (saturation > 0.6) return { type: 'energetic', name: '活力四射' };
+          if (saturation < 0.3) return { type: 'calm', name: '平静淡雅' };
+          return { type: 'balanced', name: '平衡自然' };
+        }
+
+        function showFreeAnalysis(analysis) {
+          // Show basic analysis
+          document.getElementById('analysis-scene').innerText = analysis.sceneType.name;
+          document.getElementById('analysis-lighting').innerText = analysis.lighting.name;
+          document.getElementById('analysis-color').innerText = analysis.colorTone.name;
+          document.getElementById('analysis-mood').innerText = analysis.mood.name;
+
+          // Show blurred recommendations
+          document.getElementById('recommendations-free').style.display = 'grid';
+          document.getElementById('recommendations-pro').style.display = 'none';
+
+          toast('AI 分析完成！升级到 PRO 解锁智能推荐', false);
+        }
+
+        function showProAnalysis(analysis) {
+          // Show full analysis
+          document.getElementById('analysis-scene').innerText = analysis.sceneType.name;
+          document.getElementById('analysis-lighting').innerText = analysis.lighting.name;
+          document.getElementById('analysis-color').innerText = analysis.colorTone.name;
+          document.getElementById('analysis-mood').innerText = analysis.mood.name;
+
+          // Generate and show recommendations
+          const recommendations = recommendStyles(analysis);
+          showRecommendations(recommendations);
+
+          document.getElementById('recommendations-free').style.display = 'none';
+          document.getElementById('recommendations-pro').style.display = 'grid';
+
+          toast('AI 分析完成！已生成智能推荐', false);
+        }
+
+        function recommendStyles(analysis) {
+          const styleDatabase = [
+            {
+              id: 'cinema',
+              name: '经典电影',
+              matchConditions: {
+                sceneTypes: ['general', 'indoor_warm'],
+                lighting: ['normal', 'bright_soft'],
+                moods: ['balanced', 'calm']
+              },
+              filter: 'contrast(1.15) saturate(0.85) brightness(0.95) sepia(0.05)'
+            },
+            {
+              id: 'film',
+              name: '复古胶片',
+              matchConditions: {
+                sceneTypes: ['outdoor', 'portrait'],
+                lighting: ['bright_soft', 'normal'],
+                moods: ['cheerful', 'balanced']
+              },
+              filter: 'contrast(1.1) saturate(1.2) sepia(0.3) brightness(1.05)'
+            },
+            {
+              id: 'vibe',
+              name: '法式浪漫',
+              matchConditions: {
+                sceneTypes: ['portrait', 'indoor_warm'],
+                lighting: ['dark', 'normal'],
+                moods: ['melancholic', 'calm']
+              },
+              filter: 'contrast(0.9) saturate(0.7) brightness(1.1) hue-rotate(-10deg) opacity(0.9)',
+              isPro: true
+            },
+            {
+              id: 'vlog',
+              name: '极简 VLOG',
+              matchConditions: {
+                sceneTypes: ['outdoor', 'general'],
+                lighting: ['bright_contrast', 'bright_soft'],
+                moods: ['cheerful', 'energetic']
+              },
+              filter: 'contrast(1.1) saturate(1.1) brightness(1.15)',
+              isPro: true
+            },
+            {
+              id: 'noir',
+              name: '黑白叙事',
+              matchConditions: {
+                sceneTypes: ['night', 'portrait'],
+                lighting: ['dark', 'bright_contrast'],
+                moods: ['melancholic', 'calm']
+              },
+              filter: 'contrast(1.4) brightness(0.9) saturate(0.6)',
+              isPro: true
+            },
+            {
+              id: 'cyber',
+              name: '赛博未来',
+              matchConditions: {
+                sceneTypes: ['night', 'outdoor'],
+                lighting: ['dark', 'normal'],
+                moods: ['energetic', 'melancholic']
+              },
+              filter: 'contrast(1.1) saturate(1.4) hue-rotate(-20deg) brightness(1.1)',
+              isPro: true
+            }
+          ];
+
+          // Calculate match scores
+          styleDatabase.forEach(style => {
+            let score = 0;
+            
+            if (style.matchConditions.sceneTypes.includes(analysis.sceneType.type)) score += 40;
+            if (style.matchConditions.lighting.includes(analysis.lighting.type)) score += 30;
+            if (style.matchConditions.moods.includes(analysis.mood.type)) score += 30;
+            
+            style.matchScore = score;
+          });
+
+          // Return top 3
+          return styleDatabase
+            .sort((a, b) => b.matchScore - a.matchScore)
+            .slice(0, 3);
+        }
+
+        function showRecommendations(recommendations) {
+          const container = document.getElementById('recommendations-pro');
+          container.innerHTML = recommendations.map((rec, i) => `
+            <div class="style-card" onclick="setStyle('${rec.id}')" style="padding:12px;cursor:pointer;">
+              <div style="font-size:11px;font-family:'Noto Serif SC';font-weight:700;">${rec.name}</div>
+              <div style="font-size:7px;color:#666;margin-top:2px;">匹配度 ${rec.matchScore}%</div>
+              ${rec.isPro ? '<div style="font-size:6px;color:#f97316;margin-top:4px;font-family:\'JetBrains Mono\';">PRO</div>' : ''}
+            </div>
+          `).join('');
+        }
+        </script>
       </div>
 
       <!-- About Section -->
