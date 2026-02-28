@@ -2510,7 +2510,6 @@
 
         hideRenderOverlay();
 
-        const selectedFormat = document.getElementById('video-format').value;
         const mimeType = selectedFormat === 'mp4' ? 'video/mp4' : 'video/webm';
         const outBlob = new Blob(renderChunks, { type: mimeType });
         generatedVideos.push({ blob: outBlob, cover: firstFrameCover });
