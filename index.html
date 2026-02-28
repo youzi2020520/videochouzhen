@@ -14,87 +14,6 @@
     rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
-  <script>
-    // Predefine functions to avoid ReferenceError
-    function setStyle(id) {
-      window.currentStyle = id;
-      document.querySelectorAll('.style-card').forEach(c => c.classList.remove('active'));
-      document.getElementById('sc-' + id).classList.add('active');
-      if (window.videoReady) drawVideoFrame();
-    }
-    
-    function handleProStyle(id) {
-      if (!window.isPro) {
-        showModal('activate');
-        return;
-      }
-      setStyle(id);
-    }
-    
-    function switchMode(mode) {
-      // If switching to pro mode and not authorized, show modal and don't switch
-      if (mode === 'pro' && !window.isPro) {
-        showModal('activate');
-        return;
-      }
-      
-      window.currentMode = mode;
-      document.getElementById('btn-simple').classList.toggle('active', mode === 'simple');
-      document.getElementById('btn-pro').classList.toggle('active', mode === 'pro');
-      document.getElementById('mode-label').innerText = mode === 'simple' ? 'Simple Mode' : 'Pro Mode';
-
-      // Update sidebar sections
-      document.getElementById('pro-controls').style.display = (mode === 'pro' && window.isPro) ? 'flex' : 'none';
-    }
-    
-    function showModal(id) {
-      document.getElementById(id + '-modal').style.display = 'flex';
-    }
-    
-    function hideModal(id) {
-      document.getElementById(id + '-modal').style.display = 'none';
-    }
-    
-    function handleProAction(action) {
-      if (!window.isPro) {
-        showModal('activate');
-        return;
-      }
-      
-      switch(action) {
-        case 'pdf':
-          // PDF generation logic will be handled in the main script
-          break;
-        default:
-          break;
-      }
-    }
-    
-    function switchGalleryTab(tab) {
-      window.currentGalleryTab = tab;
-      document.getElementById('tab-frames').classList.toggle('active', tab === 'frames');
-      document.getElementById('tab-videos').classList.toggle('active', tab === 'videos');
-      document.getElementById('filmstrip').style.display = tab === 'frames' ? 'flex' : 'none';
-      document.getElementById('videostrip').style.display = tab === 'videos' ? 'flex' : 'none';
-    }
-    
-    // Predefine ratio variables and function
-    window.ratioIds = { '9:16': 'r-916', '16:9': 'r-169', '1:1': 'r-11', '2.35:1': 'r-235' };
-    window.ratioValues = { '9:16': 9 / 16, '16:9': 16 / 9, '1:1': 1, '2.35:1': 2.35 };
-    
-    function setRatio(r) {
-      window.currentRatio = r;
-      document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(window.ratioIds[r]).classList.add('active');
-
-      // Update preview stage aspect Ratio
-      const stage = document.getElementById('preview-stage');
-      const val = window.ratioValues[r];
-      stage.style.aspectRatio = r.replace(':', '/');
-
-      toast(`画幅已切至 ${r}`);
-    }
-  </script>
   <style>
     :root {
       --orange: #f97316;
@@ -564,7 +483,6 @@
       border-top: 1px solid var(--border);
       background: #050508;
       flex-shrink: 0;
-      height: 190px;
     }
 
     #filmstrip-header {
@@ -1180,14 +1098,6 @@
 
           </div>
 
-          <div style="margin-top:16px;">
-            <label class="lbl">视频输出格式</label>
-            <select id="video-format" style="width:100%;padding:8px;background:#0d0d12;border:1px solid #1a1a1a;border-radius:6px;font-size:10px;font-family:'JetBrains Mono';color:#e2e2e2;">
-              <option value="mp4">MP4 (H.264)</option>
-              <option value="webm">WebM (VP9)</option>
-            </select>
-          </div>
-
           <button class="btn btn-purple" style="width:100%;margin-top:24px;box-shadow:0 10px 20px rgba(124,58,237,.2)"
             onclick="startCinematicRender()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -1200,101 +1110,8 @@
         </div>
       </div>
 
-      <!-- About Section -->
-      <div style="margin-top:auto;">
-        <div id="about-toggle" style="padding:10px 14px;font-size:8px;color:#444;font-family:'JetBrains Mono';text-transform:uppercase;letter-spacing:.15em;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1a1a1a;">
-          <span>关于视频帧探</span>
-          <svg id="about-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform 0.3s ease;">
-            <path d="M6 9l6 6 6-6" />
-          </svg>
-        </div>
-        <div id="about-content" style="padding:10px 14px;font-size:8px;color:#444;line-height:1.4;display:none;border-top:1px solid #1a1a1a;">
-          <h3 style="font-family:'Noto Serif SC';font-size:14px;margin-bottom:12px;color:#e2e2e2;">核心功能</h3>
-          
-          <div style="margin-bottom:10px;padding:10px;background:#0d0d12;border-radius:6px;border:1px solid #1a1a1a;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div style="width:24px;height:24px;background:var(--orange);border-radius:4px;display:flex;align-items:center;justify-content:center;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2">
-                  <path d="M9 12l2 2 4-4" />
-                </svg>
-              </div>
-              <div>
-                <div style="font-size:10px;color:#e2e2e2;margin-bottom:2px;">视频抽帧</div>
-                <div style="font-size:8px;color:#555;">支持间隔抽帧和AI智能抽帧，精准捕捉精彩瞬间</div>
-              </div>
-            </div>
-          </div>
-          
-          <div style="margin-bottom:10px;padding:10px;background:#0d0d12;border-radius:6px;border:1px solid #1a1a1a;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div style="width:24px;height:24px;background:var(--orange);border-radius:4px;display:flex;align-items:center;justify-content:center;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2">
-                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                  <line x1="8" y1="21" x2="16" y2="21" />
-                  <line x1="12" y1="17" x2="12" y2="21" />
-                </svg>
-              </div>
-              <div>
-                <div style="font-size:10px;color:#e2e2e2;margin-bottom:2px;">电影级渲染</div>
-                <div style="font-size:8px;color:#555;">多种视觉风格可选，专业级色彩调整</div>
-              </div>
-            </div>
-          </div>
-          
-          <div style="margin-bottom:10px;padding:10px;background:#0d0d12;border-radius:6px;border:1px solid #1a1a1a;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div style="width:24px;height:24px;background:var(--orange);border-radius:4px;display:flex;align-items:center;justify-content:center;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                  <line x1="3" y1="9" x2="21" y2="9" />
-                  <line x1="9" y1="3" x2="9" y2="21" />
-                </svg>
-              </div>
-              <div>
-                <div style="font-size:10px;color:#e2e2e2;margin-bottom:2px;">多种比例支持</div>
-                <div style="font-size:8px;color:#555;">横屏、竖屏、方形等多种比例适配</div>
-              </div>
-            </div>
-          </div>
-          
-          <div style="margin-bottom:10px;padding:10px;background:#0d0d12;border-radius:6px;border:1px solid #1a1a1a;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div style="width:24px;height:24px;background:var(--orange);border-radius:4px;display:flex;align-items:center;justify-content:center;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2">
-                  <circle cx="12" cy="12" r="3" />
-                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                </svg>
-              </div>
-              <div>
-                <div style="font-size:10px;color:#e2e2e2;margin-bottom:2px;">专业参数调整</div>
-                <div style="font-size:8px;color:#555;">FPS、快门角、色温等专业参数精细调整</div>
-              </div>
-            </div>
-          </div>
-          
-          <div style="margin-bottom:12px;padding:10px;background:#0d0d12;border-radius:6px;border:1px solid #1a1a1a;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div style="width:24px;height:24px;background:var(--orange);border-radius:4px;display:flex;align-items:center;justify-content:center;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-              </div>
-              <div>
-                <div style="font-size:10px;color:#e2e2e2;margin-bottom:2px;">高质量视频导出</div>
-                <div style="font-size:8px;color:#555;">支持MP4、WebM等多种格式，高质量输出</div>
-              </div>
-            </div>
-          </div>
-          
-          <p style="margin-bottom:8px;font-size:8px;color:#444;">视频帧探是一款专业的视频抽帧工具，帮助您从视频中提取高质量帧并渲染成电影级视频。</p>
-          <p style="font-size:8px;color:#555;">版本：v4.1.0</p>
-        </div>
-      </div>
-
       <div
-        style="padding:10px 14px;font-size:6px;color:#1a1a1a;font-family:'JetBrains Mono';text-transform:uppercase;letter-spacing:.15em;">
+        style="padding:10px 14px;font-size:6px;color:#1a1a1a;font-family:'JetBrains Mono';text-transform:uppercase;letter-spacing:.15em;margin-top:auto;">
         Build v4.1.0 · PLATFORM</div>
     </aside>
 
@@ -1374,16 +1191,26 @@
               </button>
             </div>
             
-            <div class="time-display-box" style="text-align: right;" id="tc-duration">00:00:00</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="text" id="tc-input" placeholder="00:00:00" style="width:80px;padding:6px 8px;background:#0d0d0f;border:1px solid #1a1a1a;border-radius:6px;font-size:10px;font-family:'JetBrains Mono';color:#fff;text-align:center;">
+              <button class="control-btn" onclick="seekToTimecode()" title="跳转到时间码">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5 3 19 12 5 21" />
+                </svg>
+              </button>
+              <div class="time-display-box" style="text-align: right;" id="tc-duration">00:00:00</div>
+            </div>
           </div>
         </div>
       </div>
 
       <div id="filmstrip-wrap">
         <div id="filmstrip-header">
-          <div class="mode-pill" style="padding:3px; background:#111; width:fit-content; align-items:center;">
-            <button id="tab-frames" class="mode-btn active" style="padding:6px 16px; font-size:11px;" onclick="switchGalleryTab('frames')">帧</button>
-            <button id="tab-videos" class="mode-btn" style="padding:6px 16px; font-size:11px;" onclick="switchGalleryTab('videos')">视频</button>
+          <div class="mode-pill" style="padding:2px; background:#000; width:fit-content;">
+            <button id="tab-frames" class="mode-btn active" style="padding:4px 10px; font-size:10px;"
+              onclick="switchGalleryTab('frames')">帧</button>
+            <button id="tab-videos" class="mode-btn" style="padding:4px 10px; font-size:10px;"
+              onclick="switchGalleryTab('videos')">视频</button>
           </div>
           <span style="font-size:11px; font-weight:700; color:#666; font-family:'JetBrains Mono'; white-space:nowrap;">
             已选 <span id="sel-count" style="color:#fff;">0</span> / <span id="frame-count">0</span>
@@ -1403,20 +1230,13 @@
       <!-- Toolbar -->
       <div id="toolbar">
 
-        <div style="display:flex;align-items:center;gap:6px;background:#0d0d0f;padding:2px;border-radius:6px;border:1px solid #1a1a1a;">
-          <select id="frame-format" style="background:none;border:none;color:#555;font-size:8px;font-family:'JetBrains Mono';padding:0 6px;cursor:pointer;outline:none;">
-            <option value="jpg">JPG</option>
-            <option value="png">PNG</option>
-            <option value="webp">WebP</option>
-          </select>
-          <button class="btn btn-ghost" onclick="exportZip()" style="padding:8px 12px;border:none;">
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 15V3m-4 8l4 4 4-4m-9 8h10a2 2 0 002-2v-2H3v2a2 2 0 002 2z" />
-            </svg>
-            ZIP 下载
-          </button>
-        </div>
+        <button class="btn btn-ghost" onclick="exportZip()">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 15V3m-4 8l4 4 4-4m-9 8h10a2 2 0 002-2v-2H3v2a2 2 0 002 2z" />
+          </svg>
+          ZIP 下载
+        </button>
         <div style="display:flex;align-items:center;gap:6px;background:#0d0d0f;padding:2px;border-radius:6px;border:1px solid #1a1a1a;">
           <select id="pdf-template" style="background:none;border:none;color:#555;font-size:8px;font-family:'JetBrains Mono';padding:0 6px;cursor:pointer;outline:none;">
             <option value="classic">标准网格 (3x2)</option>
@@ -1507,42 +1327,28 @@
   <script>
     // ===== State =====
     const AUTH_SERVER = "http://localhost:3000/api";
-    window.isPro = localStorage.getItem('cine_pro') === 'true';
+    let isPro = localStorage.getItem('cine_pro') === 'true';
     let blazefaceModel = null;
     let audioEnergyData = []; // Store RMS energy levels per second
     let isAIInitializing = false;
-    window.currentMode = 'simple';
-    window.currentStyle = 'cinema';
-    window.currentRatio = '16:9';
+    let currentMode = 'simple';
+    let currentStyle = 'cinema';
+    let currentRatio = '16:9';
 
     // Check license status on page load
-    if (window.isPro) {
+    if (isPro) {
       const expiryDate = localStorage.getItem('cine_expiry');
       applyProStatus(expiryDate);
     }
-
-    // About section toggle
-    document.getElementById('about-toggle').addEventListener('click', function() {
-      const content = document.getElementById('about-content');
-      const icon = document.getElementById('about-icon');
-      
-      if (content.style.display === 'none' || content.style.display === '') {
-        content.style.display = 'block';
-        icon.style.transform = 'rotate(180deg)';
-      } else {
-        content.style.display = 'none';
-        icon.style.transform = 'rotate(0deg)';
-      }
-    });
     let videoFile = null;
-    window.videoReady = false;
+    let videoReady = false;
     let isRendering = false;
     let capturedFrames = [];
     let selectedFrames = new Set();
     let generatedVideos = [];
     let selectedVideos = new Set();
     let activePreviewIdx = -1;
-    window.currentGalleryTab = 'frames';
+    let currentGalleryTab = 'frames';
     let renderChunks = [];
     let masteredFiles = [];
 
@@ -1559,28 +1365,28 @@
       cyber: { name: '赛博未来', sub: '霓虹都市 · 幻想感', fps: 22, shutter: 180, filter: 'contrast(1.3) saturate(1.8) hue-rotate(180deg) brightness(1.1)', emotionProfile: 'burst', isPro: true }
     };
 
-    if (window.isPro) applyProStatus();
+    if (isPro) applyProStatus();
 
     // ===== Mode =====
     function switchMode(mode) {
       // If switching to pro mode and not authorized, show modal and don't switch
-      if (mode === 'pro' && !window.isPro) {
+      if (mode === 'pro' && !isPro) {
         showModal('activate');
         return;
       }
       
-      window.currentMode = mode;
+      currentMode = mode;
       document.getElementById('btn-simple').classList.toggle('active', mode === 'simple');
       document.getElementById('btn-pro').classList.toggle('active', mode === 'pro');
       document.getElementById('mode-label').innerText = mode === 'simple' ? 'Simple Mode' : 'Pro Mode';
 
       // Update sidebar sections
-      document.getElementById('pro-controls').style.display = (mode === 'pro' && window.isPro) ? 'flex' : 'none';
+      document.getElementById('pro-controls').style.display = (mode === 'pro' && isPro) ? 'flex' : 'none';
     }
 
     // ===== Pro =====
     function applyProStatus(expiryDate) {
-      window.isPro = true; localStorage.setItem('cine_pro', 'true');
+      isPro = true; localStorage.setItem('cine_pro', 'true');
       const tag = document.getElementById('user-tag');
       tag.innerText = 'Pro'; tag.style.color = '#4ade80'; tag.style.borderColor = '#166534';
       document.getElementById('activate-btn').style.display = 'none';
@@ -1653,25 +1459,25 @@
 
     // ===== Style =====
     function setStyle(id) {
-      window.currentStyle = id;
+      currentStyle = id;
       document.querySelectorAll('.style-card').forEach(c => c.classList.remove('active'));
       document.getElementById('sc-' + id).classList.add('active');
-      if (window.videoReady) drawVideoFrame();
+      if (videoReady) drawVideoFrame();
     }
-    function handleProStyle(id) { if (!window.isPro) { showModal('activate'); return; } setStyle(id); }
+    function handleProStyle(id) { if (!isPro) { showModal('activate'); return; } setStyle(id); }
 
     // ===== Ratio =====
-    window.ratioIds = { '9:16': 'r-916', '16:9': 'r-169', '1:1': 'r-11', '2.35:1': 'r-235' };
-    window.ratioValues = { '9:16': 9 / 16, '16:9': 16 / 9, '1:1': 1, '2.35:1': 2.35 };
+    const ratioIds = { '9:16': 'r-916', '16:9': 'r-169', '1:1': 'r-11', '2.35:1': 'r-235' };
+    const ratioValues = { '9:16': 9 / 16, '16:9': 16 / 9, '1:1': 1, '2.35:1': 2.35 };
 
     function setRatio(r) {
-      window.currentRatio = r;
+      currentRatio = r;
       document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(window.ratioIds[r]).classList.add('active');
+      document.getElementById(ratioIds[r]).classList.add('active');
 
       // Update preview stage aspect Ratio
       const stage = document.getElementById('preview-stage');
-      const val = window.ratioValues[r];
+      const val = ratioValues[r];
       stage.style.aspectRatio = r.replace(':', '/');
 
       toast(`画幅已切至 ${r}`);
@@ -1720,7 +1526,7 @@
       const url = URL.createObjectURL(file);
       videoEl.src = url;
       videoEl.onloadedmetadata = () => {
-        window.videoReady = true;
+        videoReady = true;
         document.getElementById('placeholder').style.display = 'none';
         document.getElementById('timeline-wrap').style.display = 'block';
         loadAIModel();
@@ -1736,10 +1542,10 @@
     }
 
     function drawVideoFrame() {
-      if (!window.videoReady) return;
+      if (!videoReady) return;
       pvCanvas.width = videoEl.videoWidth || 1280;
       pvCanvas.height = videoEl.videoHeight || 720;
-      pvCtx.filter = presets[window.currentStyle]?.filter || 'none';
+      pvCtx.filter = presets[currentStyle]?.filter || 'none';
       pvCtx.drawImage(videoEl, 0, 0);
       pvCtx.filter = 'none';
     }
@@ -1789,7 +1595,7 @@
     }
 
     function togglePlay() {
-      if (!window.videoReady) return;
+      if (!videoReady) return;
       if (videoEl.paused) {
         if (!isVideoMode) showVideoView();
         videoEl.play();
@@ -1814,7 +1620,7 @@
     // ===== Timeline =====
     let isScrubbing = false;
     document.getElementById('timeline').oninput = e => {
-      if (!window.videoReady) return;
+      if (!videoReady) return;
       isScrubbing = true;
       const t = parseFloat(e.target.value);
       videoEl.currentTime = t;
@@ -1839,7 +1645,7 @@
     // ===== Navigation & Shortcuts =====
     function stepFrame(dir) {
       if (!videoReady) return;
-      const fps = presets[window.currentStyle]?.fps || 24;
+      const fps = presets[currentStyle]?.fps || 24;
       const frameTime = 1 / fps;
       videoEl.currentTime = Math.max(0, Math.min(videoEl.duration, videoEl.currentTime + (dir * frameTime)));
     }
@@ -2344,36 +2150,12 @@
     async function exportZip() {
       const frames = getExportFrames();
       if (!frames.length) { toast('没有可导出的帧', true); return; }
-      
-      const format = document.getElementById('frame-format').value;
-      const mimeType = format === 'jpg' ? 'image/jpeg' : format === 'png' ? 'image/png' : 'image/webp';
-      
       toast('正在打包...');
       const zip = new JSZip(), folder = zip.folder('CineMagic_Frames');
-      
-      for (let i = 0; i < frames.length; i++) {
-        const f = frames[i];
-        // 创建临时 canvas 来转换格式
-        const canvas = document.createElement('canvas');
-        canvas.width = f.width || 1280;
-        canvas.height = f.height || 720;
-        const ctx = canvas.getContext('2d');
-        
-        // 加载原始图像
-        const img = new Image();
-        img.src = f.dataUrl;
-        await new Promise(resolve => { img.onload = resolve; });
-        
-        // 绘制到 canvas
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        
-        // 转换为指定格式
-        const dataUrl = canvas.toDataURL(mimeType, format === 'jpg' ? 0.8 : 0.9);
-        const b64 = dataUrl.split(',')[1];
-        
-        folder.file(`frame_${String(i + 1).padStart(4, '0')}_${f.timecode.replace(/:/g, '-')}.${format}`, b64, { base64: true });
-      }
-      
+      frames.forEach((f, i) => {
+        const b64 = f.dataUrl.split(',')[1];
+        folder.file(`frame_${String(i + 1).padStart(4, '0')}_${f.timecode.replace(/:/g, '-')}.jpg`, b64, { base64: true });
+      });
       dlBlob(await zip.generateAsync({ type: 'blob' }), `CineMagic_Frames_${Date.now()}.zip`);
       toast('ZIP 下载完成');
     }
@@ -2408,7 +2190,7 @@
           doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(249, 115, 22);
           doc.text('CINEMAGIC PRO — STORYBOARD', mL, 10);
           doc.setFontSize(5); doc.setTextColor(60, 60, 60);
-          doc.text(`Style: ${window.currentStyle.toUpperCase()}  ·  Ratio: ${window.currentRatio}  ·  Frames: ${frames.length}  ·  ${new Date().toLocaleString('zh-CN')}`, mL, 14);
+          doc.text(`Style: ${currentStyle.toUpperCase()}  ·  Ratio: ${currentRatio}  ·  Frames: ${frames.length}  ·  ${new Date().toLocaleString('zh-CN')}`, mL, 14);
           
           frames.slice(p * perPage, (p + 1) * perPage).forEach((f, i) => {
             const col = i % cols, row = Math.floor(i / cols);
@@ -2432,7 +2214,7 @@
           doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(249, 115, 22);
           doc.text('CINEMAGIC — DIRECTOR\'S SCRIPT', mL, 10);
           doc.setFontSize(5); doc.setTextColor(60, 60, 60);
-          doc.text(`Style: ${window.currentStyle.toUpperCase()}  ·  Ratio: ${window.currentRatio}  ·  Frames: ${frames.length}  ·  ${new Date().toLocaleString('zh-CN')}`, mL, 14);
+          doc.text(`Style: ${currentStyle.toUpperCase()}  ·  Ratio: ${currentRatio}  ·  Frames: ${frames.length}  ·  ${new Date().toLocaleString('zh-CN')}`, mL, 14);
           
           frames.slice(p * perPage, (p + 1) * perPage).forEach((f, i) => {
             const y = mT + i * cH;
@@ -2486,8 +2268,8 @@
       renderChunks = [];
       isRendering = true;
 
-      const config = presets[window.currentStyle];
-      const fps = window.currentMode === 'pro' ? parseInt(document.getElementById('pro-fps').value) : config.fps;
+      const config = presets[currentStyle];
+      const fps = currentMode === 'pro' ? parseInt(document.getElementById('pro-fps').value) : config.fps;
       const interval = 1 / fps;
 
       try {
@@ -2517,18 +2299,13 @@
 
         // Setup MediaRecorder
         const stream = cvs.captureStream(fps);
-        const selectedFormat = document.getElementById('video-format').value;
-        
-        const mimeTypeCandidates = selectedFormat === 'mp4' ? [
+        const mimeType = [
           'video/mp4;codecs=h264',
-          'video/mp4'
-        ] : [
           'video/webm;codecs=vp9',
           'video/webm;codecs=h264',
-          'video/webm'
-        ];
-        
-        const mimeType = mimeTypeCandidates.find(type => MediaRecorder.isTypeSupported(type)) || '';
+          'video/webm',
+          'video/ogg'
+        ].find(type => MediaRecorder.isTypeSupported(type)) || '';
         _recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8000000 });
         
         _recorder.ondataavailable = e => { if (e.data.size > 0) renderChunks.push(e.data); };
@@ -2590,15 +2367,14 @@
 
         hideRenderOverlay();
 
-        const finalMimeType = selectedFormat === 'mp4' ? 'video/mp4' : 'video/webm';
-        const outBlob = new Blob(renderChunks, { type: finalMimeType });
+        const outBlob = new Blob(renderChunks, { type: 'video/mp4' });
         generatedVideos.push({ blob: outBlob, cover: firstFrameCover });
 
-        if (window.currentGalleryTab !== 'videos') switchGalleryTab('videos');
+        if (currentGalleryTab !== 'videos') switchGalleryTab('videos');
         renderFilmstrip(true);
 
         document.getElementById('download-zone').style.display = 'block';
-        document.getElementById('btn-download').onclick = () => dlBlob(outBlob, `CineMagic_${window.currentStyle}_${Date.now()}.${selectedFormat}`);
+        document.getElementById('btn-download').onclick = () => dlBlob(outBlob, `CineMagic_${currentStyle}_${Date.now()}.mp4`);
         toast('电影视频录制完成 (原生引擎)');
         
         URL.revokeObjectURL(_recordingVideo.src);
