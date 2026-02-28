@@ -415,12 +415,6 @@
     let currentMode = 'simple';
     let currentStyle = 'cinema';
     let currentRatio = '16:9';
-
-    // Check license status on page load
-    if (isPro) {
-      const expiryDate = localStorage.getItem('cine_expiry');
-      applyProStatus(expiryDate);
-    }
     let videoFile = null;
     let videoReady = false;
     let isRendering = false;
@@ -433,6 +427,11 @@
     let renderChunks = [];
     let masteredFiles = [];
 
+    // ===== Ratio =====
+    const ratioIds = { '9:16': 'r-916', '16:9': 'r-169', '1:1': 'r-11', '2.35:1': 'r-235' };
+    const ratioValues = { '9:16': 9 / 16, '16:9': 16 / 9, '1:1': 1, '2.35:1': 2.35 };
+
+    // ===== DOM Elements =====
     const videoEl = document.getElementById('video-el');
     const pvCanvas = document.getElementById('preview-canvas');
     const pvCtx = pvCanvas.getContext('2d');
@@ -441,12 +440,16 @@
       cinema: { name: '经典电影', sub: '行业基准 · 叙事感', fps: 12, shutter: 180, filter: 'contrast(1.15) saturate(0.85) brightness(0.95) sepia(0.05)', emotionProfile: 'wave' },
       film: { name: '复古胶片', sub: '暖调回忆 · 颗粒感', fps: 8, shutter: 240, filter: 'contrast(1.1) saturate(1.2) sepia(0.3) brightness(1.05)', emotionProfile: 'constant' },
       vibe: { name: '法式浪漫', sub: '清冷氛围 · 情绪拉满', fps: 20, shutter: 120, filter: 'contrast(0.9) saturate(0.7) brightness(1.1) hue-rotate(-10deg) opacity(0.9)', emotionProfile: 'wave' },
-      vlog: { name: '极简 VLOG', sub: '清爽通透 · 记录生活', fps: 24, shutter: 90, filter: 'contrast(1.1) saturate(1.1) brightness(1.15)', emotionProfile: 'burst' },
-      noir: { name: '黑白叙事', sub: '极致冲突 · 艺术表达', fps: 10, shutter: 320, filter: 'grayscale(1) contrast(1.7) brightness(0.9)', emotionProfile: 'constant', isPro: true },
-      cyber: { name: '赛博未来', sub: '霓虹都市 · 幻想感', fps: 22, shutter: 180, filter: 'contrast(1.3) saturate(1.8) hue-rotate(180deg) brightness(1.1)', emotionProfile: 'burst', isPro: true }
+      noir: { name: '黑色电影', sub: '高对比 · 光影感', fps: 15, shutter: 200, filter: 'contrast(1.4) brightness(0.9) saturate(0.6)', emotionProfile: 'wave' },
+      cyber: { name: '赛博朋克', sub: '霓虹美学 · 科技感', fps: 24, shutter: 150, filter: 'contrast(1.1) saturate(1.4) hue-rotate(-20deg) brightness(1.1)', emotionProfile: 'wave' },
+      pro: { name: 'Pro 精准制导', sub: 'AI 智能场景检测', fps: 24, shutter: 180, filter: 'none', emotionProfile: 'wave' }
     };
 
-    if (isPro) applyProStatus();
+    // Check license status on page load
+    if (isPro) {
+      const expiryDate = localStorage.getItem('cine_expiry');
+      applyProStatus(expiryDate);
+    }
 
     // ===== Mode =====
     function switchMode(mode) {
@@ -469,16 +472,18 @@
     function applyProStatus(expiryDate) {
       isPro = true; localStorage.setItem('cine_pro', 'true');
       const tag = document.getElementById('user-tag');
-      tag.innerText = 'Pro'; tag.style.color = '#f97316'; tag.style.borderColor = '#f97316'; tag.style.background = 'linear-gradient(135deg,rgba(249,115,22,0.15),rgba(249,115,22,0.05))';
-      document.getElementById('activate-btn').style.display = 'none';
-      document.getElementById('noir-lbl').style.color = '#e2e2e2';
-      document.getElementById('cyber-lbl').style.color = '#e2e2e2';
+      if (tag) {
+        tag.innerText = 'Pro'; tag.style.color = '#f97316'; tag.style.borderColor = '#f97316'; tag.style.background = 'linear-gradient(135deg,rgba(249,115,22,0.15),rgba(249,115,22,0.05))';
+      }
+      const activateBtn = document.getElementById('activate-btn');
+      if (activateBtn) activateBtn.style.display = 'none';
 
-      // Show license status and expiry date
-      document.getElementById('license-status').style.display = 'flex';
+      const licenseStatus = document.getElementById('license-status');
+      if (licenseStatus) licenseStatus.style.display = 'flex';
       
       if (expiryDate) {
-        document.getElementById('expiry-date').style.display = 'flex';
+        const expiryDateEl = document.getElementById('expiry-date');
+        if (expiryDateEl) expiryDateEl.style.display = 'flex';
         
         // Calculate remaining days
         const today = new Date();
@@ -486,12 +491,14 @@
         const diffTime = expiry - today;
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
-        document.getElementById('remaining-days').innerText = diffDays;
+        const remainingDaysEl = document.getElementById('remaining-days');
+        if (remainingDaysEl) remainingDaysEl.innerText = diffDays;
         localStorage.setItem('cine_expiry', expiryDate);
       }
 
       // Reveal Pro elements
-      if (currentMode === 'pro') document.getElementById('pro-controls').style.display = 'flex';
+      const proControls = document.getElementById('pro-controls');
+      if (proControls && currentMode === 'pro') proControls.style.display = 'flex';
     }
 
     async function validateLicense() {
@@ -544,8 +551,6 @@
     function handleProStyle(id) { if (!isPro) { showModal('activate'); return; } setStyle(id); }
 
     // ===== Ratio =====
-    const ratioIds = { '9:16': 'r-916', '16:9': 'r-169', '1:1': 'r-11', '2.35:1': 'r-235' };
-    const ratioValues = { '9:16': 9 / 16, '16:9': 16 / 9, '1:1': 1, '2.35:1': 2.35 };
 
     function setRatio(r) {
       currentRatio = r;
