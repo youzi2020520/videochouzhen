@@ -482,10 +482,12 @@
       currentMode = mode;
       document.getElementById('btn-simple').classList.toggle('active', mode === 'simple');
       document.getElementById('btn-pro').classList.toggle('active', mode === 'pro');
-      document.getElementById('mode-label').innerText = mode === 'simple' ? 'Simple Mode' : 'Pro Mode';
+      const modeLabel = document.getElementById('mode-label');
+      if (modeLabel) modeLabel.innerText = mode === 'simple' ? 'Simple Mode' : 'Pro Mode';
 
       // Update sidebar sections
-      document.getElementById('pro-controls').style.display = (mode === 'pro' && isPro) ? 'flex' : 'none';
+      const proControls = document.getElementById('pro-controls');
+      if (proControls) proControls.style.display = (mode === 'pro' && isPro) ? 'flex' : 'none';
     }
 
     // ===== Pro =====
