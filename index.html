@@ -123,12 +123,12 @@
           <label class="lbl">视觉风格 <span style="font-size:9px;color:#2a2a2a;text-transform:none;letter-spacing:0;margin-left:4px;">(对标主流创作预设)</span></label>
           
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:10px;">
-            <div class="style-card active" id="sc-cinema" onclick="handleProStyle('cinema')" style="padding:10px;">
-              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">经典电影<span style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:3px;font-family:'JetBrains Mono';margin-left:8px;">PRO</span></div>
+            <div class="style-card active" id="sc-cinema" onclick="setStyle('cinema')" style="padding:10px;">
+              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">经典电影</div>
               <div style="font-size:8px;color:#444;margin-top:2px;">行业基准 · 叙事感</div>
             </div>
-            <div class="style-card" id="sc-film" onclick="handleProStyle('film')" style="padding:10px;">
-              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">复古胶片<span style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:3px;font-family:'JetBrains Mono';margin-left:8px;">PRO</span></div>
+            <div class="style-card" id="sc-film" onclick="setStyle('film')" style="padding:10px;">
+              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">复古胶片</div>
               <div style="font-size:8px;color:#444;margin-top:2px;">暖调回忆 · 颗粒感</div>
             </div>
             <div class="style-card" id="sc-vibe" onclick="handleProStyle('vibe')" style="padding:10px;">
@@ -457,8 +457,8 @@
     const pvCtx = pvCanvas.getContext('2d');
 
     const presets = {
-      cinema: { name: '经典电影', sub: '行业基准 · 叙事感', fps: 12, shutter: 180, filter: 'contrast(1.15) saturate(0.85) brightness(0.95) sepia(0.05)', emotionProfile: 'wave', isPro: true },
-      film: { name: '复古胶片', sub: '暖调回忆 · 颗粒感', fps: 8, shutter: 240, filter: 'contrast(1.1) saturate(1.2) sepia(0.3) brightness(1.05)', emotionProfile: 'constant', isPro: true },
+      cinema: { name: '经典电影', sub: '行业基准 · 叙事感', fps: 12, shutter: 180, filter: 'contrast(1.15) saturate(0.85) brightness(0.95) sepia(0.05)', emotionProfile: 'wave' },
+      film: { name: '复古胶片', sub: '暖调回忆 · 颗粒感', fps: 8, shutter: 240, filter: 'contrast(1.1) saturate(1.2) sepia(0.3) brightness(1.05)', emotionProfile: 'constant' },
       vibe: { name: '法式浪漫', sub: '清冷氛围 · 情绪拉满', fps: 20, shutter: 120, filter: 'contrast(0.9) saturate(0.7) brightness(1.1) hue-rotate(-10deg) opacity(0.9)', emotionProfile: 'wave', isPro: true },
       vlog: { name: '极简 VLOG', sub: '通透自然 · 记录生活', fps: 24, shutter: 90, filter: 'contrast(1.1) saturate(1.1) brightness(1.15)', emotionProfile: 'burst', isPro: true },
       noir: { name: '黑色电影', sub: '高对比 · 光影感', fps: 15, shutter: 200, filter: 'contrast(1.4) brightness(0.9) saturate(0.6)', emotionProfile: 'wave', isPro: true },
