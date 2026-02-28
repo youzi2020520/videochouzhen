@@ -11,7 +11,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
   <link
-    href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;700&display=swap"
+    href="https://fonts.proxy.ustclug.org/css2?family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;700&display=swap"
     rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
@@ -349,20 +349,12 @@
 
       <!-- Toolbar -->
       <div id="toolbar">
-        <button class="btn btn-green" id="btn-export-zip" onclick="exportZip()">
+        <button class="btn btn-ghost" id="btn-export-zip" onclick="exportZip()">
           <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 15V3m-4 8l4 4 4-4m-9 8h10a2 2 0 002-2v-2H3v2a2 2 0 002 2z" />
           </svg>
           ZIP 下载
-        </button>
-
-        <button class="btn btn-green" id="btn-download-video" onclick="downloadSelectedVideo()" style="display:none;">
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
-          保存电影视频
         </button>
 
         <div id="pdf-export-zone"
@@ -954,6 +946,7 @@
         if (items.length === 0) {
           strip.style.display = 'none';
           empty.style.display = 'flex';
+          updateToolbarVisibility(0);
           return;
         }
         empty.style.display = 'none';
@@ -1001,6 +994,9 @@
           </div>
           <div class="tc-label">Movie_${i + 1}.mp4</div>
           <div class="card-actions">
+            <button class="card-act-btn dl" title="下载" onclick="event.stopPropagation(); downloadSingleVideo(event,${i})">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" d="M12 15V4m-4 7l4 4 4-4"/><path stroke-linecap="round" d="M4 20h16"/></svg>
+            </button>
             <button class="card-act-btn del" onclick="event.stopPropagation(); deleteVideo(${i})">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
             </button>
@@ -1014,27 +1010,17 @@
 
     function updateToolbarVisibility(itemCount) {
       const btnZip = document.getElementById('btn-export-zip');
-      const btnVid = document.getElementById('btn-download-video');
       const sel = currentGalleryTab === 'frames' ? selectedFrames : selectedVideos;
       const count = sel.size > 0 ? sel.size : itemCount;
 
       if (currentGalleryTab === 'frames') {
+        // Frames mode: only show ZIP button
         btnZip.style.display = count > 0 ? 'inline-flex' : 'none';
         btnZip.innerHTML = `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15V3m-4 8l4 4 4-4m-9 8h10a2 2 0 002-2v-2H3v2a2 2 0 002 2z" /></svg> ZIP 下载`;
-        btnVid.style.display = 'none';
       } else {
-        // Video Tab
-        if (count === 1 && itemCount > 0) {
-          btnZip.style.display = 'none';
-          btnVid.style.display = 'inline-flex';
-        } else if (count > 1) {
-          btnVid.style.display = 'none';
-          btnZip.style.display = 'inline-flex';
-          btnZip.innerHTML = `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15V3m-4 8l4 4 4-4m-9 8h10a2 2 0 002-2v-2H3v2a2 2 0 002 2z" /></svg> ZIP 批量下载`;
-        } else {
-          btnZip.style.display = 'none';
-          btnVid.style.display = 'none';
-        }
+        // Videos mode: always show ZIP button
+        btnZip.style.display = count > 0 ? 'inline-flex' : 'none';
+        btnZip.innerHTML = `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15V3m-4 8l4 4 4-4m-9 8h10a2 2 0 002-2v-2H3v2a2 2 0 002 2z" /></svg> ZIP 下载`;
       }
     }
 
@@ -1441,8 +1427,8 @@
       }
     }
 
-    function downloadSelectedVideo() {
-      const idx = selectedVideos.size === 1 ? [...selectedVideos][0] : 0; // fallback to 0 if none selected
+    function downloadSingleVideo(e, idx) {
+      e.stopPropagation();
       if (!generatedVideos[idx]) return;
       dlBlob(generatedVideos[idx].blob, `CineMagic_Movie_${idx + 1}.mp4`);
       toast('视频下载完成');
