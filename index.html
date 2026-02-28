@@ -1805,6 +1805,7 @@
     }
 
     function switchGalleryTab(tab) {
+      if (!videoReady) { toast('请先上传视频', true); return; }
       currentGalleryTab = tab;
       document.getElementById('tab-frames').classList.toggle('active', tab === 'frames');
       document.getElementById('tab-videos').classList.toggle('active', tab === 'videos');
@@ -1894,6 +1895,7 @@
       renderFilmstrip();
     }
     function selAll() {
+      if (!videoReady) { toast('请先上传视频', true); return; }
       const items = currentGalleryTab === 'frames' ? capturedFrames : generatedVideos;
       const sel = currentGalleryTab === 'frames' ? selectedFrames : selectedVideos;
       
@@ -1905,6 +1907,7 @@
       renderFilmstrip();
     }
     function deleteSelected() {
+      if (!videoReady) { toast('请先上传视频', true); return; }
       if (currentGalleryTab === 'frames') {
         if (selectedFrames.size === 0) { toast('请先选择要删除的帧', true); return; }
         const sortedIdx = [...selectedFrames].sort((a, b) => b - a);
@@ -1927,6 +1930,7 @@
       renderFilmstrip();
     }
     function clearGallery() {
+      if (!videoReady) { toast('请先上传视频', true); return; }
       if (currentGalleryTab === 'frames') {
         capturedFrames = []; selectedFrames = new Set(); activePreviewIdx = -1;
         document.getElementById('download-zone').style.display = 'none';
@@ -2144,6 +2148,7 @@
 
     // ===== Export ZIP =====
     async function exportZip() {
+      if (!videoReady) { toast('请先上传视频', true); return; }
       const frames = getExportFrames();
       if (!frames.length) { toast('没有可导出的帧', true); return; }
       toast('正在打包...');
@@ -2158,6 +2163,7 @@
 
     // ===== Export PDF =====
     async function exportPDF() {
+      if (!videoReady) { toast('请先上传视频', true); return; }
       const frames = getExportFrames();
       if (!frames.length) { toast('没有可导出的帧', true); return; }
       const template = document.getElementById('pdf-template').value;
