@@ -36,8 +36,9 @@
         <button class="mode-btn" id="btn-pro" onclick="switchMode('pro')">PRO 模式</button>
       </div>
       <div id="license-status"
-        style="padding:4px 12px;border:1px solid #f97316;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#f97316;text-transform:uppercase;background:linear-gradient(135deg,rgba(249,115,22,0.15),rgba(249,115,22,0.05));display:none;cursor:default"
-        title="">
+        style="padding:4px 12px;border:1px solid #f97316;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#f97316;text-transform:uppercase;background:linear-gradient(135deg,rgba(249,115,22,0.15),rgba(249,115,22,0.05));display:none;cursor:pointer;position:relative"
+        onmouseover="this.title='获取后台授权码剩余时间'"
+        onmouseout="this.title=''">
         <span style="margin-right:4px;">★</span>已授权</div>
       <div id="user-tag"
         style="padding:4px 12px;border:1px solid #222;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#555;text-transform:uppercase;background:#0d0d0f">
