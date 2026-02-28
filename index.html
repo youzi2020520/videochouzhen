@@ -1014,12 +1014,12 @@
       const count = sel.size > 0 ? sel.size : itemCount;
 
       if (currentGalleryTab === 'frames') {
-        // Frames mode: only show ZIP button
-        btnZip.style.display = count > 0 ? 'inline-flex' : 'none';
+        // Frames mode: always show ZIP button
+        btnZip.style.display = 'inline-flex';
         btnZip.innerHTML = `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15V3m-4 8l4 4 4-4m-9 8h10a2 2 0 002-2v-2H3v2a2 2 0 002 2z" /></svg> ZIP 下载`;
       } else {
         // Videos mode: always show ZIP button
-        btnZip.style.display = count > 0 ? 'inline-flex' : 'none';
+        btnZip.style.display = 'inline-flex';
         btnZip.innerHTML = `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15V3m-4 8l4 4 4-4m-9 8h10a2 2 0 002-2v-2H3v2a2 2 0 002 2z" /></svg> ZIP 下载`;
       }
     }
