@@ -134,7 +134,7 @@
         </button>
 
         <!-- AI 分析报告 -->
-        <div id="ai-analysis-result" style="display:none;margin-bottom:20px;padding:16px;background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(249,115,22,0.05));border:1px solid rgba(124,58,237,0.3);border-radius:8px;">
+        <div id="ai-analysis-result" style="display:none;margin-bottom:20px;padding:16px;background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(249,115,22,0.05));border:1px solid rgba(124,58,237,0.3);border-radius:8px;overflow:hidden;">
           <div style="font-size:10px;font-family:'JetBrains Mono';color:#888;margin-bottom:12px;text-transform:uppercase;">AI 分析报告</div>
           
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
@@ -160,7 +160,7 @@
           <div style="margin-top:16px;">
             <div style="font-size:10px;font-family:'JetBrains Mono';color:#888;margin-bottom:8px;text-transform:uppercase;">智能推荐风格</div>
             
-            <div id="recommendations-free" style="display:none;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+            <div id="recommendations-free" style="display:none;grid-template-columns:1fr;gap:8px;">
               <!-- 免费用户看到的模糊推荐 -->
               <div class="style-card-blur" onclick="showModal('activate')" style="padding:12px;position:relative;cursor:pointer;background:#0d0d0f;border:1px solid #1a1a1a;border-radius:6px;">
                 <div style="filter:blur(3px);opacity:0.5;">
@@ -201,7 +201,7 @@
             </div>
 
             <!-- PRO 用户看到的真实推荐 -->
-            <div id="recommendations-pro" style="display:none;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+            <div id="recommendations-pro" style="display:none;grid-template-columns:1fr;gap:8px;">
               <!-- 动态生成 -->
             </div>
           </div>
