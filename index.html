@@ -59,6 +59,21 @@
     function hideModal(id) {
       document.getElementById(id + '-modal').style.display = 'none';
     }
+    
+    function handleProAction(action) {
+      if (!isPro) {
+        showModal('activate');
+        return;
+      }
+      
+      switch(action) {
+        case 'pdf':
+          // PDF generation logic will be handled in the main script
+          break;
+        default:
+          break;
+      }
+    }
   </script>
   <style>
     :root {
