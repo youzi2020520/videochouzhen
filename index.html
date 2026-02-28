@@ -1118,8 +1118,29 @@
         </div>
       </div>
 
+      <!-- About Section -->
+      <div style="margin-top:auto;">
+        <div id="about-toggle" style="padding:10px 14px;font-size:8px;color:#444;font-family:'JetBrains Mono';text-transform:uppercase;letter-spacing:.15em;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1a1a1a;">
+          <span>关于视频帧探</span>
+          <svg id="about-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform 0.3s ease;">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </div>
+        <div id="about-content" style="padding:10px 14px;font-size:8px;color:#444;line-height:1.4;display:none;border-top:1px solid #1a1a1a;">
+          <p style="margin-bottom:8px;">视频帧探是一款专业的视频抽帧工具，帮助创作者快速提取视频中的关键帧，用于分镜设计、故事板制作等场景。</p>
+          <p style="margin-bottom:8px;">主要功能：</p>
+          <ul style="list-style-type:disc;list-style-position:inside;margin-bottom:8px;">
+            <li>智能抽帧：自动识别视频中的关键瞬间</li>
+            <li>电影级渲染：支持多种视觉风格</li>
+            <li>格式导出：支持JPG、PNG、WebP等格式</li>
+            <li>视频输出：支持MP4、WebM格式</li>
+          </ul>
+          <p>版本：v4.1.0</p>
+        </div>
+      </div>
+
       <div
-        style="padding:10px 14px;font-size:6px;color:#1a1a1a;font-family:'JetBrains Mono';text-transform:uppercase;letter-spacing:.15em;margin-top:auto;">
+        style="padding:10px 14px;font-size:6px;color:#1a1a1a;font-family:'JetBrains Mono';text-transform:uppercase;letter-spacing:.15em;">
         Build v4.1.0 · PLATFORM</div>
     </aside>
 
@@ -1347,6 +1368,20 @@
       const expiryDate = localStorage.getItem('cine_expiry');
       applyProStatus(expiryDate);
     }
+
+    // About section toggle
+    document.getElementById('about-toggle').addEventListener('click', function() {
+      const content = document.getElementById('about-content');
+      const icon = document.getElementById('about-icon');
+      
+      if (content.style.display === 'none' || content.style.display === '') {
+        content.style.display = 'block';
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        content.style.display = 'none';
+        icon.style.transform = 'rotate(0deg)';
+      }
+    });
     let videoFile = null;
     let videoReady = false;
     let isRendering = false;
