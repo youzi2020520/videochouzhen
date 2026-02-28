@@ -28,7 +28,9 @@
         <h1
           style="font-size:18px;font-family:'Noto Serif SC';font-weight:700;letter-spacing:.05em;background:linear-gradient(90deg,#fff,#888);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
           视频AI帧探</h1>
-        <p style="font-size:9px;font-family:'JetBrains Mono';color:#f97316;text-transform:uppercase;letter-spacing:.2em;font-weight:700;margin-top:2px;">VideoAI Frame</p>
+        <p
+          style="font-size:9px;font-family:'JetBrains Mono';color:#f97316;text-transform:uppercase;letter-spacing:.2em;font-weight:700;margin-top:2px;">
+          VideoAI Frame</p>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:12px;">
@@ -37,10 +39,9 @@
         <button class="mode-btn" id="btn-pro" onclick="switchMode('pro')">PRO 模式</button>
       </div>
       <div id="license-status"
-        style="padding:4px 12px;border:1px solid #f97316;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#f97316;text-transform:uppercase;background:linear-gradient(135deg,rgba(249,115,22,0.15),rgba(249,115,22,0.05));display:none;cursor:pointer;position:relative"
-        onmouseover="this.title='获取后台授权码剩余时间'"
-        onmouseout="this.title=''">
-        <span style="margin-right:4px;">★</span>已授权</div>
+        style="padding:4px 12px;border:1px solid #f97316;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#f97316;text-transform:uppercase;background:linear-gradient(135deg,rgba(249,115,22,0.15),rgba(249,115,22,0.05));display:none;cursor:pointer;position:relative">
+        <span style="margin-right:4px;">★</span>已授权
+      </div>
       <div id="user-tag"
         style="padding:4px 12px;border:1px solid #222;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#555;text-transform:uppercase;background:#0d0d0f">
         Free</div>
@@ -104,11 +105,15 @@
               </svg>
               间隔抽帧
             </button>
-            <button class="btn btn-purple" style="flex:1; background:linear-gradient(135deg,#7c3aed,#4f46e5); border:none;" onclick="handleProAction('ai-extract')">
+            <button class="btn btn-purple"
+              style="flex:1; background:linear-gradient(135deg,#7c3aed,#4f46e5); border:none;"
+              onclick="handleProAction('ai-extract')">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" />
+                <path
+                  d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" />
               </svg>
-              AI 智能抽帧 <span style="font-size:7px;background:rgba(255,255,255,.2);padding:1px 3px;border-radius:2px;margin-left:3px;">PRO</span>
+              AI 智能抽帧 <span
+                style="font-size:7px;background:rgba(255,255,255,.2);padding:1px 3px;border-radius:2px;margin-left:3px;">PRO</span>
             </button>
           </div>
         </div>
@@ -121,8 +126,9 @@
         <p class="sec-lbl"><span class="step-tag">Step 03</span>电影级渲染</p>
 
         <div id="render-settings-wrap">
-          <label class="lbl">视觉风格 <span style="font-size:9px;color:#2a2a2a;text-transform:none;letter-spacing:0;margin-left:4px;">(对标主流创作预设)</span></label>
-          
+          <label class="lbl">视觉风格 <span
+              style="font-size:9px;color:#2a2a2a;text-transform:none;letter-spacing:0;margin-left:4px;">(对标主流创作预设)</span></label>
+
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:10px;">
             <div class="style-card active" id="sc-cinema" onclick="setStyle('cinema')" style="padding:10px;">
               <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">经典电影</div>
@@ -133,23 +139,31 @@
               <div style="font-size:8px;color:#444;margin-top:2px;">暖调回忆 · 颗粒感</div>
             </div>
             <div class="style-card" id="sc-vibe" onclick="handleProStyle('vibe')" style="padding:10px;">
-              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">法式浪漫<span style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:3px;font-family:'JetBrains Mono';margin-left:8px;">PRO</span></div>
+              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">法式浪漫<span
+                  style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:3px;font-family:'JetBrains Mono';margin-left:8px;">PRO</span>
+              </div>
               <div style="font-size:8px;color:#444;margin-top:2px;">氛围感 · 清冷调</div>
             </div>
             <div class="style-card" id="sc-vlog" onclick="handleProStyle('vlog')" style="padding:10px;">
-              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">极简 VLOG<span style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:3px;font-family:'JetBrains Mono';margin-left:8px;">PRO</span></div>
+              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">极简 VLOG<span
+                  style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:3px;font-family:'JetBrains Mono';margin-left:8px;">PRO</span>
+              </div>
               <div style="font-size:8px;color:#444;margin-top:2px;">通透自然 · 记录</div>
             </div>
           </div>
 
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
             <div class="style-card" id="sc-noir" onclick="handleProStyle('noir')" style="padding:10px;">
-              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">黑白叙事<span style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:3px;font-family:'JetBrains Mono';margin-left:8px;">PRO</span></div>
+              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">黑白叙事<span
+                  style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:3px;font-family:'JetBrains Mono';margin-left:8px;">PRO</span>
+              </div>
               <div style="font-size:8px;color:#444;margin-top:2px;">极致冲突 · 艺术表达力</div>
             </div>
-            
+
             <div class="style-card" id="sc-cyber" onclick="handleProStyle('cyber')" style="padding:10px;">
-              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">赛博未来<span style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:3px;font-family:'JetBrains Mono';margin-left:8px;">PRO</span></div>
+              <div style="font-size:13px;font-family:'Noto Serif SC';font-weight:700">赛博未来<span
+                  style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:3px;font-family:'JetBrains Mono';margin-left:8px;">PRO</span>
+              </div>
               <div style="font-size:8px;color:#444;margin-top:2px;">霓虹都市 · 幻想感</div>
             </div>
           </div>
@@ -192,7 +206,8 @@
 
       <!-- About Section -->
       <div style="padding:20px;margin-top:auto;border-top:1px solid rgba(255,255,255,0.06);">
-        <div style="font-size:11px;font-family:'Noto Serif SC';color:#fff;margin-bottom:12px;font-weight:700;">关于 视频帧探</div>
+        <div style="font-size:11px;font-family:'Noto Serif SC';color:#fff;margin-bottom:12px;font-weight:700;">关于 视频帧探
+        </div>
         <div style="font-size:9px;color:#666;line-height:1.6;margin-bottom:15px;">
           专业的视频抽帧工具，帮助创作者从视频中提取高质量帧图像，支持多种画幅比例和专业滤镜效果。
         </div>
@@ -211,7 +226,8 @@
             <span style="color:var(--orange);">▸</span> 批量导出 · ZIP/PDF分镜表
           </div>
         </div>
-        <div style="margin-top:15px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);font-size:7px;color:#333;font-family:'JetBrains Mono';text-transform:uppercase;letter-spacing:.1em;">
+        <div
+          style="margin-top:15px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);font-size:7px;color:#333;font-family:'JetBrains Mono';text-transform:uppercase;letter-spacing:.1em;">
           版本 1.0.0 · 本地运行
         </div>
       </div>
@@ -256,10 +272,10 @@
           <div class="timeline-container">
             <input type="range" id="timeline" min="0" max="100" step="0.01" value="0">
           </div>
-          
+
           <div class="controls-main-row">
             <div class="time-display-box" id="tc-current">00:00:00</div>
-            
+
             <div class="btn-group-center">
               <button class="control-btn" onclick="stepFrame(-1)" title="后退一帧 (左方向键)">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -267,7 +283,7 @@
                   <polygon points="22 19 13 12 22 5 22 19"></polygon>
                 </svg>
               </button>
-              
+
               <button class="control-btn primary" onclick="togglePlay()" id="play-btn-main" title="播放/暂停 (空格)">
                 <svg id="pbs-play" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                   <polygon points="5 3 19 12 5 21" />
@@ -279,12 +295,13 @@
               </button>
 
               <button class="control-btn capture-main" onclick="captureCurrentFrame()" title="AI 精准截帧 (C)">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                   <circle cx="12" cy="13" r="4"></circle>
                 </svg>
               </button>
-              
+
               <button class="control-btn" onclick="stepFrame(1)" title="前进一帧 (右方向键)">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <polygon points="13 19 22 12 13 5 13 19"></polygon>
@@ -292,9 +309,10 @@
                 </svg>
               </button>
             </div>
-            
+
             <div style="display:flex;align-items:center;gap:8px;">
-              <input type="text" id="tc-input" placeholder="00:00:00" style="width:80px;padding:6px 8px;background:#0d0d0f;border:1px solid #1a1a1a;border-radius:6px;font-size:10px;font-family:'JetBrains Mono';color:#fff;text-align:center;">
+              <input type="text" id="tc-input" placeholder="00:00:00"
+                style="width:80px;padding:6px 8px;background:#0d0d0f;border:1px solid #1a1a1a;border-radius:6px;font-size:10px;font-family:'JetBrains Mono';color:#fff;text-align:center;">
               <button class="control-btn" onclick="seekToTimecode()" title="跳转到时间码">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                   <polygon points="5 3 19 12 5 21" />
@@ -331,16 +349,26 @@
 
       <!-- Toolbar -->
       <div id="toolbar">
-
-        <button class="btn btn-ghost" onclick="exportZip()">
+        <button class="btn btn-ghost" id="btn-export-zip" onclick="exportZip()">
           <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 15V3m-4 8l4 4 4-4m-9 8h10a2 2 0 002-2v-2H3v2a2 2 0 002 2z" />
           </svg>
           ZIP 下载
         </button>
-        <div style="display:flex;align-items:center;gap:6px;background:#0d0d0f;padding:2px;border-radius:6px;border:1px solid #1a1a1a;">
-          <select id="pdf-template" style="background:none;border:none;color:#555;font-size:8px;font-family:'JetBrains Mono';padding:0 6px;cursor:pointer;outline:none;">
+
+        <button class="btn btn-green" id="btn-download-video" onclick="downloadSelectedVideo()" style="display:none;">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          保存电影视频
+        </button>
+
+        <div id="pdf-export-zone"
+          style="display:flex;align-items:center;gap:6px;background:#0d0d0f;padding:2px;border-radius:6px;border:1px solid #1a1a1a;">
+          <select id="pdf-template"
+            style="background:none;border:none;color:#555;font-size:8px;font-family:'JetBrains Mono';padding:0 6px;cursor:pointer;outline:none;">
             <option value="classic">标准网格 (3x2)</option>
             <option value="script">导演脚本 (1xH)</option>
             <option value="banner">艺术海报 (Banner)</option>
@@ -350,19 +378,11 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            分镜表 PDF <span style="background:var(--orange);color:#000;font-size:6px;padding:1px 3px;border-radius:2px;margin-left:3px;font-weight:900;">PRO</span>
+            分镜表 PDF <span
+              style="background:var(--orange);color:#000;font-size:6px;padding:1px 3px;border-radius:2px;margin-left:3px;font-weight:900;">PRO</span>
           </button>
         </div>
         <div style="flex:1;"></div>
-        <div id="download-zone" style="display:none;">
-          <button class="btn btn-green" id="btn-download">
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            保存电影视频
-          </button>
-        </div>
       </div>
     </main>
   </div>
@@ -406,7 +426,7 @@
         style="width:100%;padding:11px;background:#fff;color:#000;border:none;border-radius:9px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.15em;cursor:pointer;"
         onmouseover="this.style.background='var(--orange)';this.style.color='#000'"
         onmouseout="this.style.background='#fff'">即刻解锁</button>
-      
+
       <div style="margin-top:20px;padding-top:20px;border-top:1px solid #222;">
         <h3 style="font-family:'Noto Serif SC';font-size:14px;margin-bottom:10px;">获取授权码</h3>
         <div style="display:flex;flex-direction:column;align-items:center;gap:15px;">
@@ -420,10 +440,28 @@
           </div>
         </div>
       </div>
-      
+
       <button onclick="hideModal('activate')"
         style="display:block;margin:10px auto 0;font-size:8px;font-family:'JetBrains Mono';color:#333;background:none;border:none;cursor:pointer;">取消</button>
     </div>
+  </div>
+
+  <!-- Floating Help -->
+  <div class="help-btn" onclick="document.getElementById('help-popup').classList.toggle('show')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </svg>
+  </div>
+  <div class="help-popup" id="help-popup">
+    <div class="help-title">快捷操作指南</div>
+    <div class="help-item"><span>← / →</span>切换预览 画廊步进</div>
+    <div class="help-item"><span>Enter</span>选中 / 取消选中</div>
+    <div class="help-item"><span>Space</span>播放 / 暂停视频</div>
+    <div class="help-item"><span>C Key</span>AI 精准截取单帧</div>
+    <div class="help-item"><span>Esc</span>关闭大图全屏预览</div>
   </div>
 
   <script>
@@ -480,7 +518,7 @@
         showModal('activate');
         return;
       }
-      
+
       currentMode = mode;
       document.getElementById('btn-simple').classList.toggle('active', mode === 'simple');
       document.getElementById('btn-pro').classList.toggle('active', mode === 'pro');
@@ -505,17 +543,19 @@
       const licenseStatus = document.getElementById('license-status');
       if (licenseStatus) {
         licenseStatus.style.display = 'flex';
-        
+
         if (expiryDate) {
           // Calculate remaining days
           const today = new Date();
           const expiry = new Date(expiryDate);
           const diffTime = expiry - today;
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-          
-          // Set hover tooltip
-          licenseStatus.title = '剩余 ' + diffDays + ' 天';
+          const diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+
+          // Set custom tooltip data
+          licenseStatus.setAttribute('data-tooltip', diffDays);
           localStorage.setItem('cine_expiry', expiryDate);
+        } else {
+          licenseStatus.removeAttribute('data-tooltip');
         }
       }
 
@@ -528,7 +568,7 @@
       if (!code) return toast('请输入授权码', true);
 
       toast('正在验证授权...');
-      
+
       try {
         // 尝试获取 IP 和 地理位置 (使用公共 API)
         let ipInfo = { ip: 'unknown', city: '未知' };
@@ -540,18 +580,18 @@
         const res = await fetch(`${AUTH_SERVER}/verify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            code, 
-            ip: ipInfo.ip, 
+          body: JSON.stringify({
+            code,
+            ip: ipInfo.ip,
             location: ipInfo.city + ' (自动识别)'
           })
         });
-        
+
         const data = await res.json();
-        
+
         if (data.success) {
-          applyProStatus(data.expiry); 
-          hideModal('activate'); 
+          applyProStatus(data.expiry);
+          hideModal('activate');
           toast('专业授权成功！欢迎回来');
           if (currentMode === 'pro') switchMode('pro');
         } else {
@@ -687,11 +727,11 @@
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const tempCtx = new AudioContext();
         const audioBuffer = await tempCtx.decodeAudioData(arrayBuffer);
-        
+
         const rawData = audioBuffer.getChannelData(0); // Use first channel
         const samplesPerSecond = audioBuffer.sampleRate;
         audioEnergyData = [];
-        
+
         for (let s = 0; s < audioBuffer.duration; s++) {
           let sum = 0;
           const start = Math.floor(s * samplesPerSecond);
@@ -720,8 +760,17 @@
     }
 
     function updatePlayBtn(playing) {
-      const wrap = document.getElementById('play-btn-main');
-      if (playing) wrap.classList.add('playing'); else wrap.classList.remove('playing');
+      const wrap = document.getElementById('play-btn-main'); // Timeline play button
+      const wrapOverlay = document.getElementById('play-btn-wrap'); // Canvas play button
+
+      if (playing) {
+        if (wrap) wrap.classList.add('playing');
+        if (wrapOverlay) wrapOverlay.classList.add('playing');
+      } else {
+        if (wrap) wrap.classList.remove('playing');
+        if (wrapOverlay) wrapOverlay.classList.remove('playing');
+      }
+
       document.getElementById('pbs-play').style.display = playing ? 'none' : 'block';
       document.getElementById('pbs-pause').style.display = playing ? 'block' : 'none';
     }
@@ -764,11 +813,52 @@
     }
 
     window.addEventListener('keydown', e => {
-      if (document.activeElement.tagName === 'INPUT') return;
-      if (e.key === 'ArrowLeft') { e.preventDefault(); stepFrame(-1); }
-      if (e.key === 'ArrowRight') { e.preventDefault(); stepFrame(1); }
-      if (e.key === ' ') { e.preventDefault(); togglePlay(); }
-      if (e.key.toLowerCase() === 'c') { e.preventDefault(); captureCurrentFrame(); }
+      if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+
+      const lb = document.getElementById('lightbox');
+      const isLightboxOpen = lb && lb.style.display === 'flex';
+
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        const dir = e.key === 'ArrowLeft' ? -1 : 1;
+
+        if (isLightboxOpen) {
+          e.preventDefault();
+          const items = currentGalleryTab === 'frames' ? capturedFrames : generatedVideos;
+          if (items.length === 0) return;
+
+          if (currentGalleryTab === 'frames') {
+            activePreviewIdx = (activePreviewIdx + dir + items.length) % items.length;
+            previewFrame(activePreviewIdx); // Updates canvas
+            openLightbox(activePreviewIdx); // Updates lightbox
+          } else {
+            // Video Navigation
+            let nextIdx = (activePreviewIdx + dir + items.length) % items.length;
+            previewVideo(nextIdx);
+          }
+        } else if (!isVideoMode && currentGalleryTab === 'frames') {
+          e.preventDefault();
+          if (capturedFrames.length === 0) return;
+          activePreviewIdx = (activePreviewIdx + dir + capturedFrames.length) % capturedFrames.length;
+          previewFrame(activePreviewIdx);
+        } else {
+          // Standard Video Player Navigation
+          if (e.key === 'ArrowLeft') { e.preventDefault(); stepFrame(-1); }
+          if (e.key === 'ArrowRight') { e.preventDefault(); stepFrame(1); }
+        }
+      } else if (e.key === 'Enter') {
+        if (activePreviewIdx !== -1) {
+          e.preventDefault();
+          toggleSel(e, activePreviewIdx);
+        }
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        togglePlay();
+      } else if (e.key.toLowerCase() === 'c') {
+        e.preventDefault();
+        captureCurrentFrame();
+      } else if (e.key === 'Escape') {
+        if (isLightboxOpen) closeLightbox();
+      }
     });
 
     // ===== Timecode =====
@@ -884,13 +974,14 @@
         if (items.length === 0) {
           vstrip.style.display = 'none';
           empty.style.display = 'flex';
+          updateToolbarVisibility(0);
           return;
         }
         vstrip.style.display = 'flex';
         empty.style.display = 'none';
 
         vstrip.innerHTML = items.map((vid, i) => `
-        <div class="frame-card ${sel.has(i) ? 'selected' : ''}" style="position:relative;" onclick="previewVideo(${i})">
+        <div class="frame-card ${i === activePreviewIdx ? 'active-preview' : ''} ${sel.has(i) ? 'selected' : ''}" style="position:relative;" onclick="previewVideo(${i})">
           <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#222;color:#555;">
             ${vid.cover ? `<img src="${vid.cover}" style="width:100%;height:100%;object-fit:cover;border-radius:2px;">` : `
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -902,15 +993,40 @@
           </div>
           <div class="tc-label">Movie_${i + 1}.mp4</div>
           <div class="card-actions">
-            <button class="card-act-btn dl" onclick="event.stopPropagation(); dlBlob(items[${i}].blob, 'CineMagic_Movie_${i + 1}.mp4')">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            </button>
             <button class="card-act-btn del" onclick="event.stopPropagation(); deleteVideo(${i})">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
             </button>
           </div>
         </div>
         `).join('');
+      }
+
+      updateToolbarVisibility(sel.size || items.length);
+    }
+
+    function updateToolbarVisibility(itemCount) {
+      const btnZip = document.getElementById('btn-export-zip');
+      const btnVid = document.getElementById('btn-download-video');
+      const sel = currentGalleryTab === 'frames' ? selectedFrames : selectedVideos;
+      const count = sel.size > 0 ? sel.size : itemCount;
+
+      if (currentGalleryTab === 'frames') {
+        btnZip.style.display = count > 0 ? 'inline-flex' : 'none';
+        btnZip.innerHTML = `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15V3m-4 8l4 4 4-4m-9 8h10a2 2 0 002-2v-2H3v2a2 2 0 002 2z" /></svg> ZIP 下载`;
+        btnVid.style.display = 'none';
+      } else {
+        // Video Tab
+        if (count === 1 && itemCount > 0) {
+          btnZip.style.display = 'none';
+          btnVid.style.display = 'inline-flex';
+        } else if (count > 1) {
+          btnVid.style.display = 'none';
+          btnZip.style.display = 'inline-flex';
+          btnZip.innerHTML = `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15V3m-4 8l4 4 4-4m-9 8h10a2 2 0 002-2v-2H3v2a2 2 0 002 2z" /></svg> ZIP 批量下载`;
+        } else {
+          btnZip.style.display = 'none';
+          btnVid.style.display = 'none';
+        }
       }
     }
 
@@ -927,11 +1043,18 @@
       currentGalleryTab = tab;
       document.getElementById('tab-frames').classList.toggle('active', tab === 'frames');
       document.getElementById('tab-videos').classList.toggle('active', tab === 'videos');
+
+      const pdfZone = document.getElementById('pdf-export-zone');
+      if (pdfZone) {
+        pdfZone.style.display = tab === 'frames' ? 'flex' : 'none';
+      }
+
       renderFilmstrip();
     }
 
     function previewVideo(i) {
       if (!generatedVideos[i]) return;
+      activePreviewIdx = i; // Track for navigation
       const lb = document.getElementById('lightbox');
       const img = document.getElementById('lightbox-img');
       const vid = document.getElementById('lightbox-video');
@@ -947,6 +1070,10 @@
       tc.innerText = `Movie_${i + 1}.mp4`;
       lb.style.display = 'flex';
       vid.play().catch(e => console.warn("Auto-play prevented", e));
+
+      // Highlight in gallery
+      document.querySelectorAll('#videostrip .frame-card').forEach((el, idx) => el.classList.toggle('active-preview', idx === i));
+      document.getElementById('videostrip').children[i]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
 
     function previewFrame(idx) {
@@ -969,35 +1096,26 @@
     }
 
     function openLightbox(idx) {
+      if (!capturedFrames[idx]) return;
+      activePreviewIdx = idx;
       const f = capturedFrames[idx];
-      document.getElementById('lightbox-img').src = f.dataUrl;
+      const img = document.getElementById('lightbox-img');
+      const vid = document.getElementById('lightbox-video');
+
+      img.src = f.dataUrl;
+      img.style.display = 'block';
+      vid.style.display = 'none';
+      vid.pause();
+
       document.getElementById('lightbox-tc').innerText = 'TC: ' + f.timecode + ' — Frame #' + String(f.index + 1).padStart(4, '0');
       document.getElementById('lightbox').style.display = 'flex';
+
+      // Sync gallery highlight
+      document.querySelectorAll('#filmstrip .frame-card').forEach((el, i) => el.classList.toggle('active-preview', i === idx));
+      document.getElementById('fc-' + idx)?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
     function closeLightbox() { document.getElementById('lightbox').style.display = 'none'; }
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeLightbox();
-      
-      // Arrow key navigation in gallery
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        const items = currentGalleryTab === 'frames' ? capturedFrames : generatedVideos;
-        if (items.length === 0) return;
-        
-        const sel = currentGalleryTab === 'frames' ? selectedFrames : selectedVideos;
-        
-        if (sel.size === 0) {
-          sel.add(0);
-        } else {
-          const currentIdx = [...sel][sel.size - 1];
-          let newIdx = e.key === 'ArrowLeft' ? currentIdx - 1 : currentIdx + 1;
-          if (newIdx < 0) newIdx = items.length - 1;
-          if (newIdx >= items.length) newIdx = 0;
-          sel.clear();
-          sel.add(newIdx);
-        }
-        renderFilmstrip();
-      }
-    });
+    // Removed redundant keydown listener as it's consolidated above
 
 
 
@@ -1038,7 +1156,7 @@
       if (!videoReady) { toast('请先上传视频', true); return; }
       const items = currentGalleryTab === 'frames' ? capturedFrames : generatedVideos;
       const sel = currentGalleryTab === 'frames' ? selectedFrames : selectedVideos;
-      
+
       if (sel.size > 0) {
         sel.clear();
       } else {
@@ -1055,7 +1173,6 @@
         selectedFrames.clear();
         activePreviewIdx = -1;
         toast('已删除选中帧');
-        if (capturedFrames.length === 0) document.getElementById('download-zone').style.display = 'none';
       } else {
         if (selectedVideos.size === 0) { toast('请先选择要删除的视频', true); return; }
         const sortedIdx = [...selectedVideos].sort((a, b) => b - a);
@@ -1073,7 +1190,6 @@
       if (!videoReady) { toast('请先上传视频', true); return; }
       if (currentGalleryTab === 'frames') {
         capturedFrames = []; selectedFrames = new Set(); activePreviewIdx = -1;
-        document.getElementById('download-zone').style.display = 'none';
         if (videoReady) showVideoView();
       } else {
         generatedVideos.forEach(v => { if (v.url) URL.revokeObjectURL(v.url); });
@@ -1170,12 +1286,12 @@
 
     async function startAISceneExtract() {
       if (!videoReady) { toast('请先加载视频', true); return; }
-      
+
       switchGalleryTab('frames');
       showRenderOverlay();
       isRendering = true;
       capturedFrames = []; selectedFrames = new Set(); activePreviewIdx = -1;
-      
+
       // AI Brain: Start Audio Analysis in background if not done
       if (audioEnergyData.length === 0) {
         document.getElementById('render-status').innerText = 'AI 正在同步分析音频高能点...';
@@ -1183,42 +1299,42 @@
       }
 
       document.getElementById('render-status').innerText = 'AI 2.0 融合大脑开启扫描...';
-      
+
       const smallCvs = document.createElement('canvas');
       smallCvs.width = 48; smallCvs.height = 48;
       const smallCtx = smallCvs.getContext('2d');
-      
+
       let prevData = null;
-      const scanFps = 4; 
+      const scanFps = 4;
       const interval = 1 / scanFps;
       const totalSteps = Math.floor(videoEl.duration / interval);
       let lastCaptureTime = -1;
-      
+
       for (let i = 0; i < totalSteps && isRendering; i++) {
         const t = i * interval;
         await seekVideoTo(t);
-        
+
         // 1. Visual Scene Analytics
         smallCtx.drawImage(videoEl, 0, 0, 48, 48);
         const currentData = smallCtx.getImageData(0, 0, 48, 48).data;
         let visualScore = 0;
-        
+
         if (prevData) {
           let diffSum = 0;
           for (let j = 0; j < currentData.length; j += 4) {
             const dr = currentData[j] - prevData[j];
-            const dg = currentData[j+1] - prevData[j+1];
-            const db = currentData[j+2] - prevData[j+2];
-            diffSum += Math.sqrt(dr*dr + dg*dg + db*db);
+            const dg = currentData[j + 1] - prevData[j + 1];
+            const db = currentData[j + 2] - prevData[j + 2];
+            diffSum += Math.sqrt(dr * dr + dg * dg + db * db);
           }
           visualScore = diffSum / (48 * 48);
         }
         prevData = currentData;
-        
+
         // 2. Audio Peak Detection
         const audioIdx = Math.floor(t);
         const audioScore = (audioEnergyData[audioIdx] || 0) * 100; // RMS to score scale
-        
+
         // 3. Face Identification (Pro Feature)
         let faceFound = false;
         if (blazefaceModel && i % 4 === 0) { // Check face every 1 second to save perf
@@ -1240,7 +1356,7 @@
           lastCaptureTime = t;
           document.getElementById('render-status').innerText = `AI 2.0 已智选 ${capturedFrames.length} 个瞬间...`;
         }
-        
+
         const pct = Math.floor(i / totalSteps * 100);
         document.getElementById('progress-bar').style.width = pct + '%';
         document.getElementById('render-percent').innerText = pct + '%';
@@ -1248,7 +1364,7 @@
           document.getElementById('render-status').innerText = `AI 正在深度理解视频流... ${pct}%`;
         }
       }
-      
+
       hideRenderOverlay();
       isRendering = false;
       toast(`AI 2.0 创作完成：捕捉到 ${capturedFrames.length} 个高价值瞬间`);
@@ -1286,19 +1402,42 @@
       });
     }
 
-    // ===== Export ZIP =====
+    // ===== Export ZIP & Video =====
     async function exportZip() {
       if (!videoReady) { toast('请先上传视频', true); return; }
-      const frames = getExportFrames();
-      if (!frames.length) { toast('没有可导出的帧', true); return; }
-      toast('正在打包...');
-      const zip = new JSZip(), folder = zip.folder('CineMagic_Frames');
-      frames.forEach((f, i) => {
-        const b64 = f.dataUrl.split(',')[1];
-        folder.file(`frame_${String(i + 1).padStart(4, '0')}_${f.timecode.replace(/:/g, '-')}.jpg`, b64, { base64: true });
-      });
-      dlBlob(await zip.generateAsync({ type: 'blob' }), `CineMagic_Frames_${Date.now()}.zip`);
-      toast('ZIP 下载完成');
+
+      if (currentGalleryTab === 'frames') {
+        const frames = getExportFrames();
+        if (!frames.length) { toast('没有可导出的帧', true); return; }
+        toast('正在打包...');
+        const zip = new JSZip(), folder = zip.folder('CineMagic_Frames');
+        frames.forEach((f, i) => {
+          const b64 = f.dataUrl.split(',')[1];
+          folder.file(`frame_${String(i + 1).padStart(4, '0')}_${f.timecode.replace(/:/g, '-')}.jpg`, b64, { base64: true });
+        });
+        dlBlob(await zip.generateAsync({ type: 'blob' }), `CineMagic_Frames_${Date.now()}.zip`);
+        toast('ZIP 下载完成');
+      } else {
+        // Video Zip
+        const videos = selectedVideos.size > 0 ? [...selectedVideos].map(i => generatedVideos[i]) : generatedVideos;
+        if (!videos.length) { toast('没有可导出的视频', true); return; }
+        toast('正在打包视频...');
+        const zip = new JSZip(), folder = zip.folder('CineMagic_Videos');
+        for (let i = 0; i < videos.length; i++) {
+          const v = videos[i];
+          const arrayBuffer = await v.blob.arrayBuffer();
+          folder.file(`Movie_${i + 1}.mp4`, arrayBuffer);
+        }
+        dlBlob(await zip.generateAsync({ type: 'blob' }), `CineMagic_Videos_${Date.now()}.zip`);
+        toast('视频 ZIP 下载完成');
+      }
+    }
+
+    function downloadSelectedVideo() {
+      const idx = selectedVideos.size === 1 ? [...selectedVideos][0] : 0; // fallback to 0 if none selected
+      if (!generatedVideos[idx]) return;
+      dlBlob(generatedVideos[idx].blob, `CineMagic_Movie_${idx + 1}.mp4`);
+      toast('视频下载完成');
     }
 
     // ===== Export PDF =====
@@ -1309,14 +1448,14 @@
       const template = document.getElementById('pdf-template').value;
       toast('正在生成分镜表...');
       const { jsPDF } = window.jspdf;
-      
+
       const isLandscape = template !== 'script';
-      const doc = new jsPDF({ 
-        orientation: isLandscape ? 'landscape' : 'portrait', 
-        unit: 'mm', 
-        format: 'a4' 
+      const doc = new jsPDF({
+        orientation: isLandscape ? 'landscape' : 'portrait',
+        unit: 'mm',
+        format: 'a4'
       });
-      
+
       const W = isLandscape ? 297 : 210, H = isLandscape ? 210 : 297;
       const mL = 10, mT = 18;
       const addBg = () => { doc.setFillColor(8, 8, 12); doc.rect(0, 0, W, H, 'F'); };
@@ -1333,7 +1472,7 @@
           doc.text('CINEMAGIC PRO — STORYBOARD', mL, 10);
           doc.setFontSize(5); doc.setTextColor(60, 60, 60);
           doc.text(`Style: ${currentStyle.toUpperCase()}  ·  Ratio: ${currentRatio}  ·  Frames: ${frames.length}  ·  ${new Date().toLocaleString('zh-CN')}`, mL, 14);
-          
+
           frames.slice(p * perPage, (p + 1) * perPage).forEach((f, i) => {
             const col = i % cols, row = Math.floor(i / cols);
             const x = mL + col * cW, y = mT + row * cH;
@@ -1357,24 +1496,24 @@
           doc.text('CINEMAGIC — DIRECTOR\'S SCRIPT', mL, 10);
           doc.setFontSize(5); doc.setTextColor(60, 60, 60);
           doc.text(`Style: ${currentStyle.toUpperCase()}  ·  Ratio: ${currentRatio}  ·  Frames: ${frames.length}  ·  ${new Date().toLocaleString('zh-CN')}`, mL, 14);
-          
+
           frames.slice(p * perPage, (p + 1) * perPage).forEach((f, i) => {
             const y = mT + i * cH;
             // Frame image on left
             const imgW = (W - 20) * 0.4;
             const imgH = imgW * 9 / 16;
             doc.addImage(f.dataUrl, 'JPEG', mL, y + 5, imgW, imgH);
-            
+
             // Script area on right
             doc.setDrawColor(30, 30, 40);
             doc.rect(mL + imgW + 5, y + 5, (W - 20) * 0.6 - 5, imgH);
-            
+
             doc.setFontSize(6); doc.setTextColor(249, 115, 22);
             doc.text(`SHOT ${p * perPage + i + 1} @ ${f.timecode}`, mL + imgW + 7, y + 10);
-            
+
             doc.setDrawColor(20, 20, 25);
-            for(let line=0; line<3; line++) {
-              doc.line(mL + imgW + 7, y + 15 + line*6, W - 15, y + 15 + line*6);
+            for (let line = 0; line < 3; line++) {
+              doc.line(mL + imgW + 7, y + 15 + line * 6, W - 15, y + 15 + line * 6);
             }
           });
         }
@@ -1393,7 +1532,7 @@
           doc.text('CINEMAGIC PRO ARTISTIC MASTER', 20, imgH + 42);
         }
       }
-      
+
       dlBlob(doc.output('blob'), `CineMagic_Storyboard_${template}_${Date.now()}.pdf`);
       toast('PDF 下载成功');
     }
@@ -1416,13 +1555,13 @@
 
       try {
         document.getElementById('render-status').innerText = 'Initializing Native Engine...';
-        
+
         // Setup hidden rendering video
         if (!_recordingVideo) _recordingVideo = document.createElement('video');
         _recordingVideo.src = URL.createObjectURL(videoFile);
         _recordingVideo.muted = true;
         _recordingVideo.playsInline = true;
-        
+
         await new Promise((r, j) => {
           _recordingVideo.onloadedmetadata = r;
           _recordingVideo.onerror = j;
@@ -1449,7 +1588,7 @@
           'video/ogg'
         ].find(type => MediaRecorder.isTypeSupported(type)) || '';
         _recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8000000 });
-        
+
         _recorder.ondataavailable = e => { if (e.data.size > 0) renderChunks.push(e.data); };
         _recorder.start();
 
@@ -1458,7 +1597,7 @@
         for (let i = 0; i < totalFrames && isRendering; i++) {
           const time = i * interval;
           _recordingVideo.currentTime = time;
-          
+
           await new Promise(r => {
             const onSeeked = () => {
               _recordingVideo.removeEventListener('seeked', onSeeked);
@@ -1515,10 +1654,8 @@
         if (currentGalleryTab !== 'videos') switchGalleryTab('videos');
         renderFilmstrip(true);
 
-        document.getElementById('download-zone').style.display = 'block';
-        document.getElementById('btn-download').onclick = () => dlBlob(outBlob, `CineMagic_${currentStyle}_${Date.now()}.mp4`);
         toast('电影视频录制完成 (原生引擎)');
-        
+
         URL.revokeObjectURL(_recordingVideo.src);
       } catch (e) {
         console.error("Native Render Error:", e);
