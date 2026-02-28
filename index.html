@@ -123,92 +123,9 @@
 
       <!-- STEP 03: Rendering -->
       <div class="blk" id="render-group">
-        <p class="sec-lbl"><span class="step-tag">Step 03</span>AI 智能调色</p>
+        <p class="sec-lbl"><span class="step-tag">Step 03</span>手动选择风格</p>
 
-        <!-- AI 分析按钮 -->
-        <button class="btn btn-purple" style="width:100%;margin-bottom:20px;" onclick="analyzeVideo()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-          </svg>
-          AI 智能分析视频
-        </button>
-
-        <!-- AI 分析报告 -->
-        <div id="ai-analysis-result" style="display:none;margin-bottom:20px;padding:16px;background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(249,115,22,0.05));border:1px solid rgba(124,58,237,0.3);border-radius:8px;overflow:hidden;">
-          <div style="font-size:10px;font-family:'JetBrains Mono';color:#888;margin-bottom:12px;text-transform:uppercase;">AI 分析报告</div>
-          
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-            <div>
-              <div style="font-size:9px;color:#666;margin-bottom:4px;">场景类型</div>
-              <div style="font-size:12px;font-family:'Noto Serif SC';color:#fff;" id="analysis-scene">-</div>
-            </div>
-            <div>
-              <div style="font-size:9px;color:#666;margin-bottom:4px;">光线条件</div>
-              <div style="font-size:12px;font-family:'Noto Serif SC';color:#fff;" id="analysis-lighting">-</div>
-            </div>
-            <div>
-              <div style="font-size:9px;color:#666;margin-bottom:4px;">色彩基调</div>
-              <div style="font-size:12px;font-family:'Noto Serif SC';color:#fff;" id="analysis-color">-</div>
-            </div>
-            <div>
-              <div style="font-size:9px;color:#666;margin-bottom:4px;">情绪氛围</div>
-              <div style="font-size:12px;font-family:'Noto Serif SC';color:#fff;" id="analysis-mood">-</div>
-            </div>
-          </div>
-
-          <!-- 智能推荐 -->
-          <div style="margin-top:16px;">
-            <div style="font-size:10px;font-family:'JetBrains Mono';color:#888;margin-bottom:8px;text-transform:uppercase;">智能推荐风格</div>
-            
-            <div id="recommendations-free" style="display:none;grid-template-columns:1fr;gap:8px;">
-              <!-- 免费用户看到的模糊推荐 -->
-              <div class="style-card-blur" onclick="showModal('activate')" style="padding:12px;position:relative;cursor:pointer;background:#0d0d0f;border:1px solid #1a1a1a;border-radius:6px;">
-                <div style="filter:blur(3px);opacity:0.5;">
-                  <div style="font-size:11px;font-family:'Noto Serif SC';font-weight:700;">推荐风格 1</div>
-                  <div style="font-size:7px;color:#666;margin-top:2px;">匹配度 92%</div>
-                </div>
-                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);border-radius:6px;">
-                  <div style="text-align:center;">
-                    <div style="font-size:16px;margin-bottom:4px;">🔒</div>
-                    <div style="font-size:8px;font-family:'JetBrains Mono';color:#f97316;">PRO 解锁</div>
-                  </div>
-                </div>
-              </div>
-              <div class="style-card-blur" onclick="showModal('activate')" style="padding:12px;position:relative;cursor:pointer;background:#0d0d0f;border:1px solid #1a1a1a;border-radius:6px;">
-                <div style="filter:blur(3px);opacity:0.5;">
-                  <div style="font-size:11px;font-family:'Noto Serif SC';font-weight:700;">推荐风格 2</div>
-                  <div style="font-size:7px;color:#666;margin-top:2px;">匹配度 87%</div>
-                </div>
-                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);border-radius:6px;">
-                  <div style="text-align:center;">
-                    <div style="font-size:16px;margin-bottom:4px;">🔒</div>
-                    <div style="font-size:8px;font-family:'JetBrains Mono';color:#f97316;">PRO 解锁</div>
-                  </div>
-                </div>
-              </div>
-              <div class="style-card-blur" onclick="showModal('activate')" style="padding:12px;position:relative;cursor:pointer;background:#0d0d0f;border:1px solid #1a1a1a;border-radius:6px;">
-                <div style="filter:blur(3px);opacity:0.5;">
-                  <div style="font-size:11px;font-family:'Noto Serif SC';font-weight:700;">推荐风格 3</div>
-                  <div style="font-size:7px;color:#666;margin-top:2px;">匹配度 81%</div>
-                </div>
-                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);border-radius:6px;">
-                  <div style="text-align:center;">
-                    <div style="font-size:16px;margin-bottom:4px;">🔒</div>
-                    <div style="font-size:8px;font-family:'JetBrains Mono';color:#f97316;">PRO 解锁</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- PRO 用户看到的真实推荐 -->
-            <div id="recommendations-pro" style="display:none;grid-template-columns:1fr;gap:8px;">
-              <!-- 动态生成 -->
-            </div>
-          </div>
-        </div>
-
-        <!-- 手动选择风格 -->
-        <label class="lbl">或手动选择风格</label>
+        <label class="lbl">视觉风格</label>
 
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:10px;">
             <div class="style-card active" id="sc-cinema" onclick="setStyle('cinema')" style="padding:10px;">
@@ -460,6 +377,9 @@
           // Show blurred recommendations
           document.getElementById('recommendations-free').style.display = 'grid';
           document.getElementById('recommendations-pro').style.display = 'none';
+          
+          // Show indicator
+          document.getElementById('analysis-indicator').style.display = 'block';
 
           toast('AI 分析完成！升级到 PRO 解锁智能推荐', false);
         }
@@ -477,6 +397,9 @@
 
           document.getElementById('recommendations-free').style.display = 'none';
           document.getElementById('recommendations-pro').style.display = 'grid';
+          
+          // Show indicator
+          document.getElementById('analysis-indicator').style.display = 'block';
 
           toast('AI 分析完成！已生成智能推荐', false);
         }
@@ -695,6 +618,93 @@
               </button>
               <div class="time-display-box" style="text-align: right;" id="tc-duration">00:00:00</div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI 智能分析按钮 -->
+      <div style="padding:16px;display:flex;align-items:center;gap:12px;">
+        <button class="btn btn-purple" style="flex:1;" onclick="analyzeVideo()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+          </svg>
+          AI 智能分析视频
+        </button>
+        <div id="analysis-indicator" style="display:none;padding:6px 12px;background:linear-gradient(135deg,rgba(124,58,237,0.2),rgba(249,115,22,0.1));border:1px solid rgba(124,58,237,0.3);border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#f97316;">
+          ✨ AI 已分析
+        </div>
+      </div>
+
+      <!-- AI 分析报告 -->
+      <div id="ai-analysis-result" style="display:none;margin:0 16px 16px;padding:16px;background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(249,115,22,0.05));border:1px solid rgba(124,58,237,0.3);border-radius:8px;">
+        <div style="font-size:10px;font-family:'JetBrains Mono';color:#888;margin-bottom:12px;text-transform:uppercase;">AI 分析报告</div>
+        
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
+          <div>
+            <div style="font-size:9px;color:#666;margin-bottom:4px;">场景类型</div>
+            <div style="font-size:12px;font-family:'Noto Serif SC';color:#fff;" id="analysis-scene">-</div>
+          </div>
+          <div>
+            <div style="font-size:9px;color:#666;margin-bottom:4px;">光线条件</div>
+            <div style="font-size:12px;font-family:'Noto Serif SC';color:#fff;" id="analysis-lighting">-</div>
+          </div>
+          <div>
+            <div style="font-size:9px;color:#666;margin-bottom:4px;">色彩基调</div>
+            <div style="font-size:12px;font-family:'Noto Serif SC';color:#fff;" id="analysis-color">-</div>
+          </div>
+          <div>
+            <div style="font-size:9px;color:#666;margin-bottom:4px;">情绪氛围</div>
+            <div style="font-size:12px;font-family:'Noto Serif SC';color:#fff;" id="analysis-mood">-</div>
+          </div>
+        </div>
+
+        <!-- 智能推荐 -->
+        <div style="margin-top:16px;">
+          <div style="font-size:10px;font-family:'JetBrains Mono';color:#888;margin-bottom:8px;text-transform:uppercase;">智能推荐风格</div>
+          
+          <div id="recommendations-free" style="display:none;grid-template-columns:repeat(3,1fr);gap:8px;">
+            <!-- 免费用户看到的模糊推荐 -->
+            <div class="style-card-blur" onclick="showModal('activate')" style="padding:12px;position:relative;cursor:pointer;background:#0d0d0f;border:1px solid #1a1a1a;border-radius:6px;">
+              <div style="filter:blur(3px);opacity:0.5;">
+                <div style="font-size:11px;font-family:'Noto Serif SC';font-weight:700;">推荐风格 1</div>
+                <div style="font-size:7px;color:#666;margin-top:2px;">匹配度 92%</div>
+              </div>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);border-radius:6px;">
+                <div style="text-align:center;">
+                  <div style="font-size:16px;margin-bottom:4px;">🔒</div>
+                  <div style="font-size:8px;font-family:'JetBrains Mono';color:#f97316;">PRO 解锁</div>
+                </div>
+              </div>
+            </div>
+            <div class="style-card-blur" onclick="showModal('activate')" style="padding:12px;position:relative;cursor:pointer;background:#0d0d0f;border:1px solid #1a1a1a;border-radius:6px;">
+              <div style="filter:blur(3px);opacity:0.5;">
+                <div style="font-size:11px;font-family:'Noto Serif SC';font-weight:700;">推荐风格 2</div>
+                <div style="font-size:7px;color:#666;margin-top:2px;">匹配度 87%</div>
+              </div>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);border-radius:6px;">
+                <div style="text-align:center;">
+                  <div style="font-size:16px;margin-bottom:4px;">🔒</div>
+                  <div style="font-size:8px;font-family:'JetBrains Mono';color:#f97316;">PRO 解锁</div>
+                </div>
+              </div>
+            </div>
+            <div class="style-card-blur" onclick="showModal('activate')" style="padding:12px;position:relative;cursor:pointer;background:#0d0d0f;border:1px solid #1a1a1a;border-radius:6px;">
+              <div style="filter:blur(3px);opacity:0.5;">
+                <div style="font-size:11px;font-family:'Noto Serif SC';font-weight:700;">推荐风格 3</div>
+                <div style="font-size:7px;color:#666;margin-top:2px;">匹配度 81%</div>
+              </div>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);border-radius:6px;">
+                <div style="text-align:center;">
+                  <div style="font-size:16px;margin-bottom:4px;">🔒</div>
+                  <div style="font-size:8px;font-family:'JetBrains Mono';color:#f97316;">PRO 解锁</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PRO 用户看到的真实推荐 -->
+          <div id="recommendations-pro" style="display:none;grid-template-columns:repeat(3,1fr);gap:8px;">
+            <!-- 动态生成 -->
           </div>
         </div>
       </div>
