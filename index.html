@@ -975,7 +975,29 @@
       document.getElementById('lightbox').style.display = 'flex';
     }
     function closeLightbox() { document.getElementById('lightbox').style.display = 'none'; }
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeLightbox();
+      
+      // Arrow key navigation in gallery
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        const items = currentGalleryTab === 'frames' ? capturedFrames : generatedVideos;
+        if (items.length === 0) return;
+        
+        const sel = currentGalleryTab === 'frames' ? selectedFrames : selectedVideos;
+        
+        if (sel.size === 0) {
+          sel.add(0);
+        } else {
+          const currentIdx = [...sel][sel.size - 1];
+          let newIdx = e.key === 'ArrowLeft' ? currentIdx - 1 : currentIdx + 1;
+          if (newIdx < 0) newIdx = items.length - 1;
+          if (newIdx >= items.length) newIdx = 0;
+          sel.clear();
+          sel.add(newIdx);
+        }
+        renderFilmstrip();
+      }
+    });
 
 
 
