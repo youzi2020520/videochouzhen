@@ -959,10 +959,10 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 /* Floating Help */
-.help-btn {
+.help-btn,
+.xhs-btn {
   position: fixed;
   right: 24px;
-  bottom: 24px;
   width: 44px;
   height: 44px;
   background: rgba(26, 26, 30, 0.8);
@@ -978,9 +978,19 @@ input[type=range]::-webkit-slider-thumb {
   z-index: 9999;
   transition: all 0.3s;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  text-decoration: none;
 }
 
-.help-btn:hover {
+.help-btn {
+  bottom: 24px;
+}
+
+.xhs-btn {
+  bottom: 80px;
+}
+
+.help-btn:hover,
+.xhs-btn:hover {
   background: var(--orange);
   color: #000;
   transform: scale(1.05);
@@ -989,7 +999,7 @@ input[type=range]::-webkit-slider-thumb {
 .help-popup {
   position: fixed;
   right: 24px;
-  bottom: 80px;
+  bottom: 136px;
   width: 240px;
   background: rgba(13, 13, 15, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.08);
