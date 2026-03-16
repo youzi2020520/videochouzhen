@@ -5,8 +5,8 @@ const path = require('path');
 const crypto = require('crypto');
 
 const app = express();
-const IS_VERCEL = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
-const DB_PATH = IS_VERCEL ? '/tmp/auth_db.json' : path.join(__dirname, 'auth_db.json');
+const isVercel = process.env.VERCEL_AFFINITY || process.env.VERCEL_REGION;
+const DB_PATH = isVercel ? '/tmp/auth_db.json' : path.join(__dirname, 'auth_db.json');
 
 app.use(bodyParser.json());
 
