@@ -9,6 +9,12 @@ const DB_PATH = process.env.VERCEL ? '/tmp/auth_db.json' : path.join(__dirname, 
 
 app.use(bodyParser.json());
 
+app.use(express.static(__dirname));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 const ADMIN_USER = 'admin';
 const ADMIN_PASS = 'clover2026';
 
