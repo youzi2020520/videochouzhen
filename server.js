@@ -9,11 +9,7 @@ const isVercel = process.env.VERCEL_AFFINITY || process.env.VERCEL_REGION;
 const DB_PATH = isVercel ? '/tmp/auth_db.json' : path.join(__dirname, 'auth_db.json');
 
 app.use(bodyParser.json());
-
-const staticPath = __dirname;
-app.use(express.static(staticPath, {
-    index: ['index.html', 'login.html', 'admin.html']
-}));
+app.use(express.static(__dirname));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
