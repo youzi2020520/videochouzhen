@@ -5,11 +5,15 @@ const path = require('path');
 const crypto = require('crypto');
 
 const app = express();
-const DB_PATH = process.env.VERCEL ? '/tmp/auth_db.json' : path.join(__dirname, 'auth_db.json');
+const IS_VERCEL = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
+const DB_PATH = IS_VERCEL ? '/tmp/auth_db.json' : path.join(__dirname, 'auth_db.json');
 
 app.use(bodyParser.json());
 
-app.use(express.static(__dirname));
+const staticPath = __dirname;
+app.use(express.static(staticPath, {
+    index: ['index.html', 'login.html', 'admin.html']
+}));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
