@@ -70,11 +70,16 @@ app.use('/admin.html', (req, res, next) => {
 
 // Initialize "Database"
 if (!fs.existsSync(DB_PATH)) {
-    fs.writeFileSync(DB_PATH, JSON.stringify({ codes: [] }));
+    fs.writeFileSync(DB_PATH, JSON.stringify({ codes: [] }, null, 2));
 }
 
 function getDB() {
-    return JSON.parse(fs.readFileSync(DB_PATH));
+    try {
+        const data = fs.readFileSync(DB_PATH, 'utf8');
+        return JSON.parse(data);
+    } catch (err) {
+        return { codes: [] };
+    }
 }
 
 function saveDB(db) {
@@ -163,3 +168,5 @@ app.post('/api/admin/toggle', requireAdminAuth, (req, res) => {
 app.listen(PORT, () => {
     console.log(`视频帧探服务运行在 http://localhost:${PORT}`);
 });
+
+module.exports = app;
