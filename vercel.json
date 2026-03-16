@@ -8,28 +8,12 @@
   ],
   "routes": [
     {
-      "src": "/api/login",
+      "src": "/api/(.*)",
       "dest": "server.js"
     },
     {
-      "src": "/api/logout",
-      "dest": "server.js"
-    },
-    {
-      "src": "/api/verify",
-      "dest": "server.js"
-    },
-    {
-      "src": "/api/admin/generate",
-      "dest": "server.js"
-    },
-    {
-      "src": "/api/admin/list",
-      "dest": "server.js"
-    },
-    {
-      "src": "/api/admin/toggle",
-      "dest": "server.js"
+      "src": "/(.*)\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2)",
+      "dest": "/$1"
     },
     {
       "src": "/(.*)",

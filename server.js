@@ -1,15 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
-const cors = require('cors');
 const path = require('path');
 const crypto = require('crypto');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-const DB_PATH = path.join(__dirname, 'auth_db.json');
+const DB_PATH = process.env.VERCEL ? '/tmp/auth_db.json' : path.join(__dirname, 'auth_db.json');
 
-app.use(cors());
 app.use(bodyParser.json());
 
 const ADMIN_USER = 'admin';
@@ -20,10 +17,26 @@ function generateToken(username) {
     return crypto.createHash('sha256').update(payload).digest('hex').substring(0, 32);
 }
 
-// Token storage (in production, use a database or Redis)
 let tokenStore = {};
 
-// Login API
+function getDB() {
+    try {
+        if (fs.existsSync(DB_PATH)) {
+            const data = fs.readFileSync(DB_PATH, 'utf8');
+            return JSON.parse(data);
+        }
+    } catch (err) {}
+    return { codes: [] };
+}
+
+function saveDB(db) {
+    try {
+        fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
+    } catch (err) {
+        console.error('Failed to save DB:', err);
+    }
+}
+
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     if (username === ADMIN_USER && password === ADMIN_PASS) {
@@ -35,23 +48,18 @@ app.post('/api/login', (req, res) => {
     }
 });
 
-// Logout API
 app.post('/api/logout', (req, res) => {
     const token = req.headers['authorization'] || req.query.token;
     if (token && tokenStore[token]) {
         delete tokenStore[token];
-        res.json({ success: true, message: '登出成功' });
-    } else {
-        res.json({ success: true, message: '已登出' });
     }
+    res.json({ success: true });
 });
 
-// Verify token helper (server-side)
 function verifyServerToken(token) {
     return token && tokenStore[token] !== undefined;
 }
 
-// Admin API middleware
 function requireAdminAuth(req, res, next) {
     const token = req.headers['authorization'] || req.query.token;
     if (!token || !verifyServerToken(token)) {
@@ -60,37 +68,6 @@ function requireAdminAuth(req, res, next) {
     next();
 }
 
-app.use('/admin.html', (req, res, next) => {
-    const token = req.query.token;
-    if (!token || !verifyServerToken(token)) {
-        return res.redirect('/login.html?returnUrl=/admin.html');
-    }
-    next();
-});
-
-// Initialize "Database"
-if (!fs.existsSync(DB_PATH)) {
-    fs.writeFileSync(DB_PATH, JSON.stringify({ codes: [] }, null, 2));
-}
-
-function getDB() {
-    try {
-        const data = fs.readFileSync(DB_PATH, 'utf8');
-        return JSON.parse(data);
-    } catch (err) {
-        return { codes: [] };
-    }
-}
-
-function saveDB(db) {
-    fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
-}
-
-// --- Client APIs ---
-
-app.use(express.static(__dirname));
-
-// Verify a code
 app.post('/api/verify', (req, res) => {
     const { code, wechatId, ip, location } = req.body;
     const db = getDB();
@@ -103,20 +80,15 @@ app.post('/api/verify', (req, res) => {
     if (record.status === 0) return res.status(403).json({ success: false, message: '授权码已禁用' });
     if (new Date(record.expiry) < new Date()) return res.status(403).json({ success: false, message: '授权码已过期' });
 
-    // Update login info
-    record.lastIp = ip || req.ip;
+    record.lastIp = ip || 'unknown';
     record.lastLocation = location || '未知';
     record.lastLogin = new Date().toISOString();
     
     saveDB(db);
-    // Format expiry date to YYYY-MM-DD
     const expiryDate = new Date(record.expiry).toISOString().split('T')[0];
     res.json({ success: true, message: '验证成功', expiry: expiryDate });
 });
 
-// --- Management APIs (Add basic password protection for prod) ---
-
-// Generate a code
 app.post('/api/admin/generate', requireAdminAuth, (req, res) => {
     const { wechatId, days } = req.body;
     if (!wechatId) return res.status(400).json({ error: '请提供微信号' });
@@ -146,12 +118,10 @@ app.post('/api/admin/generate', requireAdminAuth, (req, res) => {
     res.json({ success: true, code: newCode });
 });
 
-// List codes
 app.get('/api/admin/list', requireAdminAuth, (req, res) => {
     res.json(getDB().codes);
 });
 
-// Toggle status
 app.post('/api/admin/toggle', requireAdminAuth, (req, res) => {
     const { code } = req.body;
     const db = getDB();
@@ -163,10 +133,6 @@ app.post('/api/admin/toggle', requireAdminAuth, (req, res) => {
     } else {
         res.status(404).json({ error: '未找到该授权码' });
     }
-});
-
-app.listen(PORT, () => {
-    console.log(`视频帧探服务运行在 http://localhost:${PORT}`);
 });
 
 module.exports = app;
