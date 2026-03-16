@@ -56,10 +56,34 @@
     </div>
 
     <script>
-        const API_BASE = 'http://localhost:3000/api';
+        const API_BASE = '';
+
+        function getToken() {
+            let token = localStorage.getItem('admin_token');
+            if (!token) {
+                const urlParams = new URLSearchParams(window.location.search);
+                token = urlParams.get('token');
+                if (token) {
+                    localStorage.setItem('admin_token', token);
+                }
+            }
+            return token;
+        }
+
+        function checkAuth() {
+            const token = getToken();
+            if (!token) {
+                window.location.href = '/login.html?returnUrl=' + encodeURIComponent(window.location.href);
+                return false;
+            }
+            return token;
+        }
 
         async function fetchCodes() {
-            const res = await fetch(`${API_BASE}/admin/list`);
+            const token = checkAuth();
+            if (!token) return;
+
+            const res = await fetch(`${API_BASE}/api/admin/list?token=${token}`);
             const codes = await res.json();
             const tbody = document.querySelector('#code-table tbody');
             tbody.innerHTML = '';
@@ -88,9 +112,11 @@
         async function generateCode() {
             const wechatId = document.getElementById('wechat-id').value;
             const days = document.getElementById('expiry-days').value;
+            const token = checkAuth();
+            if (!token) return;
             if (!wechatId) return alert('请输入微信号');
 
-            const res = await fetch(`${API_BASE}/admin/generate`, {
+            const res = await fetch(`${API_BASE}/api/admin/generate?token=${token}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ wechatId, days })
@@ -105,7 +131,10 @@
         }
 
         async function toggleStatus(code) {
-            await fetch(`${API_BASE}/admin/toggle`, {
+            const token = checkAuth();
+            if (!token) return;
+
+            await fetch(`${API_BASE}/api/admin/toggle?token=${token}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code })

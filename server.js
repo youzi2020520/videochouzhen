@@ -3,13 +3,70 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const cors = require('cors');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const DB_PATH = path.join(__dirname, 'auth_db.json');
 
 app.use(cors());
 app.use(bodyParser.json());
+
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'clover2026';
+
+function generateToken(username) {
+    const payload = `${username}:${Date.now()}`;
+    return crypto.createHash('sha256').update(payload).digest('hex').substring(0, 32);
+}
+
+// Token storage (in production, use a database or Redis)
+let tokenStore = {};
+
+// Login API
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    if (username === ADMIN_USER && password === ADMIN_PASS) {
+        const token = generateToken(username);
+        tokenStore[token] = { username, created: Date.now() };
+        res.json({ success: true, token });
+    } else {
+        res.status(401).json({ success: false, message: '用户名或密码错误' });
+    }
+});
+
+// Logout API
+app.post('/api/logout', (req, res) => {
+    const token = req.headers['authorization'] || req.query.token;
+    if (token && tokenStore[token]) {
+        delete tokenStore[token];
+        res.json({ success: true, message: '登出成功' });
+    } else {
+        res.json({ success: true, message: '已登出' });
+    }
+});
+
+// Verify token helper (server-side)
+function verifyServerToken(token) {
+    return token && tokenStore[token] !== undefined;
+}
+
+// Admin API middleware
+function requireAdminAuth(req, res, next) {
+    const token = req.headers['authorization'] || req.query.token;
+    if (!token || !verifyServerToken(token)) {
+        return res.status(401).json({ success: false, message: '请先登录' });
+    }
+    next();
+}
+
+app.use('/admin.html', (req, res, next) => {
+    const token = req.query.token;
+    if (!token || !verifyServerToken(token)) {
+        return res.redirect('/login.html?returnUrl=/admin.html');
+    }
+    next();
+});
 
 // Initialize "Database"
 if (!fs.existsSync(DB_PATH)) {
@@ -25,6 +82,8 @@ function saveDB(db) {
 }
 
 // --- Client APIs ---
+
+app.use(express.static(__dirname));
 
 // Verify a code
 app.post('/api/verify', (req, res) => {
@@ -53,7 +112,7 @@ app.post('/api/verify', (req, res) => {
 // --- Management APIs (Add basic password protection for prod) ---
 
 // Generate a code
-app.post('/api/admin/generate', (req, res) => {
+app.post('/api/admin/generate', requireAdminAuth, (req, res) => {
     const { wechatId, days } = req.body;
     if (!wechatId) return res.status(400).json({ error: '请提供微信号' });
 
@@ -83,12 +142,12 @@ app.post('/api/admin/generate', (req, res) => {
 });
 
 // List codes
-app.get('/api/admin/list', (req, res) => {
+app.get('/api/admin/list', requireAdminAuth, (req, res) => {
     res.json(getDB().codes);
 });
 
 // Toggle status
-app.post('/api/admin/toggle', (req, res) => {
+app.post('/api/admin/toggle', requireAdminAuth, (req, res) => {
     const { code } = req.body;
     const db = getDB();
     const record = db.codes.find(c => c.code === code);
