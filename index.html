@@ -42,21 +42,11 @@
         <button class="mode-btn active" id="btn-simple" onclick="switchMode('simple')">标准模式</button>
         <button class="mode-btn" id="btn-pro" onclick="switchMode('pro')">PRO 模式</button>
       </div>
-      <div id="license-status"
-        style="padding:4px 12px;border:1px solid #f97316;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#f97316;text-transform:uppercase;background:linear-gradient(135deg,rgba(249,115,22,0.15),rgba(249,115,22,0.05));display:none;cursor:pointer;position:relative">
-        <span style="margin-right:4px;">★</span>已充值
-        <div id="license-tooltip"
-          style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1a1a1a;border:1px solid #f97316;border-radius:6px;padding:6px 10px;font-size:9px;white-space:nowrap;color:#f97316;z-index:999;pointer-events:none;font-family:'JetBrains Mono';">
-          <span id="license-tooltip-text">--</span>
-        </div>
-      </div>
       <div id="ai-quota-badge"
-        style="padding:4px 12px;border:1px solid #22c55e;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#22c55e;text-transform:uppercase;background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(34,197,94,0.05));display:none;">
+        style="padding:4px 12px;border:1px solid #22c55e;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#22c55e;text-transform:uppercase;background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(34,197,94,0.05));display:none;cursor:pointer;"
+        title="点击充值积分" onclick="showModal('activate')">
         积分 <span id="ai-quota-num" style="font-weight:700;">--</span>
       </div>
-      <button onclick="showModal('activate')"
-        style="font-size:10px;font-family:'JetBrains Mono';color:var(--orange);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.12em;font-weight:700;"
-        id="activate-btn">充值积分</button>
     </div>
   </header>
 
@@ -772,49 +762,8 @@
 
     // ===== 充值成功后更新UI =====
     function applyCreditsStatus(addedCredits) {
-      // 显示取消按钮（允许关闭弹窗）
-      const cancelBtn = document.getElementById('activate-cancel-btn');
-      if (cancelBtn) cancelBtn.style.display = 'block';
-
-      // 隐藏「充值积分」按钮，改显示「已充值」badge
-      const activateBtn = document.getElementById('activate-btn');
-      if (activateBtn) activateBtn.style.display = 'none';
-
       updateAIQuotaBadge();
-
-      const licenseStatus = document.getElementById('license-status');
-      if (licenseStatus) {
-        licenseStatus.style.display = 'flex';
-        licenseStatus.style.alignItems = 'center';
-
-        const tooltipEl = document.getElementById('license-tooltip');
-        const tooltipText = document.getElementById('license-tooltip-text');
-        const credits = parseInt(localStorage.getItem('cine_credits') || '0');
-        if (tooltipText) tooltipText.textContent = `积分余额 ${credits}`;
-
-        // 绑定 hover 事件（只绑一次）
-        if (!licenseStatus._tooltipBound) {
-          licenseStatus._tooltipBound = true;
-          licenseStatus.addEventListener('mouseenter', () => {
-            // 每次 hover 实时刷新积分
-            const t = document.getElementById('license-tooltip-text');
-            if (t) t.textContent = `积分余额 ${parseInt(localStorage.getItem('cine_credits') || '0')}`;
-            if (tooltipEl) tooltipEl.style.display = 'block';
-          });
-          licenseStatus.addEventListener('mouseleave', () => {
-            if (tooltipEl) tooltipEl.style.display = 'none';
-          });
-        }
-      }
     }
-
-    // 页面加载时：如果已有积分（曾充值过），恢复已充值状态
-    (function initCreditsStatus() {
-      const credits = parseInt(localStorage.getItem('cine_credits') || '0');
-      if (credits > 0) {
-        applyCreditsStatus(0);
-      }
-    })();
 
     async function validateLicense() {
       const code = document.getElementById('license-input').value.trim().toUpperCase();
