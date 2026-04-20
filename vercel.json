@@ -10,8 +10,9 @@
     }
   ],
   "routes": [
+    { "src": "/style.css", "dest": "/public/style.css" },
+    { "src": "/imge/(.*)", "dest": "/public/imge/$1" },
     { "src": "/api/(.*)", "dest": "server.js" },
-    { "src": "/(.*\\.(css|svg|png|jpg|jpeg|gif|ico|js))", "dest": "/$1" },
     { "src": "/(.*)", "dest": "server.js" }
   ]
 }
