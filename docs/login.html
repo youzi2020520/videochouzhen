@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员登录 - CineMagic Pro</title>
+    <style>
+        :root { --orange: #f97316; --bg: #0a0a0c; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            color: #fff;
+            font-family: system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            background: #121215;
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #222;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo h1 {
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: var(--orange);
+            font-size: 24px;
+        }
+        .logo p {
+            color: #666;
+            font-size: 12px;
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #888;
+            font-size: 13px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #1a1a1f;
+            color: #fff;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--orange);
+        }
+        .form-group input::placeholder {
+            color: #555;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            border: none;
+            background: var(--orange);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+        .btn-login:hover {
+            opacity: 0.9;
+        }
+        .btn-login:active {
+            transform: scale(0.98);
+        }
+        .btn-login:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .error-msg {
+            background: #2a1515;
+            border: 1px solid #442222;
+            color: #f87171;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: none;
+        }
+        .error-msg.show {
+            display: block;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 12px;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>CINEMAGIC</h1>
+            <p>授权管理系统</p>
+        </div>
+
+        <div id="error-msg" class="error-msg"></div>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label>用户名</label>
+                <input type="text" id="username" placeholder="请输入管理员账号" required>
+            </div>
+            <div class="form-group">
+                <label>密码</label>
+                <input type="password" id="password" placeholder="请输入管理员密码" required>
+            </div>
+            <button type="submit" class="btn-login" id="login-btn">登 录</button>
+        </form>
+
+        <div class="footer">
+            © 2024 CineMagic Pro
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('login-btn');
+            const errorMsg = document.getElementById('error-msg');
+
+            if (!username || !password) {
+                showError('请输入用户名和密码');
+                return;
+            }
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = '登录中...';
+            errorMsg.classList.remove('show');
+
+            try {
+                const res = await fetch(`${API_BASE}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    localStorage.setItem('admin_token', data.token);
+                    localStorage.setItem('admin_user', data.username);
+                    let returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/admin.html';
+                    const separator = returnUrl.includes('?') ? '&' : '?';
+                    window.location.href = returnUrl + separator + 'token=' + data.token;
+                } else {
+                    showError(data.message || '登录失败');
+                }
+            } catch (err) {
+                showError('网络错误，请稍后重试');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = '登 录';
+            }
+        });
+
+        function showError(msg) {
+            const errorMsg = document.getElementById('error-msg');
+            errorMsg.textContent = msg;
+            errorMsg.classList.add('show');
+        }
+
+        if (localStorage.getItem('admin_token')) {
+            window.location.href = '/admin.html';
+        }
+    </script>
+</body>
+</html>

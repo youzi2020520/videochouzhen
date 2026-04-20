@@ -10,9 +10,6 @@
     }
   ],
   "routes": [
-    { "src": "/style.css", "dest": "/public/style.css" },
-    { "src": "/imge/(.*)", "dest": "/public/imge/$1" },
-    { "src": "/api/(.*)", "dest": "server.js" },
-    { "src": "/(.*)", "dest": "server.js" }
+    { "src": "/api/(.*)", "dest": "server.js" }
   ]
 }
