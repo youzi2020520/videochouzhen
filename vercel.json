@@ -11,6 +11,8 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "server.js" },
+    { "src": "/style.css", "dest": "/style.css" },
+    { "src": "/imge/(.*)", "dest": "/imge/$1" },
     { "src": "/(.*)", "dest": "server.js" }
   ]
 }
