@@ -46,9 +46,10 @@
         style="padding:4px 12px;border:1px solid #f97316;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#f97316;text-transform:uppercase;background:linear-gradient(135deg,rgba(249,115,22,0.15),rgba(249,115,22,0.05));display:none;cursor:pointer;position:relative">
         <span style="margin-right:4px;">★</span>已授权
       </div>
-      <div id="user-tag"
-        style="padding:4px 12px;border:1px solid #222;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#555;text-transform:uppercase;background:#0d0d0f">
-        Free</div>
+      <div id="ai-quota-badge"
+        style="padding:4px 12px;border:1px solid #22c55e;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#22c55e;text-transform:uppercase;background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(34,197,94,0.05));display:none;">
+        AI 剩余 <span id="ai-quota-num" style="font-weight:700;">--</span> 次
+      </div>
       <button onclick="showModal('activate')"
         style="font-size:10px;font-family:'JetBrains Mono';color:var(--orange);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.12em;font-weight:700;"
         id="activate-btn">激活 Pro</button>
@@ -218,7 +219,8 @@
 
       </div>
 
-      <!-- STEP 03: Rendering -->
+      <!-- STEP 03: Rendering（仅 PRO 可用） -->
+      <div id="pro-render-group" style="display:none;">
       <div class="blk" id="render-group">
         <p class="sec-lbl"><span class="step-tag">Step 03</span>AI 智能调色</p>
 
@@ -342,6 +344,7 @@
             </div>
           </div>
       </div>
+      </div><!-- /pro-render-group -->
 
       <!-- About Section -->
       <div style="padding:20px;margin-top:auto;border-top:1px solid rgba(255,255,255,0.06);">
@@ -504,19 +507,26 @@
 
         <div id="pdf-export-zone"
           style="display:flex;align-items:center;gap:6px;background:#0d0d0f;padding:2px;border-radius:6px;border:1px solid #1a1a1a;">
-          <select id="pdf-template"
-            style="background:none;border:none;color:#555;font-size:8px;font-family:'JetBrains Mono';padding:0 6px;cursor:pointer;outline:none;">
-            <option value="classic">标准网格 (3x2)</option>
-            <option value="script">导演脚本 (1xH)</option>
-            <option value="banner">艺术海报 (Banner)</option>
-          </select>
-          <button class="btn btn-ghost" onclick="handleProAction('pdf')" style="padding:8px 12px;border:none;">
+          <button class="btn btn-ghost" onclick="handleAIStoryboard()" style="padding:8px 12px;border:none;" id="ai-storyboard-btn">
             <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
             </svg>
-            分镜表 PDF <span
-              style="background:var(--orange);color:#000;font-size:6px;padding:1px 3px;border-radius:2px;margin-left:3px;font-weight:900;">PRO</span>
+            AI 识别分镜
+          </button>
+          <button class="btn btn-ghost" onclick="handleExportExcel()" style="padding:8px 12px;border:none;" id="export-excel-btn">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            导出 Excel
+          </button>
+          <button class="btn btn-ghost" onclick="downloadStoryboardTemplate()" style="padding:8px 12px;border:none;" id="template-btn" title="下载空白分镜表模板">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            下载模板
           </button>
         </div>
         <div style="flex:1;"></div>
@@ -525,12 +535,51 @@
   </div>
 
   <!-- Lightbox (click frame to full preview) -->
-  <div id="lightbox" onclick="closeLightbox(event)">
-    <img id="lightbox-img" src="" alt="">
-    <video id="lightbox-video" controls></video>
-    <div id="lightbox-tc"></div>
-    <div style="font-size:7px;font-family:'JetBrains Mono';color:#333;text-transform:uppercase;letter-spacing:.15em;">
-      点击任意处关闭</div>
+  <div id="lightbox">
+    <!-- 左侧：图片预览 + 导航 -->
+    <div id="lightbox-viewer" onclick="closeLightboxOnOverlay(event)">
+      <div id="lightbox-nav-prev" onclick="event.stopPropagation(); lightboxNavigate(-1)" style="display:none;position:absolute;left:16px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </div>
+      <img id="lightbox-img" src="" alt="">
+      <video id="lightbox-video" controls style="display:none;"></video>
+      <div id="lightbox-nav-next" onclick="event.stopPropagation(); lightboxNavigate(1)" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div id="lightbox-tc" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-size:10px;font-family:'JetBrains Mono';color:rgba(255,255,255,0.6);"></div>
+      <div style="position:absolute;bottom:12px;right:16px;font-size:9px;font-family:'JetBrains Mono';color:rgba(255,255,255,0.3);" id="lightbox-counter"></div>
+    </div>
+
+    <!-- 右侧：分镜描述面板 -->
+    <div id="lightbox-panel">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="font-size:11px;font-family:'Noto Serif SC';font-weight:700;color:#fff;">分镜描述</div>
+        <button onclick="closeLightbox()" style="background:none;border:none;cursor:pointer;padding:4px;opacity:0.5;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label style="font-size:9px;font-family:'JetBrains Mono';color:#555;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:4px;">景别</label>
+        <input id="lb-景别" style="width:100%;background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:7px 10px;color:#fff;font-size:12px;font-family:'Noto Serif SC';outline:none;" oninput="syncAIResult('景别', this.value)">
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label style="font-size:9px;font-family:'JetBrains Mono';color:#555;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:4px;">风格</label>
+        <input id="lb-风格" style="width:100%;background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:7px 10px;color:#fff;font-size:12px;font-family:'Noto Serif SC';outline:none;" oninput="syncAIResult('风格', this.value)">
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label style="font-size:9px;font-family:'JetBrains Mono';color:#555;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:4px;">画面描述</label>
+        <textarea id="lb-画面描述" rows="5" style="width:100%;background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:7px 10px;color:#fff;font-size:11px;font-family:'Noto Serif SC';outline:none;resize:vertical;line-height:1.6;" placeholder="AI 识别结果将显示在此处，点击可手动修改" oninput="syncAIResult('画面描述', this.value)"></textarea>
+      </div>
+
+      <div id="lb-ai-badge" style="display:none;margin-bottom:12px;padding:6px 10px;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#7c3aed;">
+        ✦ AI 识别结果
+      </div>
+
+      <div style="font-size:8px;font-family:'JetBrains Mono';color:#333;text-align:center;margin-top:8px;">← → 键切换帧 | 点击左侧关闭</div>
+    </div>
   </div>
 
   <!-- Render Overlay -->
@@ -578,8 +627,35 @@
         </div>
       </div>
 
-      <button onclick="hideModal('activate')"
-        style="display:block;margin:10px auto 0;font-size:8px;font-family:'JetBrains Mono';color:#333;background:none;border:none;cursor:pointer;">取消</button>
+      <button id="activate-cancel-btn" onclick="hideModal('activate')"
+        style="display:block;margin:10px auto 0;font-size:8px;font-family:'JetBrains Mono';color:#333;background:none;border:none;cursor:pointer;">关闭</button>
+    </div>
+  </div>
+
+  <!-- AI Storyboard Confirm Modal -->
+  <div class="modal-bg" id="pdf-preview-modal">
+    <div class="modal-box" style="max-width:320px;text-align:center;">
+      <h2 style="font-family:'Noto Serif SC';font-size:16px;margin-bottom:12px;">AI 识别分镜表</h2>
+      <div id="pdf-preview-info" style="font-size:11px;font-family:'JetBrains Mono';color:#888;line-height:1.8;margin-bottom:16px;"></div>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button
+          style="padding:8px 20px;background:var(--orange);color:#000;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-family:'JetBrains Mono';">
+          开始识别
+        </button>
+        <button onclick="hideModal('pdf-preview')"
+          style="padding:8px 20px;background:#1a1a1a;color:#555;border:1px solid #2a2a2a;border-radius:6px;font-size:11px;cursor:pointer;font-family:'JetBrains Mono';">
+          取消
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Progress Bar (in toolbar) -->
+  <div id="ai-progress-bar"
+    style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0d0d0f;border:1px solid #2a2a2a;border-radius:8px;padding:10px 20px;z-index:9999;text-align:center;min-width:260px;">
+    <div id="ai-progress-text" style="font-size:10px;font-family:'JetBrains Mono';color:#888;margin-bottom:6px;"></div>
+    <div style="width:100%;height:3px;background:#1a1a1a;border-radius:2px;overflow:hidden;">
+      <div id="ai-progress-fill" style="height:100%;background:var(--orange);width:0%;transition:width 0.3s;"></div>
     </div>
   </div>
 
@@ -607,7 +683,36 @@
     <div class="help-item"><span>Space</span>播放 / 暂停视频</div>
     <div class="help-item"><span>C Key</span>AI 精准截取单帧</div>
     <div class="help-item"><span>Esc</span>关闭大图全屏预览</div>
+    <div style="border-top:1px solid #2a2a2a;margin-top:8px;padding-top:8px;">
+      <div class="help-title" style="margin-bottom:6px;">AI 识别设置</div>
+      <div style="font-size:8px;color:#555;margin-bottom:4px;">MiniMax API Key（识别分镜表用）</div>
+      <div style="display:flex;gap:4px;">
+        <input id="claude-key-input" type="password" placeholder="sk-api-..."
+          style="flex:1;background:#0d0d0f;border:1px solid #2a2a2a;border-radius:4px;padding:4px 6px;font-size:8px;font-family:'JetBrains Mono';color:#888;outline:none;" />
+        <button onclick="saveClaudeKey()"
+          style="padding:4px 8px;background:var(--orange);color:#000;border:none;border-radius:4px;font-size:8px;cursor:pointer;">保存</button>
+      </div>
+      <div id="claude-key-status" style="font-size:7px;color:#444;margin-top:3px;"></div>
+    </div>
   </div>
+
+  <script>
+    // Load saved API key into input
+    (function loadClaudeKey() {
+      const saved = localStorage.getItem('cine_claude_key') || '';
+      const input = document.getElementById('claude-key-input');
+      if (input) input.value = saved;
+    })();
+    function saveClaudeKey() {
+      const key = document.getElementById('claude-key-input').value.trim();
+      localStorage.setItem('cine_claude_key', key);
+      const status = document.getElementById('claude-key-status');
+      if (status) {
+        status.textContent = key ? '✅ 已保存' : '已清除';
+        status.style.color = '#4ade80';
+      }
+    }
+  </script>
 
   <script>
     // ===== State =====
@@ -628,6 +733,8 @@
     let activePreviewIdx = -1;
     let currentGalleryTab = 'frames';
     let renderChunks = [];
+    let storyboardAIResults = []; // AI识别结果：{景别, 风格, 画面描述}
+    let isAIAnalyzing = false;
     let masteredFiles = [];
 
     // ===== Ratio =====
@@ -672,17 +779,25 @@
       // Update sidebar sections
       const proControls = document.getElementById('pro-controls');
       if (proControls) proControls.style.display = (mode === 'pro' && isPro) ? 'flex' : 'none';
+
+      // PRO 智能调色模块可见性
+      const proRenderGroup = document.getElementById('pro-render-group');
+      if (proRenderGroup) proRenderGroup.style.display = (mode === 'pro' && isPro) ? 'block' : 'none';
     }
 
     // ===== Pro =====
     function applyProStatus(expiryDate) {
       isPro = true; localStorage.setItem('cine_pro', 'true');
+      // 授权后显示取消按钮（允许关闭弹窗）
+      const cancelBtn = document.getElementById('activate-cancel-btn');
+      if (cancelBtn) cancelBtn.style.display = 'block';
       const tag = document.getElementById('user-tag');
       if (tag) {
-        tag.innerText = 'Pro'; tag.style.color = '#f97316'; tag.style.borderColor = '#f97316'; tag.style.background = 'linear-gradient(135deg,rgba(249,115,22,0.15),rgba(249,115,22,0.05))';
+        tag.innerHTML = '★ Pro'; tag.style.color = '#f97316'; tag.style.borderColor = '#f97316'; tag.style.background = 'linear-gradient(135deg,rgba(249,115,22,0.15),rgba(249,115,22,0.05))';
       }
       const activateBtn = document.getElementById('activate-btn');
       if (activateBtn) activateBtn.style.display = 'none';
+      updateAIQuotaBadge();
 
       const licenseStatus = document.getElementById('license-status');
       if (licenseStatus) {
@@ -703,8 +818,11 @@
         }
       }
 
-      // Auto switch to PRO mode after activation
-      switchMode('pro');
+      // 保持用户当前模式，不强制切换
+
+      // PRO 智能调色模块初始化可见性
+      const proRenderGroup = document.getElementById('pro-render-group');
+      if (proRenderGroup) proRenderGroup.style.display = (currentMode === 'pro' && isPro) ? 'block' : 'none';
     }
 
     async function validateLicense() {
@@ -872,6 +990,13 @@
 
     function loadVideoFile(file) {
       if (!file) return;
+      // 文件大小警告
+      const MB = file.size / 1024 / 1024;
+      if (MB > 500) {
+        toast(`⚠️ 文件较大 (${MB.toFixed(1)}MB)，处理时间可能较长，请耐心等待`, true);
+      } else if (MB > 200) {
+        toast(`📁 文件大小 ${MB.toFixed(1)}MB，正在加载...`);
+      }
       videoFile = file;
       document.getElementById('file-label').innerText = file.name.length > 22 ? file.name.slice(0, 20) + '…' : file.name;
       const url = URL.createObjectURL(file);
@@ -1002,10 +1127,16 @@
     }
 
     window.addEventListener('keydown', e => {
-      if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
-
       const lb = document.getElementById('lightbox');
       const isLightboxOpen = lb && lb.style.display === 'flex';
+
+      // ESC 关闭灯箱
+      if (e.key === 'Escape' && isLightboxOpen) {
+        closeLightbox();
+        return;
+      }
+
+      if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
 
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         const dir = e.key === 'ArrowLeft' ? -1 : 1;
@@ -1072,11 +1203,233 @@
     }
     document.getElementById('tc-input').onkeydown = e => { if (e.key === 'Enter') seekToTimecode(); };
 
+    // ===== AI 识别分镜（面向所有用户，按次数限额） =====
+    function handleAIStoryboard() {
+      const frames = getExportFrames();
+      if (!frames.length) { toast('没有可导出的帧', true); return; }
+      if (!videoReady) { toast('请先上传视频', true); return; }
+      showAIStoryboardConfirm(frames);
+    }
+
+    // ===== 导出 Excel（面向所有用户，无限免费） =====
+    function handleExportExcel() {
+      const frames = getExportFrames();
+      if (!frames.length) { toast('没有可导出的帧', true); return; }
+      if (!videoReady) { toast('请先上传视频', true); return; }
+      exportStoryboardExcel(frames);
+    }
+
+    // ===== 下载空白分镜表模板 =====
+    function downloadStoryboardTemplate() {
+      const a = document.createElement('a');
+      a.href = 'storyboard_分镜表.xlsx';
+      a.download = 'storyboard_分镜表.xlsx';
+      a.click();
+    }
+
+    // ===== PRO 专属操作（仍需 PRO 授权） =====
     function handleProAction(action) {
       if (!isPro) { showModal('activate'); return; }
       if (currentMode !== 'pro') { toast('请切换到 PRO 模式使用此功能', true); return; }
-      if (action === 'pdf') exportPDF();
       if (action === 'ai-extract') startAISceneExtract();
+    }
+
+    // ===== AI 识别分镜表 =====
+    function showAIStoryboardConfirm(frames) {
+      const limit = checkAIQuota(frames.length);
+      if (!limit.allowed) {
+        toast(limit.msg, true);
+        return;
+      }
+      document.getElementById('pdf-preview-info').innerHTML =
+        `📊 将识别 <b style="color:var(--orange)">${frames.length}</b> 张帧<br>` +
+        `📋 内容：景别 / 风格 / 画面描述<br>` +
+        `⏱️ 预计耗时：<b style="color:var(--orange)">${Math.ceil(frames.length * 3)}~${Math.ceil(frames.length * 6)}</b> 秒<br>` +
+        `<span style="font-size:9px;color:#555;">剩余额度：${limit.remaining}/${limit.max} 次</span>`;
+      // 改确认弹窗的确认按钮行为
+      const confirmBtn = document.querySelector('#pdf-preview-modal button:first-child');
+      confirmBtn.onclick = () => { hideModal('pdf-preview'); startAIStoryboardAnalysis(frames); };
+      showModal('pdf-preview');
+    }
+
+    function updateAIQuotaBadge() {
+      const badge = document.getElementById('ai-quota-badge');
+      const numEl = document.getElementById('ai-quota-num');
+      if (!badge || !numEl) return;
+      const today = new Date().toDateString();
+      const freeUsed = parseInt(localStorage.getItem('cine_free_ai_used') || '0');
+      const proDate = localStorage.getItem('cine_pro_ai_date');
+      const proUsed = parseInt(localStorage.getItem('cine_pro_ai_used') || '0');
+      const FREE_MAX = 20;
+      const PRO_MAX = 100;
+
+      if (!isPro) {
+        const remaining = Math.max(0, FREE_MAX - freeUsed);
+        if (remaining <= 0) {
+          badge.style.display = 'none';
+        } else {
+          badge.style.display = 'block';
+          numEl.textContent = remaining;
+        }
+      } else {
+        badge.style.display = 'block';
+        const remaining = Math.max(0, PRO_MAX - proUsed);
+        numEl.textContent = remaining;
+      }
+    }
+
+    function checkAIQuota(framesCount) {
+      const today = new Date().toDateString();
+      const freeUsed = parseInt(localStorage.getItem('cine_free_ai_used') || '0');
+      const proDate = localStorage.getItem('cine_pro_ai_date');
+      const proUsed = parseInt(localStorage.getItem('cine_pro_ai_used') || '0');
+      const FREE_MAX = 20;
+      const PRO_MAX = 100;
+
+      if (!isPro) {
+        // Free用户：终身20张
+        if (freeUsed >= FREE_MAX) {
+          return { allowed: false, msg: `Free 用户已用完 ${FREE_MAX} 张免费额度，请激活 Pro`, remaining: 0, max: FREE_MAX };
+        }
+        return { allowed: true, remaining: FREE_MAX - freeUsed, max: FREE_MAX };
+      } else {
+        // Pro用户：每天100张
+        if (proDate !== today) {
+          localStorage.setItem('cine_pro_ai_date', today);
+          localStorage.setItem('cine_pro_ai_used', '0');
+          return { allowed: true, remaining: PRO_MAX, max: PRO_MAX };
+        }
+        if (proUsed >= PRO_MAX) {
+          return { allowed: false, msg: `今日 Pro 额度已用完 (${PRO_MAX}/${PRO_MAX})，明天再来`, remaining: 0, max: PRO_MAX };
+        }
+        const remaining = PRO_MAX - proUsed;
+        return { allowed: true, remaining, max: PRO_MAX };
+      }
+    }
+
+    function recordAIUsage(framesCount) {
+      if (!isPro) {
+        const prev = parseInt(localStorage.getItem('cine_free_ai_used') || '0');
+        localStorage.setItem('cine_free_ai_used', String(prev + framesCount));
+      } else {
+        const today = new Date().toDateString();
+        const prev = parseInt(localStorage.getItem('cine_pro_ai_used') || '0');
+        localStorage.setItem('cine_pro_ai_used', String(prev + framesCount));
+      }
+      updateAIQuotaBadge();
+    }
+
+    async function startAIStoryboardAnalysis(frames) {
+      if (isAIAnalyzing) return;
+      isAIAnalyzing = true;
+      storyboardAIResults = [];
+      const total = frames.length;
+
+      // 获取 API Key
+      const apiKey = localStorage.getItem('cine_claude_key') || '';
+      if (!apiKey) {
+        toast('请先配置 MiniMax API Key（设置中）', true);
+        isAIAnalyzing = false;
+        return;
+      }
+
+      const progressEl = document.getElementById('ai-progress-text');
+      const progressFill = document.getElementById('ai-progress-fill');
+      const progressWrap = document.getElementById('ai-progress-bar');
+      if (progressWrap) progressWrap.style.display = 'block';
+
+      for (let i = 0; i < total; i++) {
+        const f = frames[i];
+        const base64 = f.dataUrl.split(',')[1];
+        const pct = Math.round((i + 1) / total * 100);
+
+        if (progressEl) progressEl.textContent = `正在识别第 ${i + 1}/${total} 帧...`;
+        if (progressFill) progressFill.style.width = pct + '%';
+
+        try {
+          const result = await analyzeFrameWithMinimax(base64, f.timecode, i + 1, total);
+          storyboardAIResults[i] = result;
+        } catch (e) {
+          console.warn('帧', i + 1, '分析失败:', e);
+          storyboardAIResults[i] = { 景别: '-', 风格: '-', 画面描述: '（识别失败）' };
+        }
+        await new Promise(r => setTimeout(r, 300)); // 避免 API 限速
+      }
+
+      recordAIUsage(total);
+      if (progressEl) progressEl.textContent = '识别完成！';
+      if (progressFill) progressFill.style.width = '100%';
+      setTimeout(() => {
+        if (progressWrap) progressWrap.style.display = 'none';
+        if (progressEl) progressEl.textContent = '';
+        if (progressFill) progressFill.style.width = '0%';
+      }, 2000);
+
+      toast(`AI 识别完成，已生成 ${total} 条分镜数据`, false);
+      isAIAnalyzing = false;
+    }
+
+    async function analyzeFrameWithMinimax(base64Data, timecode, index, total) {
+      const apiKey = localStorage.getItem('cine_claude_key');
+      const prompt = `你是一位专业的影视分镜分析师。请仔细分析这张视频截图，并按照以下格式输出 JSON（只输出 JSON，不要有其他内容）：
+
+{
+  "景别": "请分析这是远景/全景/中景/近景/特写/大特写中的哪一种，或根据画面内容合理推断",
+  "风格": "请分析整体视觉风格，如：扁平化UI设计、极简UI演示、电影感色调、赛博朋克、日系小清新、写实纪录片风等",
+  "画面描述": "请用2-3句话详细描述画面内容，包括主体、背景、色彩基调、重要元素等"
+}
+
+注意事项：
+- 景别只需给出一个最准确的判断
+- 风格描述要专业简洁
+- 画面描述要客观、具体，不要包含你的思考过程`;
+
+      const res = await fetch('https://api.minimax.chat/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + apiKey
+        },
+        body: JSON.stringify({
+          model: 'MiniMax-VL-01',
+          messages: [{
+            role: 'user',
+            content: [
+              {
+                type: 'image_url',
+                image_url: {
+                  url: 'data:image/jpeg;base64,' + base64Data
+                }
+              },
+              {
+                type: 'text',
+                text: prompt
+              }
+            ]
+          }]
+        }),
+        mode: 'cors'
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error('API Error: ' + err);
+      }
+
+      const data = await res.json();
+      const text = data.choices?.[0]?.message?.content || '{}';
+      // 尝试解析 JSON
+      try {
+        const json = JSON.parse(text);
+        return json;
+      } catch {
+        // 尝试提取 JSON
+        const match = text.match(/\{[\s\S]*\}/);
+        if (match) {
+          try { return JSON.parse(match[0]); } catch { }
+        }
+        return { 景别: '-', 风格: '-', 画面描述: text.slice(0, 100) };
+      }
     }
 
     function fmtTimeFull(s) {
@@ -1290,14 +1643,55 @@
       vid.style.display = 'none';
       vid.pause();
 
-      document.getElementById('lightbox-tc').innerText = 'TC: ' + f.timecode + ' — Frame #' + String(f.index + 1).padStart(4, '0');
+      document.getElementById('lightbox-tc').innerText = 'TC: ' + f.timecode;
+      document.getElementById('lightbox-counter').innerText = `${idx + 1} / ${capturedFrames.length}`;
       document.getElementById('lightbox').style.display = 'flex';
+
+      // 更新导航箭头显示
+      const prevBtn = document.getElementById('lightbox-nav-prev');
+      const nextBtn = document.getElementById('lightbox-nav-next');
+      if (prevBtn) prevBtn.style.display = idx > 0 ? 'flex' : 'none';
+      if (nextBtn) nextBtn.style.display = idx < capturedFrames.length - 1 ? 'flex' : 'none';
+
+      // 填充 AI 描述
+      const ai = storyboardAIResults[idx] || {};
+      const hasAI = ai && (ai.景别 || ai.风格 || ai.画面描述);
+      document.getElementById('lb-景别').value = ai.景别 || '';
+      document.getElementById('lb-风格').value = ai.风格 || '';
+      document.getElementById('lb-画面描述').value = ai.画面描述 || '';
+      document.getElementById('lb-ai-badge').style.display = hasAI ? 'block' : 'none';
 
       // Sync gallery highlight
       document.querySelectorAll('#filmstrip .frame-card').forEach((el, i) => el.classList.toggle('active-preview', i === idx));
       document.getElementById('fc-' + idx)?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
-    function closeLightbox() { document.getElementById('lightbox').style.display = 'none'; }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+    }
+
+    // 将编辑同步到 storyboardAIResults
+    function syncAIResult(field, value) {
+      if (!storyboardAIResults[activePreviewIdx]) {
+        storyboardAIResults[activePreviewIdx] = {};
+      }
+      storyboardAIResults[activePreviewIdx][field] = value;
+    }
+
+    // 键盘导航
+    function lightboxNavigate(dir) {
+      const next = activePreviewIdx + dir;
+      if (next >= 0 && next < capturedFrames.length) {
+        openLightbox(next);
+      }
+    }
+
+    // 点击图片区域关闭
+    function closeLightboxOnOverlay(event) {
+      if (event.target.id === 'lightbox' || event.target.id === 'lightbox-viewer') {
+        closeLightbox();
+      }
+    }
     // Removed redundant keydown listener as it's consolidated above
 
 
@@ -2414,104 +2808,212 @@
       }, 300);
     }
 
-    // ===== Export PDF =====
-    async function exportPDF() {
-      if (!videoReady) { toast('请先上传视频', true); return; }
-      const frames = getExportFrames();
-      if (!frames.length) { toast('没有可导出的帧', true); return; }
-      const template = document.getElementById('pdf-template').value;
-      toast('正在生成分镜表...');
-      const { jsPDF } = window.jspdf;
+    // ===== 导出 Excel 分镜表 =====
+    function getExportFrames() { return selectedFrames.size > 0 ? [...selectedFrames].map(i => capturedFrames[i]) : capturedFrames; }
 
-      const isLandscape = template !== 'script';
-      const doc = new jsPDF({
-        orientation: isLandscape ? 'landscape' : 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const W = isLandscape ? 297 : 210, H = isLandscape ? 210 : 297;
-      const mL = 10, mT = 18;
-      const addBg = () => { doc.setFillColor(8, 8, 12); doc.rect(0, 0, W, H, 'F'); };
-
-      if (template === 'classic') {
-        const cols = 3, rows = 2;
-        const cW = (W - 20) / cols, cH = (H - 30) / rows;
-        const perPage = cols * rows;
-
-        for (let p = 0; p < Math.ceil(frames.length / perPage); p++) {
-          if (p > 0) doc.addPage();
-          addBg();
-          doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(249, 115, 22);
-          doc.text('CINEMAGIC PRO — STORYBOARD', mL, 10);
-          doc.setFontSize(5); doc.setTextColor(60, 60, 60);
-          doc.text(`Style: ${currentStyle.toUpperCase()}  ·  Ratio: ${currentRatio}  ·  Frames: ${frames.length}  ·  ${new Date().toLocaleString('zh-CN')}`, mL, 14);
-
-          frames.slice(p * perPage, (p + 1) * perPage).forEach((f, i) => {
-            const col = i % cols, row = Math.floor(i / cols);
-            const x = mL + col * cW, y = mT + row * cH;
-            doc.setDrawColor(25, 25, 35); doc.setLineWidth(0.2); doc.rect(x, y, cW - 3, cH - 7, 'D');
-            doc.addImage(f.dataUrl, 'JPEG', x + 0.5, y + 0.5, cW - 4, cH - 9);
-            doc.setFontSize(5); doc.setTextColor(249, 115, 22);
-            doc.text('TC: ' + f.timecode, x + 1.5, y + cH - 7.5);
-            doc.setTextColor(50, 50, 50);
-            doc.text('#' + String(f.index + 1).padStart(3, '0'), x + cW - 9, y + cH - 7.5);
-          });
-        }
-      } else if (template === 'script') {
-        const rows = 4;
-        const cH = (H - 30) / rows;
-        const perPage = rows;
-
-        for (let p = 0; p < Math.ceil(frames.length / perPage); p++) {
-          if (p > 0) doc.addPage();
-          addBg();
-          doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(249, 115, 22);
-          doc.text('CINEMAGIC — DIRECTOR\'S SCRIPT', mL, 10);
-          doc.setFontSize(5); doc.setTextColor(60, 60, 60);
-          doc.text(`Style: ${currentStyle.toUpperCase()}  ·  Ratio: ${currentRatio}  ·  Frames: ${frames.length}  ·  ${new Date().toLocaleString('zh-CN')}`, mL, 14);
-
-          frames.slice(p * perPage, (p + 1) * perPage).forEach((f, i) => {
-            const y = mT + i * cH;
-            // Frame image on left
-            const imgW = (W - 20) * 0.4;
-            const imgH = imgW * 9 / 16;
-            doc.addImage(f.dataUrl, 'JPEG', mL, y + 5, imgW, imgH);
-
-            // Script area on right
-            doc.setDrawColor(30, 30, 40);
-            doc.rect(mL + imgW + 5, y + 5, (W - 20) * 0.6 - 5, imgH);
-
-            doc.setFontSize(6); doc.setTextColor(249, 115, 22);
-            doc.text(`SHOT ${p * perPage + i + 1} @ ${f.timecode}`, mL + imgW + 7, y + 10);
-
-            doc.setDrawColor(20, 20, 25);
-            for (let line = 0; line < 3; line++) {
-              doc.line(mL + imgW + 7, y + 15 + line * 6, W - 15, y + 15 + line * 6);
-            }
-          });
-        }
-      } else if (template === 'banner') {
-        // Banner mode: Landscape, 1 big frame + style info
-        for (let i = 0; i < frames.length; i++) {
-          if (i > 0) doc.addPage();
-          addBg();
-          const f = frames[i];
-          const imgW = W - 40;
-          const imgH = imgW * 9 / 16;
-          doc.addImage(f.dataUrl, 'JPEG', 20, 20, imgW, imgH);
-          doc.setFontSize(16); doc.setTextColor(255, 255, 255);
-          doc.text(f.timecode, 20, imgH + 35);
-          doc.setFontSize(10); doc.setTextColor(249, 115, 22);
-          doc.text('CINEMAGIC PRO ARTISTIC MASTER', 20, imgH + 42);
-        }
+    // ===== 原生 JS ZIP 生成器（Store 模式，不压缩，不依赖任何 CDN） =====
+    function crc32(buf) {
+      let crc = -1;
+      for (let i = 0; i < buf.length; i++) {
+        crc ^= buf[i];
+        for (let j = 0; j < 8; j++) crc = (crc >>> 1) ^ (crc & 1 ? 0xEDB88320 : 0);
       }
-
-      dlBlob(doc.output('blob'), `CineMagic_Storyboard_${template}_${Date.now()}.pdf`);
-      toast('PDF 下载成功');
+      return (crc ^ -1) >>> 0;
     }
 
-    function getExportFrames() { return selectedFrames.size > 0 ? [...selectedFrames].map(i => capturedFrames[i]) : capturedFrames; }
+    function buildXlsx(files) {
+      const parts = [];
+      const cdEntries = [];
+      let offset = 0;
+      for (const f of files) {
+        const raw = new TextEncoder().encode(f.data);
+        const crc = crc32(raw);
+        const nb = new TextEncoder().encode(f.name);
+        const hdr = new Uint8Array(30 + nb.length);
+        const dv = new DataView(hdr.buffer);
+        hdr.set([0x50, 0x4B, 0x03, 0x04]);
+        dv.setUint16(4, 20, true);
+        dv.setUint16(6, 0, true);
+        dv.setUint16(8, 0, true);
+        dv.setUint16(10, 0, true); dv.setUint16(12, 0, true);
+        dv.setUint32(14, crc, true);
+        dv.setUint32(18, raw.length, true);
+        dv.setUint32(22, raw.length, true);
+        dv.setUint32(26, nb.length, true);
+        dv.setUint32(30, 0, true);
+        hdr.set(nb, 30);
+        parts.push(hdr, raw);
+        cdEntries.push({ nb, crc, size: raw.length, offset });
+        offset += hdr.length + raw.length;
+      }
+      const cdParts = [];
+      let cdOffset = offset;
+      for (const e of cdEntries) {
+        const cde = new Uint8Array(46 + e.nb.length);
+        const dv = new DataView(cde.buffer);
+        cde.set([0x50, 0x4B, 0x01, 0x00]);
+        dv.setUint16(4, 20, true);
+        dv.setUint16(6, 0, true); dv.setUint16(8, 0, true);
+        dv.setUint16(10, 0, true); dv.setUint16(12, 0, true);
+        dv.setUint32(14, e.crc, true);
+        dv.setUint32(18, e.size, true); dv.setUint32(22, e.size, true);
+        dv.setUint32(26, e.nb.length, true);
+        dv.setUint32(30, 0, true); dv.setUint32(34, 0, true);
+        dv.setUint16(38, 0, true);
+        dv.setUint32(42, e.offset, true);
+        cde.set(e.nb, 46);
+        cdParts.push(cde);
+      }
+      const eocd = new Uint8Array(22);
+      const dv2 = new DataView(eocd.buffer);
+      eocd.set([0x50, 0x4B, 0x05, 0x06]);
+      dv2.setUint32(4, 0, true);
+      dv2.setUint16(8, cdEntries.length, true);
+      dv2.setUint16(10, cdEntries.length, true);
+      const cdLen = cdParts.reduce((a, b) => a + b.length, 0);
+      dv2.setUint32(12, cdLen, true);
+      dv2.setUint32(16, cdOffset, true);
+      dv2.setUint32(20, 0, true);
+      const all = [...parts, ...cdParts, eocd];
+      const total = all.reduce((a, b) => a + b.length, 0);
+      const out = new Uint8Array(total);
+      let p = 0;
+      for (const x of all) { out.set(x, p); p += x.length; }
+      return new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    }
+
+
+    // ===== 最小化 fallback XML（模板加载失败时使用）=====
+    const ctMinimal = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/></Types>';
+    const pkgRelsMinimal = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+    const wbMinimal = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Storyboard" sheetId="1" r:id="rId1" state="visible"/></sheets></workbook>';
+    const wbRelsMinimal = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="workbook.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+    const stylesMinimal = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="0"/><fonts count="2"><font><sz val="10"/><name val="Arial"/></font><font><sz val="11"/><b/><color rgb="FFFFFFFF"/><name val="Arial"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF4F46E5"/></fgColor></patternFill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellStyleXfs><cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" align="center" valign="center"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" align="center" valign="center"/><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" align="left" valign="center"/><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" align="left" valign="top" wrapText="1"/></cellXfs></styleSheet>';
+
+    async function exportStoryboardExcel(frames) {
+      if (!frames.length) { toast('没有可导出的帧', true); return; }
+      toast('正在加载模板...');
+
+      let tplFiles = {};
+      try {
+        const resp = await fetch('storyboard_分镜表.xlsx');
+        if (!resp.ok) throw new Error('模板加载失败');
+        tplFiles = await readZipFilesFromBlob(await resp.blob());
+      } catch(e) {}
+
+      toast('正在填充数据...');
+      const esc = v => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+      const strPool = ['编号', '时间(s)', '景别', '风格', '画面', '画面描述', ''];
+      const strIdx = {};
+      function getStr(s) {
+        if (s === '' || s == null) return 6;
+        if (strIdx[s] !== undefined) return strIdx[s];
+        const i = strPool.length;
+        strPool.push(s); strIdx[s] = i; return i;
+      }
+
+      const dataRows = frames.map((f, ri) => {
+        const ai = storyboardAIResults[ri] || {};
+        return { idx: ri + 1, time: f.timecode || '', jingbie: ai.景别 || '', fengge: ai.风格 || '', base64Img: f.dataUrl || '', miaoshu: ai.画面描述 || '' };
+      });
+
+      const lastRow = frames.length + 1;
+      let sheetRows = '<row r="1" s="2" customFormat="1" ht="30" customHeight="1" spans="1:6">';
+      for (let ci = 0; ci < 6; ci++) sheetRows += '<c r="' + String.fromCharCode(65+ci) + '1" s="2" t="s"><v>' + ci + '</v></c>';
+      sheetRows += '</row>';
+      dataRows.forEach((d, ri) => {
+        const r = ri + 2;
+        sheetRows += '<row r="' + r + '" ht="90" customHeight="1" spans="1:6">';
+        sheetRows += '<c r="A' + r + '" s="3"><v>' + d.idx + '</v></c>';
+        sheetRows += '<c r="B' + r + '" s="3" t="s"><v>' + getStr(d.time) + '</v></c>';
+        sheetRows += '<c r="C' + r + '" s="3" t="s"><v>' + getStr(d.jingbie) + '</v></c>';
+        sheetRows += '<c r="D' + r + '" s="3" t="s"><v>' + getStr(d.fengge) + '</v></c>';
+        sheetRows += '<c r="E' + r + '" s="4" t="s"><v>' + getStr(d.base64Img) + '</v></c>';
+        sheetRows += '<c r="F' + r + '" s="4" t="s"><v>' + getStr(d.miaoshu) + '</v></c>';
+        sheetRows += '</row>';
+      });
+
+      const sheetXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:x14="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:etc="http://www.wps.cn/officeDocument/2017/etCustomData"><sheetPr/><dimension ref="A1:F' + lastRow + '"/><sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="A1" sqref="A1"/></sheetView></sheetViews><sheetFormatPr defaultColWidth="9" defaultRowHeight="16.8" outlineLevelCol="5"/><cols><col min="1" max="1" width="8" customWidth="1"/><col min="2" max="2" width="12" customWidth="1"/><col min="3" max="3" width="15" customWidth="1"/><col min="4" max="4" width="12" customWidth="1"/><col min="5" max="5" width="40" customWidth="1"/><col min="6" max="6" width="50" customWidth="1"/></cols><sheetData>' + sheetRows + '</sheetData><pageMargins left="0.5" right="0.5" top="0.75" bottom="0.75"/></worksheet>';
+
+      let ssItems = ''; strPool.forEach(s => { ssItems += '<si><t>' + esc(s) + '</t></si>'; });
+      const sharedStringsXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="' + strPool.length + '" uniqueCount="' + strPool.length + '">' + ssItems + '</sst>';
+
+      const t = (name) => { const d = tplFiles[name]; if (!d) return ''; return new TextDecoder().decode(d); };
+      const zip = buildXlsx([
+        { name: '[Content_Types].xml', data: t('[Content_Types].xml') || ctMinimal },
+        { name: '_rels/.rels', data: t('_rels/.rels') || pkgRelsMinimal },
+        { name: 'docProps/app.xml', data: t('docProps/app.xml') },
+        { name: 'docProps/core.xml', data: t('docProps/core.xml') },
+        { name: 'xl/workbook.xml', data: t('xl/workbook.xml') || wbMinimal },
+        { name: 'xl/_rels/workbook.xml.rels', data: t('xl/_rels/workbook.xml.rels') || wbRelsMinimal },
+        { name: 'xl/styles.xml', data: t('xl/styles.xml') || stylesMinimal },
+        { name: 'xl/sharedStrings.xml', data: sharedStringsXml },
+        { name: 'xl/worksheets/sheet1.xml', data: sheetXml }
+      ]);
+      dlBlob(zip, 'CineMagic_Storyboard_' + Date.now() + '.xlsx');
+      toast('Excel 分镜表下载成功！');
+    }
+
+    async function readZipFromBlob(blob) {
+      const buf = await blob.arrayBuffer();
+      const arr = new Uint8Array(buf);
+      const files = {};
+      let i = arr.length - 22;
+      for (; i >= 0; i--) { if (arr[i]===0x50&&arr[i+1]===0x4B&&arr[i+2]===0x05&&arr[i+3]===0x06) break; }
+      if (i < 0) throw new Error('Invalid ZIP');
+      const dv = new DataView(buf);
+      const cdEntries = dv.getUint16(i + 8, true);
+      const cdOffset = dv.getUint32(i + 16, true);
+      let p = cdOffset;
+      for (let e = 0; e < cdEntries; e++) {
+        if (arr[p]!==0x50||arr[p+1]!==0x4B||arr[p+2]!==0x01||arr[p+3]!==0x02) break;
+        const fnLen=dv.getUint16(p+24,true), extraLen=dv.getUint16(p+28,true), commentLen=dv.getUint16(p+30,true);
+        const uncompSize=dv.getUint32(p+24,true);
+        const localHeaderOffset=dv.getUint32(p+42,true);
+        const fn=new TextDecoder().decode(arr.subarray(p+46,p+46+fnLen));
+        const dataStart=localHeaderOffset+30+fnLen;
+        const data=arr.subarray(dataStart,dataStart+uncompSize);
+        files[fn]=new TextDecoder().decode(data);
+        p+=46+fnLen+extraLen+commentLen;
+      }
+      return files;
+    }
+    async function readZipFilesFromBlob(blob) {
+      const buf = await blob.arrayBuffer();
+      const arr = new Uint8Array(buf);
+      const files = {};
+      let i = arr.length - 22;
+      for (; i >= 0; i--) { if (arr[i]===0x50&&arr[i+1]===0x4B&&arr[i+2]===0x05&&arr[i+3]===0x06) break; }
+      if (i < 0) throw new Error('Invalid ZIP');
+      const dv = new DataView(buf);
+      const cdEntries = dv.getUint16(i + 8, true);
+      const cdOffset = dv.getUint32(i + 16, true);
+      let p = cdOffset;
+      for (let e = 0; e < cdEntries; e++) {
+        if (arr[p]!==0x50||arr[p+1]!==0x4B||arr[p+2]!==0x01||arr[p+3]!==0x02) break;
+        const fnLen=dv.getUint16(p+24,true), extraLen=dv.getUint16(p+28,true), commentLen=dv.getUint16(p+30,true);
+        const compMethod=dv.getUint16(p+10,true);
+        const uncompSize=dv.getUint32(p+24,true);
+        const localHeaderOffset=dv.getUint32(p+42,true);
+        const fn=new TextDecoder().decode(arr.subarray(p+46,p+46+fnLen));
+        const dataStart=localHeaderOffset+30+fnLen;
+        let raw=arr.subarray(dataStart,dataStart+(compMethod===0?uncompSize:compMethod));
+        let data=raw;
+        if (compMethod===8) {
+          try {
+            const ds=new DecompressionStream('deflate');
+            const writer=ds.writable.getWriter();
+            writer.write(raw); writer.close();
+            const resp=await new Response(ds.readable).arrayBuffer();
+            data=new Uint8Array(resp);
+          } catch(e2) { data=raw; }
+        }
+        files[fn]=data;
+        p+=46+fnLen+extraLen+commentLen;
+      }
+      return files;
+    }
 
     // ===== Cinematic render (Universal MediaRecorder Native Engine) =====
     let _recordingVideo = null;
@@ -2648,11 +3150,38 @@
     function fmtTime(s) { if (isNaN(s)) return '00:00'; const m = Math.floor(s / 60), sec = Math.floor(s % 60); return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0'); }
     function dlBlob(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); }
     function toast(msg, err = false) { const t = document.createElement('div'); t.className = 'toast'; t.style.background = err ? '#991b1b' : '#14532d'; t.style.color = err ? '#fca5a5' : '#4ade80'; t.style.border = `1px solid ${err ? '#7f1d1d' : '#166534'}`; t.innerText = msg; document.body.appendChild(t); t.style.animation = 'toastIn .3s ease'; setTimeout(() => t.remove(), 2800); }
-    function showModal(id) { document.getElementById(id + '-modal').style.display = 'flex'; }
-    function hideModal(id) { document.getElementById(id + '-modal').style.display = 'none'; }
+    function showModal(id) {
+      document.getElementById(id + '-modal').style.display = 'flex';
+      // 已授权时，显示取消按钮
+      if (id === 'activate' && isPro) {
+        const cancelBtn = document.getElementById('activate-cancel-btn');
+        if (cancelBtn) cancelBtn.style.display = 'block';
+      }
+    }
+    function hideModal(id) {
+      document.getElementById(id + '-modal').style.display = 'none';
+    }
 
     // Init
     switchMode('simple');
+
+    // ===== 启动授权检查 =====
+    (function checkAuthOnLoad() {
+      updateAIQuotaBadge();
+      if (!isPro) {
+        showModal('activate');
+      }
+      // 检查授权是否快过期（3天内）
+      const storedExpiry = localStorage.getItem('cine_expiry');
+      if (storedExpiry) {
+        const today = new Date();
+        const expiry = new Date(storedExpiry);
+        const diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+        if (diffDays > 0 && diffDays <= 3) {
+          setTimeout(() => toast(`⚠️ 授权将在 ${diffDays} 天后过期，续费请联系我们`, true), 1500);
+        }
+      }
+    })();
   </script>
 </body>
 

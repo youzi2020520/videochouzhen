@@ -671,25 +671,32 @@ input[type=range]::-webkit-slider-thumb {
 #lightbox {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, .95);
+  background: rgba(0, 0, 0, .97);
   z-index: 500;
   display: none;
+  align-items: stretch;
+  justify-content: center;
+}
+
+#lightbox-viewer {
+  flex: 1;
+  display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
-  gap: 12px;
+  position: relative;
+  cursor: pointer;
 }
 
 #lightbox img {
-  max-width: 90vw;
-  max-height: 80vh;
+  max-width: 100%;
+  max-height: 90vh;
   border-radius: 4px;
   object-fit: contain;
 }
 
 #lightbox video {
-  max-width: 90vw;
-  max-height: 80vh;
+  max-width: 100%;
+  max-height: 90vh;
   border-radius: 4px;
   display: none;
   outline: none;
@@ -698,7 +705,25 @@ input[type=range]::-webkit-slider-thumb {
 #lightbox-tc {
   font-family: 'JetBrains Mono';
   font-size: 11px;
-  color: #555;
+  color: rgba(255,255,255,0.6);
+}
+
+/* 右侧分镜描述面板 */
+#lightbox-panel {
+  width: 280px;
+  min-width: 280px;
+  background: #0d0d12;
+  border-left: 1px solid #1a1a1a;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+#lightbox-panel input:focus,
+#lightbox-panel textarea:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
 }
 
 /* Bottom toolbar */
