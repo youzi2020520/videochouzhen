@@ -48,7 +48,7 @@
       </div>
       <div id="ai-quota-badge"
         style="padding:4px 12px;border:1px solid #22c55e;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#22c55e;text-transform:uppercase;background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(34,197,94,0.05));display:none;">
-        AI 剩余 <span id="ai-quota-num" style="font-weight:700;">--</span> 次
+        积分 <span id="ai-quota-num" style="font-weight:700;">--</span>
       </div>
       <button onclick="showModal('activate')"
         style="font-size:10px;font-family:'JetBrains Mono';color:var(--orange);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.12em;font-weight:700;"
@@ -846,6 +846,11 @@
         const data = await res.json();
 
         if (data.success) {
+          // 充值积分：仅首次激活（本机没有积分记录时）才充值，避免重复激活刷积分
+          const existingCredits = localStorage.getItem('cine_credits');
+          if (existingCredits === null && data.credits) {
+            localStorage.setItem('cine_credits', String(data.credits));
+          }
           applyProStatus(data.expiry);
           hideModal('activate');
           toast('专业授权成功！欢迎回来');
@@ -1232,7 +1237,7 @@
         `📊 将识别 <b style="color:var(--orange)">${frames.length}</b> 张帧<br>` +
         `📋 内容：景别 / 风格 / 画面描述<br>` +
         `⏱️ 预计耗时：<b style="color:var(--orange)">${Math.ceil(frames.length * 3)}~${Math.ceil(frames.length * 6)}</b> 秒<br>` +
-        `<span style="font-size:9px;color:#555;">剩余额度：${limit.remaining}/${limit.max} 次</span>`;
+        `<span style="font-size:9px;color:#555;">本次消耗 ${frames.length} 积分，剩余 ${limit.remaining} 积分</span>`;
       // 改确认弹窗的确认按钮行为
       const confirmBtn = document.querySelector('#pdf-preview-modal button:first-child');
       confirmBtn.onclick = () => { hideModal('pdf-preview'); startAIStoryboardAnalysis(frames); };
@@ -1243,66 +1248,38 @@
       const badge = document.getElementById('ai-quota-badge');
       const numEl = document.getElementById('ai-quota-num');
       if (!badge || !numEl) return;
-      const today = new Date().toDateString();
-      const freeUsed = parseInt(localStorage.getItem('cine_free_ai_used') || '0');
-      const proDate = localStorage.getItem('cine_pro_ai_date');
-      const proUsed = parseInt(localStorage.getItem('cine_pro_ai_used') || '0');
-      const FREE_MAX = 20;
-      const PRO_MAX = 100;
 
       if (!isPro) {
-        const remaining = Math.max(0, FREE_MAX - freeUsed);
-        if (remaining <= 0) {
-          badge.style.display = 'none';
-        } else {
-          badge.style.display = 'block';
-          numEl.textContent = remaining;
-        }
-      } else {
-        badge.style.display = 'block';
-        const remaining = Math.max(0, PRO_MAX - proUsed);
-        numEl.textContent = remaining;
+        badge.style.display = 'none';
+        return;
       }
+      const credits = parseInt(localStorage.getItem('cine_credits') || '0');
+      badge.style.display = 'block';
+      numEl.textContent = credits;
+      // 积分不足时变红提示
+      badge.style.borderColor = credits <= 0 ? '#ef4444' : '#22c55e';
+      badge.style.color        = credits <= 0 ? '#ef4444' : '#22c55e';
     }
 
     function checkAIQuota(framesCount) {
-      const today = new Date().toDateString();
-      const freeUsed = parseInt(localStorage.getItem('cine_free_ai_used') || '0');
-      const proDate = localStorage.getItem('cine_pro_ai_date');
-      const proUsed = parseInt(localStorage.getItem('cine_pro_ai_used') || '0');
-      const FREE_MAX = 20;
-      const PRO_MAX = 100;
-
       if (!isPro) {
-        // Free用户：终身20张
-        if (freeUsed >= FREE_MAX) {
-          return { allowed: false, msg: `Free 用户已用完 ${FREE_MAX} 张免费额度，请激活 Pro`, remaining: 0, max: FREE_MAX };
-        }
-        return { allowed: true, remaining: FREE_MAX - freeUsed, max: FREE_MAX };
-      } else {
-        // Pro用户：每天100张
-        if (proDate !== today) {
-          localStorage.setItem('cine_pro_ai_date', today);
-          localStorage.setItem('cine_pro_ai_used', '0');
-          return { allowed: true, remaining: PRO_MAX, max: PRO_MAX };
-        }
-        if (proUsed >= PRO_MAX) {
-          return { allowed: false, msg: `今日 Pro 额度已用完 (${PRO_MAX}/${PRO_MAX})，明天再来`, remaining: 0, max: PRO_MAX };
-        }
-        const remaining = PRO_MAX - proUsed;
-        return { allowed: true, remaining, max: PRO_MAX };
+        return { allowed: false, msg: '请先激活专业授权以使用 AI 识别功能', remaining: 0, max: 0 };
       }
+      const credits = parseInt(localStorage.getItem('cine_credits') || '0');
+      if (credits <= 0) {
+        return { allowed: false, msg: '积分不足，请联系管理员充值积分', remaining: 0, max: credits };
+      }
+      if (framesCount > credits) {
+        return { allowed: false, msg: `积分不足：本次需消耗 ${framesCount} 积分，当前剩余 ${credits} 积分`, remaining: credits, max: credits };
+      }
+      return { allowed: true, remaining: credits, max: credits };
     }
 
     function recordAIUsage(framesCount) {
-      if (!isPro) {
-        const prev = parseInt(localStorage.getItem('cine_free_ai_used') || '0');
-        localStorage.setItem('cine_free_ai_used', String(prev + framesCount));
-      } else {
-        const today = new Date().toDateString();
-        const prev = parseInt(localStorage.getItem('cine_pro_ai_used') || '0');
-        localStorage.setItem('cine_pro_ai_used', String(prev + framesCount));
-      }
+      if (!isPro) return;
+      const credits = parseInt(localStorage.getItem('cine_credits') || '0');
+      const newCredits = Math.max(0, credits - framesCount);
+      localStorage.setItem('cine_credits', String(newCredits));
       updateAIQuotaBadge();
     }
 
