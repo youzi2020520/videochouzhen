@@ -846,10 +846,11 @@
         const data = await res.json();
 
         if (data.success) {
-          // 充值积分：仅首次激活（本机没有积分记录时）才充值，避免重复激活刷积分
-          const existingCredits = localStorage.getItem('cine_credits');
-          if (existingCredits === null && data.credits) {
-            localStorage.setItem('cine_credits', String(data.credits));
+          // 充值积分：激活时取会员积分与当前积分的较大值（保证激活后积分不低于套餐额度）
+          if (data.credits) {
+            const existingCredits = parseInt(localStorage.getItem('cine_credits') || '0');
+            const newCredits = Math.max(existingCredits, data.credits);
+            localStorage.setItem('cine_credits', String(newCredits));
           }
           applyProStatus(data.expiry);
           hideModal('activate');
