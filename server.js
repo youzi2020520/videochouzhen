@@ -9,12 +9,16 @@ const app = express();
 const isVercel = process.env.VERCEL_AFFINITY || process.env.VERCEL_REGION;
 const DB_PATH = isVercel ? '/tmp/auth_db.json' : path.join(__dirname, 'auth_db.json');
 
-// CORS 支持
+// CORS 支持 - 允许 GitHub Pages 访问
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
 }));
+
+// 预检请求处理
+app.options('*', cors());
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
