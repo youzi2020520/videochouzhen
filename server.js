@@ -98,11 +98,11 @@ app.post('/api/verify', (req, res) => {
     const expiry   = new Date(record.expiry);
     const totalMs  = expiry - created;
     const totalDays = Math.round(totalMs / (1000 * 60 * 60 * 24));
-    let credits = 200; // 默认 30 天套餐
+    let credits = 500; // 默认 30 天套餐
     if (totalDays >= 3650) {
         credits = 5000; // 永久
     } else if (totalDays >= 300) {
-        credits = 200;  // 年度/30天套餐
+        credits = 500;  // 年度/30天套餐
     } else if (totalDays <= 10) {
         credits = 100;  // 7天套餐
     }
