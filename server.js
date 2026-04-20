@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -7,6 +8,13 @@ const crypto = require('crypto');
 const app = express();
 const isVercel = process.env.VERCEL_AFFINITY || process.env.VERCEL_REGION;
 const DB_PATH = isVercel ? '/tmp/auth_db.json' : path.join(__dirname, 'auth_db.json');
+
+// CORS 支持
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
