@@ -139,3 +139,11 @@ app.post('/api/admin/toggle', requireAdminAuth, (req, res) => {
 });
 
 module.exports = app;
+
+// 本地启动支持
+if (require.main === module) {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+    });
+}
