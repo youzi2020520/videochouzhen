@@ -45,6 +45,10 @@
       <div id="license-status"
         style="padding:4px 12px;border:1px solid #f97316;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#f97316;text-transform:uppercase;background:linear-gradient(135deg,rgba(249,115,22,0.15),rgba(249,115,22,0.05));display:none;cursor:pointer;position:relative">
         <span style="margin-right:4px;">★</span>已授权
+        <div id="license-tooltip"
+          style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1a1a1a;border:1px solid #f97316;border-radius:6px;padding:6px 10px;font-size:9px;white-space:nowrap;color:#f97316;z-index:999;pointer-events:none;font-family:'JetBrains Mono';">
+          <span id="license-tooltip-text">--</span>
+        </div>
       </div>
       <div id="ai-quota-badge"
         style="padding:4px 12px;border:1px solid #22c55e;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#22c55e;text-transform:uppercase;background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(34,197,94,0.05));display:none;">
@@ -796,6 +800,10 @@
       const licenseStatus = document.getElementById('license-status');
       if (licenseStatus) {
         licenseStatus.style.display = 'flex';
+        licenseStatus.style.alignItems = 'center';
+
+        const tooltipEl = document.getElementById('license-tooltip');
+        const tooltipText = document.getElementById('license-tooltip-text');
 
         if (expiryDate) {
           // Calculate remaining days
@@ -804,11 +812,33 @@
           const diffTime = expiry - today;
           const diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
-          // Set custom tooltip data
+          // 更新 tooltip 内容
+          if (tooltipText) {
+            if (diffDays === 0) {
+              tooltipText.textContent = '授权今日到期';
+            } else if (diffDays > 3650) {
+              tooltipText.textContent = '★ 永久授权';
+            } else {
+              tooltipText.textContent = `剩余 ${diffDays} 天`;
+            }
+          }
+
           licenseStatus.setAttribute('data-tooltip', diffDays);
           localStorage.setItem('cine_expiry', expiryDate);
         } else {
+          if (tooltipText) tooltipText.textContent = '★ 永久授权';
           licenseStatus.removeAttribute('data-tooltip');
+        }
+
+        // 绑定 hover 事件（只绑一次）
+        if (!licenseStatus._tooltipBound) {
+          licenseStatus._tooltipBound = true;
+          licenseStatus.addEventListener('mouseenter', () => {
+            if (tooltipEl) tooltipEl.style.display = 'block';
+          });
+          licenseStatus.addEventListener('mouseleave', () => {
+            if (tooltipEl) tooltipEl.style.display = 'none';
+          });
         }
       }
 
@@ -3153,6 +3183,21 @@
       // 免费用户首次访问赋予 15 积分
       if (!isPro && localStorage.getItem('cine_credits') === null) {
         localStorage.setItem('cine_credits', '15');
+      }
+
+      // Pro 用户积分兜底：清缓存后根据剩余天数推算套餐积分
+      if (isPro && localStorage.getItem('cine_credits') === null) {
+        const storedExpiry = localStorage.getItem('cine_expiry');
+        let fallbackCredits = 500; // 默认 30 天套餐
+        if (storedExpiry) {
+          const today = new Date();
+          const expiry = new Date(storedExpiry);
+          const remainDays = Math.max(0, Math.ceil((expiry - today) / (1000 * 60 * 60 * 24)));
+          if (remainDays > 3650) fallbackCredits = 5000;      // 永久
+          else if (remainDays > 20) fallbackCredits = 500;    // 30天/365天
+          else fallbackCredits = 100;                          // 7天
+        }
+        localStorage.setItem('cine_credits', String(fallbackCredits));
       }
       updateAIQuotaBadge();
       if (!isPro) {
