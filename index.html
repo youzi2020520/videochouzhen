@@ -44,7 +44,7 @@
       </div>
       <div id="license-status"
         style="padding:4px 12px;border:1px solid #f97316;border-radius:6px;font-size:9px;font-family:'JetBrains Mono';color:#f97316;text-transform:uppercase;background:linear-gradient(135deg,rgba(249,115,22,0.15),rgba(249,115,22,0.05));display:none;cursor:pointer;position:relative">
-        <span style="margin-right:4px;">★</span>已授权
+        <span style="margin-right:4px;">★</span>已充值
         <div id="license-tooltip"
           style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1a1a1a;border:1px solid #f97316;border-radius:6px;padding:6px 10px;font-size:9px;white-space:nowrap;color:#f97316;z-index:999;pointer-events:none;font-family:'JetBrains Mono';">
           <span id="license-tooltip-text">--</span>
@@ -56,7 +56,7 @@
       </div>
       <button onclick="showModal('activate')"
         style="font-size:10px;font-family:'JetBrains Mono';color:var(--orange);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.12em;font-weight:700;"
-        id="activate-btn">激活 Pro</button>
+        id="activate-btn">充值积分</button>
     </div>
   </header>
 
@@ -600,27 +600,27 @@
   <!-- Activate Modal -->
   <div class="modal-bg" id="activate-modal">
     <div class="modal-box">
-      <h2 style="font-family:'Noto Serif SC';font-size:18px;margin-bottom:5px;">解锁专业授权</h2>
+      <h2 style="font-family:'Noto Serif SC';font-size:18px;margin-bottom:5px;">充值积分</h2>
       <p
         style="font-size:8px;font-family:'JetBrains Mono';color:#555;text-transform:uppercase;letter-spacing:.15em;margin-bottom:20px;">
-        输入作者授权码</p>
-      <input class="mono-input" id="license-input" placeholder="XXXXXXXXXX"
-        style="text-align:center;letter-spacing:.25em;margin-bottom:10px;">
+        输入积分充值码</p>
+      <input class="mono-input" id="license-input" placeholder="CINE-XXXXXXXX"
+        style="text-align:center;letter-spacing:.15em;margin-bottom:10px;">
       <button onclick="validateLicense()"
         style="width:100%;padding:11px;background:#fff;color:#000;border:none;border-radius:9px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.15em;cursor:pointer;"
         onmouseover="this.style.background='var(--orange)';this.style.color='#000'"
-        onmouseout="this.style.background='#fff'">即刻解锁</button>
+        onmouseout="this.style.background='#fff'">确认充值</button>
 
       <div style="margin-top:20px;padding-top:20px;border-top:1px solid #222;">
-        <h3 style="font-family:'Noto Serif SC';font-size:14px;margin-bottom:10px;">获取授权码</h3>
+        <h3 style="font-family:'Noto Serif SC';font-size:14px;margin-bottom:10px;">获取充值码</h3>
         <div style="display:flex;flex-direction:column;align-items:center;gap:15px;">
           <div style="text-align:center;">
             <p style="font-size:10px;font-family:'JetBrains Mono';color:#888;margin-bottom:8px;">添加作者微信</p>
             <img src="imge/qr-code-sponsor.png" alt="作者微信二维码" style="width:120px;height:120px;border-radius:8px;">
           </div>
           <div style="text-align:center;">
-            <p style="font-size:10px;font-family:'JetBrains Mono';color:#888;margin-bottom:8px;">9.9元试用会员</p>
-            <p style="font-size:8px;color:#444;line-height:1.4;">包含30天专业功能使用权<br>解锁所有高级特性</p>
+            <p style="font-size:10px;font-family:'JetBrains Mono';color:#888;margin-bottom:8px;">积分套餐</p>
+            <p style="font-size:8px;color:#444;line-height:1.4;">50/100/300/500/1000/3000/5000 积分<br>1 积分 = 1 帧 AI 识别</p>
           </div>
         </div>
       </div>
@@ -715,7 +715,6 @@
   <script>
     // ===== State =====
     const AUTH_SERVER = "/api";
-    let isPro = localStorage.getItem('cine_pro') === 'true';
     let audioEnergyData = []; // Store RMS energy levels per second
     let isAIInitializing = false;
     let currentMode = 'simple';
@@ -747,27 +746,15 @@
     const presets = {
       cinema: { name: '经典电影', sub: '行业基准 · 叙事感', fps: 12, shutter: 180, filter: 'contrast(1.15) saturate(0.85) brightness(0.95) sepia(0.05)', emotionProfile: 'wave' },
       film: { name: '复古胶片', sub: '暖调回忆 · 颗粒感', fps: 8, shutter: 240, filter: 'contrast(1.1) saturate(1.2) sepia(0.3) brightness(1.05)', emotionProfile: 'constant' },
-      vibe: { name: '法式浪漫', sub: '清冷氛围 · 情绪拉满', fps: 20, shutter: 120, filter: 'contrast(0.9) saturate(0.7) brightness(1.1) hue-rotate(-10deg) opacity(0.9)', emotionProfile: 'wave', isPro: true },
-      vlog: { name: '极简 VLOG', sub: '通透自然 · 记录生活', fps: 24, shutter: 90, filter: 'contrast(1.1) saturate(1.1) brightness(1.15)', emotionProfile: 'burst', isPro: true },
-      noir: { name: '黑色电影', sub: '高对比 · 光影感', fps: 15, shutter: 200, filter: 'contrast(1.4) brightness(0.9) saturate(0.6)', emotionProfile: 'wave', isPro: true },
-      cyber: { name: '赛博朋克', sub: '霓虹美学 · 科技感', fps: 24, shutter: 150, filter: 'contrast(1.1) saturate(1.4) hue-rotate(-20deg) brightness(1.1)', emotionProfile: 'wave', isPro: true },
-      pro: { name: 'Pro 精准制导', sub: 'AI 智能场景检测', fps: 24, shutter: 180, filter: 'none', emotionProfile: 'wave', isPro: true }
+      vibe: { name: '法式浪漫', sub: '清冷氛围 · 情绪拉满', fps: 20, shutter: 120, filter: 'contrast(0.9) saturate(0.7) brightness(1.1) hue-rotate(-10deg) opacity(0.9)', emotionProfile: 'wave' },
+      vlog: { name: '极简 VLOG', sub: '通透自然 · 记录生活', fps: 24, shutter: 90, filter: 'contrast(1.1) saturate(1.1) brightness(1.15)', emotionProfile: 'burst' },
+      noir: { name: '黑色电影', sub: '高对比 · 光影感', fps: 15, shutter: 200, filter: 'contrast(1.4) brightness(0.9) saturate(0.6)', emotionProfile: 'wave' },
+      cyber: { name: '赛博朋克', sub: '霓虹美学 · 科技感', fps: 24, shutter: 150, filter: 'contrast(1.1) saturate(1.4) hue-rotate(-20deg) brightness(1.1)', emotionProfile: 'wave' },
+      pro: { name: 'Pro 精准制导', sub: 'AI 智能场景检测', fps: 24, shutter: 180, filter: 'none', emotionProfile: 'wave' }
     };
-
-    // Check license status on page load
-    if (isPro) {
-      const expiryDate = localStorage.getItem('cine_expiry');
-      applyProStatus(expiryDate);
-    }
 
     // ===== Mode =====
     function switchMode(mode) {
-      // If switching to pro mode and not authorized, show modal and don't switch
-      if (mode === 'pro' && !isPro) {
-        showModal('activate');
-        return;
-      }
-
       currentMode = mode;
       document.getElementById('btn-simple').classList.toggle('active', mode === 'simple');
       document.getElementById('btn-pro').classList.toggle('active', mode === 'pro');
@@ -776,25 +763,23 @@
 
       // Update sidebar sections
       const proControls = document.getElementById('pro-controls');
-      if (proControls) proControls.style.display = (mode === 'pro' && isPro) ? 'flex' : 'none';
+      if (proControls) proControls.style.display = (mode === 'pro') ? 'flex' : 'none';
 
       // PRO 智能调色模块可见性
       const proRenderGroup = document.getElementById('pro-render-group');
-      if (proRenderGroup) proRenderGroup.style.display = (mode === 'pro' && isPro) ? 'block' : 'none';
+      if (proRenderGroup) proRenderGroup.style.display = (mode === 'pro') ? 'block' : 'none';
     }
 
-    // ===== Pro =====
-    function applyProStatus(expiryDate) {
-      isPro = true; localStorage.setItem('cine_pro', 'true');
-      // 授权后显示取消按钮（允许关闭弹窗）
+    // ===== 充值成功后更新UI =====
+    function applyCreditsStatus(addedCredits) {
+      // 显示取消按钮（允许关闭弹窗）
       const cancelBtn = document.getElementById('activate-cancel-btn');
       if (cancelBtn) cancelBtn.style.display = 'block';
-      const tag = document.getElementById('user-tag');
-      if (tag) {
-        tag.innerHTML = '★ Pro'; tag.style.color = '#f97316'; tag.style.borderColor = '#f97316'; tag.style.background = 'linear-gradient(135deg,rgba(249,115,22,0.15),rgba(249,115,22,0.05))';
-      }
+
+      // 隐藏「充值积分」按钮，改显示「已充值」badge
       const activateBtn = document.getElementById('activate-btn');
       if (activateBtn) activateBtn.style.display = 'none';
+
       updateAIQuotaBadge();
 
       const licenseStatus = document.getElementById('license-status');
@@ -804,36 +789,16 @@
 
         const tooltipEl = document.getElementById('license-tooltip');
         const tooltipText = document.getElementById('license-tooltip-text');
-
-        if (expiryDate) {
-          // Calculate remaining days
-          const today = new Date();
-          const expiry = new Date(expiryDate);
-          const diffTime = expiry - today;
-          const diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-
-          // 更新 tooltip 内容
-          if (tooltipText) {
-            if (diffDays === 0) {
-              tooltipText.textContent = '授权今日到期';
-            } else if (diffDays > 3650) {
-              tooltipText.textContent = '★ 永久授权';
-            } else {
-              tooltipText.textContent = `剩余 ${diffDays} 天`;
-            }
-          }
-
-          licenseStatus.setAttribute('data-tooltip', diffDays);
-          localStorage.setItem('cine_expiry', expiryDate);
-        } else {
-          if (tooltipText) tooltipText.textContent = '★ 永久授权';
-          licenseStatus.removeAttribute('data-tooltip');
-        }
+        const credits = parseInt(localStorage.getItem('cine_credits') || '0');
+        if (tooltipText) tooltipText.textContent = `积分余额 ${credits}`;
 
         // 绑定 hover 事件（只绑一次）
         if (!licenseStatus._tooltipBound) {
           licenseStatus._tooltipBound = true;
           licenseStatus.addEventListener('mouseenter', () => {
+            // 每次 hover 实时刷新积分
+            const t = document.getElementById('license-tooltip-text');
+            if (t) t.textContent = `积分余额 ${parseInt(localStorage.getItem('cine_credits') || '0')}`;
             if (tooltipEl) tooltipEl.style.display = 'block';
           });
           licenseStatus.addEventListener('mouseleave', () => {
@@ -841,27 +806,28 @@
           });
         }
       }
-
-      // 保持用户当前模式，不强制切换
-
-      // PRO 智能调色模块初始化可见性
-      const proRenderGroup = document.getElementById('pro-render-group');
-      if (proRenderGroup) proRenderGroup.style.display = (currentMode === 'pro' && isPro) ? 'block' : 'none';
     }
+
+    // 页面加载时：如果已有积分（曾充值过），恢复已充值状态
+    (function initCreditsStatus() {
+      const credits = parseInt(localStorage.getItem('cine_credits') || '0');
+      if (credits > 0) {
+        applyCreditsStatus(0);
+      }
+    })();
 
     async function validateLicense() {
       const code = document.getElementById('license-input').value.trim().toUpperCase();
-      if (!code) return toast('请输入授权码', true);
+      if (!code) return toast('请输入充值码', true);
 
-      toast('正在验证授权...');
+      toast('正在验证充值码...');
 
       try {
-        // 尝试获取 IP 和 地理位置 (使用公共 API)
         let ipInfo = { ip: 'unknown', city: '未知' };
         try {
           const ipRes = await fetch('https://ipapi.co/json/');
           ipInfo = await ipRes.json();
-        } catch (e) { console.warn("AI: Location fetch failed", e); }
+        } catch (e) { console.warn("Location fetch failed", e); }
 
         const res = await fetch(`${AUTH_SERVER}/verify`, {
           method: 'POST',
@@ -876,32 +842,25 @@
         const data = await res.json();
 
         if (data.success) {
-          // 充值积分：激活时取会员积分与当前积分的较大值（保证激活后积分不低于套餐额度）
-          if (data.credits) {
-            const existingCredits = parseInt(localStorage.getItem('cine_credits') || '0');
-            const newCredits = Math.max(existingCredits, data.credits);
-            localStorage.setItem('cine_credits', String(newCredits));
-          }
-          applyProStatus(data.expiry);
+          // 积分叠加（充值码每次都累加积分）
+          const existingCredits = parseInt(localStorage.getItem('cine_credits') || '0');
+          const newCredits = existingCredits + (data.credits || 0);
+          localStorage.setItem('cine_credits', String(newCredits));
+          applyCreditsStatus(data.credits);
           hideModal('activate');
-          toast('专业授权成功！欢迎回来');
-          if (currentMode === 'pro') switchMode('pro');
+          toast(`充值成功！+${data.credits} 积分，当前共 ${newCredits} 积分`);
         } else {
-          toast(data.message || '授权码无效', true);
+          toast(data.message || '充值码无效', true);
         }
       } catch (err) {
         console.error(err);
-        toast('服务器连接失败，请检查后端是否运行', true);
+        toast('服务器连接失败，请稍后重试', true);
       }
     }
 
     // ===== Style =====
     function setStyle(id) {
       const preset = presets[id];
-      if (preset?.isPro && !isPro) {
-        showModal('activate');
-        return;
-      }
       if (preset?.isPro && currentMode !== 'pro') {
         toast('请切换到 PRO 模式使用此滤镜', true);
         return;
@@ -911,7 +870,7 @@
       document.getElementById('sc-' + id).classList.add('active');
       if (videoReady) drawVideoFrame();
     }
-    function handleProStyle(id) { if (!isPro) { showModal('activate'); return; } setStyle(id); }
+    function handleProStyle(id) { setStyle(id); }
     
     // 工具提示函数
     let currentTooltip = null;
@@ -1250,9 +1209,8 @@
     }
 
 
-    // ===== PRO 专属操作（仍需 PRO 授权） =====
+    // ===== PRO 模式专属操作 =====
     function handleProAction(action) {
-      if (!isPro) { showModal('activate'); return; }
       if (currentMode !== 'pro') { toast('请切换到 PRO 模式使用此功能', true); return; }
       if (action === 'ai-extract') startAISceneExtract();
     }
@@ -1291,7 +1249,7 @@
     function checkAIQuota(framesCount) {
       const credits = parseInt(localStorage.getItem('cine_credits') || '0');
       if (credits <= 0) {
-        return { allowed: false, msg: isPro ? '积分不足，请联系管理员充值积分' : '免费积分已用完，激活会员获得更多积分', remaining: 0, max: credits };
+        return { allowed: false, msg: '积分不足，请点击「充值积分」按钮获取充值码', remaining: 0, max: credits };
       }
       if (framesCount > credits) {
         return { allowed: false, msg: `积分不足：本次需消耗 ${framesCount} 积分，当前剩余 ${credits} 积分`, remaining: credits, max: credits };
@@ -2330,20 +2288,14 @@
         panel.innerHTML = originalPanelContent;
 
         // 更新 UI
-        updateAnalysisUI(analysis, false);
+        updateAnalysisUI(analysis, true);
 
-        if (!isPro) {
-          // 免费用户：显示基础分析 + 模糊推荐
-          showFreeAnalysis(analysis);
-          toast('分析完成！PRO 用户可查看完整报告和智能推荐', false);
-        } else {
-          // PRO 用户：完整分析 + 智能推荐
-          const advancedAnalysis = await deepAnalyze(sampleFrames);
-          updateAnalysisUI(advancedAnalysis, true);
-          const recommendations = recommendStyles(advancedAnalysis);
-          showProRecommendations(recommendations);
-          toast('AI 分析完成！已为您推荐最适合的风格', false);
-        }
+        // 完整分析 + 智能推荐（所有用户）
+        const advancedAnalysis = await deepAnalyze(sampleFrames);
+        updateAnalysisUI(advancedAnalysis, true);
+        const recommendations = recommendStyles(advancedAnalysis);
+        showProRecommendations(recommendations);
+        toast('AI 分析完成！已为您推荐最适合的风格', false);
       } catch (error) {
         console.error('AI analysis error:', error);
         // 恢复原始内容
@@ -3060,10 +3012,8 @@
         if (!isFinite(duration)) throw new Error('无法读取视频时长，请尝试重新导出该视频或检查格式');
         const totalFrames = Math.floor(duration * fps);
         const cvs = document.createElement('canvas');
-        // Pro Resolution Support
-        const isMasterPro = isPro;
-        cvs.width = isMasterPro ? (videoEl.videoWidth || 1280) : Math.min(1280, videoEl.videoWidth || 1280);
-        cvs.height = isMasterPro ? (videoEl.videoHeight || 720) : Math.min(720, videoEl.videoHeight || 720);
+        cvs.width = videoEl.videoWidth || 1280;
+        cvs.height = videoEl.videoHeight || 720;
         const ctx = cvs.getContext('2d');
         let firstFrameCover = null;
 
@@ -3165,8 +3115,8 @@
     function toast(msg, err = false) { const t = document.createElement('div'); t.className = 'toast'; t.style.background = err ? '#991b1b' : '#14532d'; t.style.color = err ? '#fca5a5' : '#4ade80'; t.style.border = `1px solid ${err ? '#7f1d1d' : '#166534'}`; t.innerText = msg; document.body.appendChild(t); t.style.animation = 'toastIn .3s ease'; setTimeout(() => t.remove(), 2800); }
     function showModal(id) {
       document.getElementById(id + '-modal').style.display = 'flex';
-      // 已授权时，显示取消按钮
-      if (id === 'activate' && isPro) {
+      // 充值弹窗始终显示取消按钮（积分系统下不强制）
+      if (id === 'activate') {
         const cancelBtn = document.getElementById('activate-cancel-btn');
         if (cancelBtn) cancelBtn.style.display = 'block';
       }
@@ -3178,40 +3128,18 @@
     // Init
     switchMode('simple');
 
-    // ===== 启动授权检查 =====
+    // ===== 启动检查 =====
     (function checkAuthOnLoad() {
-      // 免费用户首次访问赋予 15 积分
-      if (!isPro && localStorage.getItem('cine_credits') === null) {
+      // 首次访问赋予 15 积分（体验额度）
+      if (localStorage.getItem('cine_credits') === null) {
         localStorage.setItem('cine_credits', '15');
       }
-
-      // Pro 用户积分兜底：清缓存后根据剩余天数推算套餐积分
-      if (isPro && localStorage.getItem('cine_credits') === null) {
-        const storedExpiry = localStorage.getItem('cine_expiry');
-        let fallbackCredits = 500; // 默认 30 天套餐
-        if (storedExpiry) {
-          const today = new Date();
-          const expiry = new Date(storedExpiry);
-          const remainDays = Math.max(0, Math.ceil((expiry - today) / (1000 * 60 * 60 * 24)));
-          if (remainDays > 3650) fallbackCredits = 5000;      // 永久
-          else if (remainDays > 20) fallbackCredits = 500;    // 30天/365天
-          else fallbackCredits = 100;                          // 7天
-        }
-        localStorage.setItem('cine_credits', String(fallbackCredits));
-      }
       updateAIQuotaBadge();
-      if (!isPro) {
-        showModal('activate');
-      }
-      // 检查授权是否快过期（3天内）
-      const storedExpiry = localStorage.getItem('cine_expiry');
-      if (storedExpiry) {
-        const today = new Date();
-        const expiry = new Date(storedExpiry);
-        const diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-        if (diffDays > 0 && diffDays <= 3) {
-          setTimeout(() => toast(`⚠️ 授权将在 ${diffDays} 天后过期，续费请联系我们`, true), 1500);
-        }
+
+      // 积分不足时提示充值（但不强制弹窗）
+      const credits = parseInt(localStorage.getItem('cine_credits') || '0');
+      if (credits <= 0) {
+        setTimeout(() => toast('💡 积分不足，点击右上角「充值积分」获取充值码', false), 2000);
       }
     })();
   </script>

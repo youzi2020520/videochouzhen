@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>CineMagic Pro - 授权中心</title>
+    <title>视频AI帧探 - 积分管理后台</title>
     <style>
         :root { --orange: #f97316; --bg: #0a0a0c; }
         body { background: var(--bg); color: #fff; font-family: system-ui; padding: 40px; }
@@ -18,36 +18,41 @@
         .status-on { color: #4ade80; }
         .status-off { color: #f87171; }
         .ip-info { font-family: monospace; font-size: 11px; color: #888; }
+        .credits-badge { display:inline-block; padding:2px 8px; background:rgba(249,115,22,0.15); border:1px solid #f97316; border-radius:4px; color:#f97316; font-size:11px; font-family:monospace; }
     </style>
 </head>
 <body>
-    <h1>授权管理后台</h1>
+    <h1>积分管理后台</h1>
 
     <div class="card">
-        <h3>生成新授权码</h3>
-        <div style="display:flex; gap:10px;">
-            <input type="text" id="wechat-id" placeholder="输入微信号">
-            <select id="expiry-days">
-                <option value="7">7 天（100 积分）</option>
-                <option value="30" selected>30 天（500 积分）</option>
-                <option value="365">365 天（500 积分）</option>
-                <option value="9999">永久（5000 积分）</option>
+        <h3>生成积分充值码</h3>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <input type="text" id="wechat-id" placeholder="输入微信号 / 备注" style="min-width:160px;">
+            <select id="credits-amount">
+                <option value="50">50 积分（体验）</option>
+                <option value="100">100 积分</option>
+                <option value="300">300 积分</option>
+                <option value="500" selected>500 积分</option>
+                <option value="1000">1000 积分</option>
+                <option value="3000">3000 积分</option>
+                <option value="5000">5000 积分</option>
             </select>
-            <button onclick="generateCode()">点击生成</button>
+            <button onclick="generateCode()">生成充值码</button>
         </div>
-        <p id="gen-result" style="color:var(--orange); font-weight: bold; margin-top: 10px;"></p>
+        <p id="gen-result" style="color:var(--orange); font-weight: bold; margin-top: 10px; font-family:monospace;"></p>
     </div>
 
     <div class="card">
-        <h3>激活列表</h3>
+        <h3>充值码列表</h3>
         <table id="code-table">
             <thead>
                 <tr>
-                    <th>微信号</th>
-                    <th>授权码</th>
+                    <th>微信号 / 备注</th>
+                    <th>充值码</th>
+                    <th>积分</th>
                     <th>状态</th>
-                    <th>到期时间</th>
-                    <th>最后登录 IP/地点</th>
+                    <th>创建时间</th>
+                    <th>最后使用 IP / 地点</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -90,14 +95,15 @@
             
             codes.forEach(c => {
                 const tr = document.createElement('tr');
-                const isExpired = new Date(c.expiry) < new Date();
+                const isUsed = !!c.lastLogin;
                 tr.innerHTML = `
                     <td>${c.wechatId}</td>
                     <td style="font-family:monospace">${c.code}</td>
+                    <td><span class="credits-badge">+${c.credits || '-'} 积分</span></td>
                     <td class="${c.status === 1 ? 'status-on' : 'status-off'}">
-                        ${c.status === 1 ? (isExpired ? '已过期' : '启用中') : '已禁用'}
+                        ${c.status === 1 ? (isUsed ? '已使用' : '未使用') : '已禁用'}
                     </td>
-                    <td>${new Date(c.expiry).toLocaleDateString()}</td>
+                    <td style="font-size:11px;color:#888;">${c.created ? new Date(c.created).toLocaleDateString() : '-'}</td>
                     <td class="ip-info">${c.lastIp || '无'}<br>${c.lastLocation || ''}</td>
                     <td>
                         <button class="toggle-btn ${c.status === 0 ? 'disabled' : ''}" onclick="toggleStatus('${c.code}')">
@@ -110,20 +116,20 @@
         }
 
         async function generateCode() {
-            const wechatId = document.getElementById('wechat-id').value;
-            const days = document.getElementById('expiry-days').value;
+            const wechatId = document.getElementById('wechat-id').value.trim();
+            const credits = document.getElementById('credits-amount').value;
             const token = checkAuth();
             if (!token) return;
-            if (!wechatId) return alert('请输入微信号');
+            if (!wechatId) return alert('请输入微信号或备注');
 
             const res = await fetch(`${API_BASE}/api/admin/generate?token=${token}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ wechatId, days })
+                body: JSON.stringify({ wechatId, credits })
             });
             const data = await res.json();
             if (data.success) {
-                document.getElementById('gen-result').innerText = `生成成功: ${data.code}`;
+                document.getElementById('gen-result').innerText = `✅ 生成成功：${data.code}（+${credits} 积分）`;
                 fetchCodes();
             } else {
                 alert(data.message);

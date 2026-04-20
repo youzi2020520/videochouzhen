@@ -79,54 +79,36 @@ app.post('/api/verify', (req, res) => {
     const db = getDB();
     const index = db.codes.findIndex(c => c.code === code);
 
-    if (index === -1) return res.status(401).json({ success: false, message: '无效授权码' });
+    if (index === -1) return res.status(401).json({ success: false, message: '无效充值码' });
     
     const record = db.codes[index];
     
-    if (record.status === 0) return res.status(403).json({ success: false, message: '授权码已禁用' });
-    if (new Date(record.expiry) < new Date()) return res.status(403).json({ success: false, message: '授权码已过期' });
+    if (record.status === 0) return res.status(403).json({ success: false, message: '充值码已禁用' });
 
     record.lastIp = ip || 'unknown';
     record.lastLocation = location || '未知';
     record.lastLogin = new Date().toISOString();
     
     saveDB(db);
-    const expiryDate = new Date(record.expiry).toISOString().split('T')[0];
 
-    // 根据有效天数确定积分套餐
-    const created  = new Date(record.created || record.lastLogin || Date.now());
-    const expiry   = new Date(record.expiry);
-    const totalMs  = expiry - created;
-    const totalDays = Math.round(totalMs / (1000 * 60 * 60 * 24));
-    let credits = 500; // 默认 30 天套餐
-    if (totalDays >= 3650) {
-        credits = 5000; // 永久
-    } else if (totalDays >= 300) {
-        credits = 500;  // 年度/30天套餐
-    } else if (totalDays <= 10) {
-        credits = 100;  // 7天套餐
-    }
+    const credits = record.credits || 100; // 直接读取码上绑定的积分数
 
-    res.json({ success: true, message: '验证成功', expiry: expiryDate, credits });
+    res.json({ success: true, message: '充值成功', credits });
 });
 
 app.post('/api/admin/generate', requireAdminAuth, (req, res) => {
-    const { wechatId, days } = req.body;
-    if (!wechatId) return res.status(400).json({ error: '请提供微信号' });
+    const { wechatId, credits } = req.body;
+    if (!wechatId) return res.status(400).json({ error: '请提供微信号/备注' });
 
     const db = getDB();
-    const existing = db.codes.find(c => c.wechatId === wechatId);
-    if (existing) return res.json({ success: false, message: '该微信号已存在授权码', code: existing.code });
 
     const newCode = 'CINE-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-    const expiry = new Date();
-    expiry.setDate(expiry.getDate() + (parseInt(days) || 30));
 
     const newRecord = {
         wechatId,
         code: newCode,
         status: 1,
-        expiry: expiry.toISOString(),
+        credits: parseInt(credits) || 100,
         created: new Date().toISOString(),
         lastIp: '',
         lastLocation: '',
