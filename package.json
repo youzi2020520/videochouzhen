@@ -1,10 +1,13 @@
 {
-  "name": "视频帧探",
+  "name": "video-frame-extractor",
   "version": "1.0.0",
   "description": "视频帧探 - 视频抽帧工具",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
+  },
+  "engines": {
+    "node": "18.x"
   },
   "dependencies": {
     "body-parser": "^1.20.2",
