@@ -1249,10 +1249,6 @@
       const numEl = document.getElementById('ai-quota-num');
       if (!badge || !numEl) return;
 
-      if (!isPro) {
-        badge.style.display = 'none';
-        return;
-      }
       const credits = parseInt(localStorage.getItem('cine_credits') || '0');
       badge.style.display = 'block';
       numEl.textContent = credits;
@@ -1262,12 +1258,9 @@
     }
 
     function checkAIQuota(framesCount) {
-      if (!isPro) {
-        return { allowed: false, msg: '请先激活专业授权以使用 AI 识别功能', remaining: 0, max: 0 };
-      }
       const credits = parseInt(localStorage.getItem('cine_credits') || '0');
       if (credits <= 0) {
-        return { allowed: false, msg: '积分不足，请联系管理员充值积分', remaining: 0, max: credits };
+        return { allowed: false, msg: isPro ? '积分不足，请联系管理员充值积分' : '免费积分已用完，激活会员获得更多积分', remaining: 0, max: credits };
       }
       if (framesCount > credits) {
         return { allowed: false, msg: `积分不足：本次需消耗 ${framesCount} 积分，当前剩余 ${credits} 积分`, remaining: credits, max: credits };
@@ -1276,7 +1269,6 @@
     }
 
     function recordAIUsage(framesCount) {
-      if (!isPro) return;
       const credits = parseInt(localStorage.getItem('cine_credits') || '0');
       const newCredits = Math.max(0, credits - framesCount);
       localStorage.setItem('cine_credits', String(newCredits));
@@ -3157,6 +3149,10 @@
 
     // ===== 启动授权检查 =====
     (function checkAuthOnLoad() {
+      // 免费用户首次访问赋予 15 积分
+      if (!isPro && localStorage.getItem('cine_credits') === null) {
+        localStorage.setItem('cine_credits', '15');
+      }
       updateAIQuotaBadge();
       if (!isPro) {
         showModal('activate');
