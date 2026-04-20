@@ -4,10 +4,8 @@
   "description": "视频帧探 - 视频抽帧工具",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
-  },
-  "engines": {
-    "node": "22.x"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
     "body-parser": "^1.20.2",
