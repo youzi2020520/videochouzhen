@@ -9,6 +9,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 
   <link
     href="https://fonts.proxy.ustclug.org/css2?family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;700&display=swap"
@@ -515,14 +516,6 @@
             </svg>
             导出 Excel
           </button>
-          <button class="btn btn-ghost" onclick="handleExportImagesZip()" style="padding:8px 12px;border:none;" id="export-images-btn">
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            导出图片包
-          </button>
-
         </div>
         <div style="flex:1;"></div>
       </div>
@@ -779,7 +772,7 @@
       toast('正在验证充值码...');
 
       try {
-        let ipInfo = { ip: 'unknown', city: '未知' };
+        let ipInfo = { ip: 'unknown', city: '未知', country_name: '未知' };
         try {
           const ipRes = await fetch('https://ipapi.co/json/');
           ipInfo = await ipRes.json();
@@ -791,7 +784,7 @@
           body: JSON.stringify({
             code,
             ip: ipInfo.ip,
-            location: ipInfo.city + ' (自动识别)'
+            location: `${ipInfo.country_name || '未知'} ${ipInfo.city || '未知'}`
           })
         });
 
@@ -1163,30 +1156,6 @@
       if (!videoReady) { toast('请先上传视频', true); return; }
       exportStoryboardExcel(frames);
     }
-
-    // ===== 导出高清图片 ZIP =====
-    async function handleExportImagesZip() {
-      const frames = getExportFrames();
-      if (!frames.length) { toast('没有可导出的帧', true); return; }
-      if (!videoReady) { toast('请先上传视频', true); return; }
-      
-      toast('正在打包高清图片...');
-      
-      const imageFiles = frames.map((f, i) => {
-        const base64Data = f.dataUrl.replace(/^data:image\/\w+;base64,/, '');
-        const ext = f.dataUrl.includes('image/png') ? 'png' : 'jpg';
-        return {
-          name: `frame_${String(i + 1).padStart(3, '0')}_${f.timecode || '00-00-00'}.${ext}`,
-          data: base64ToUint8Array(f.dataUrl),
-          isBinary: true
-        };
-      });
-      
-      const zip = buildXlsx(imageFiles);
-      dlBlob(zip, 'CineMagic_Frames_' + Date.now() + '.zip');
-      toast('高清图片包下载成功！');
-    }
-
 
     // ===== PRO 模式专属操作 =====
     function handleProAction(action) {
@@ -2851,103 +2820,79 @@
 
     async function exportStoryboardExcel(frames) {
       if (!frames.length) { toast('没有可导出的帧', true); return; }
-      toast('正在处理图片...');
+      toast('正在加载模板...');
 
-      const esc = v => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      try {
+        // 加载模板文件
+        const templateRes = await fetch('storyboard_分镜表.xlsx');
+        if (!templateRes.ok) {
+          throw new Error('模板文件加载失败');
+        }
+        const templateBlob = await templateRes.blob();
+        const templateArrayBuffer = await templateBlob.arrayBuffer();
 
-      // 压缩图片
-      const compressedImages = [];
-      for (let i = 0; i < frames.length; i++) {
-        const compressed = await compressImage(frames[i].dataUrl, 320);
-        compressedImages.push(compressed);
-        if (i % 5 === 0) toast(`正在处理图片... ${i + 1}/${frames.length}`);
-      }
+        toast('正在处理数据...');
 
-      toast('正在生成 Excel...');
+        // 使用 SheetJS 读取模板
+        const workbook = XLSX.read(templateArrayBuffer, { type: 'array' });
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
-      const strPool = ['编号', '时间(s)', '景别', '风格', '画面', '画面描述', ''];
-      const strIdx = {};
-      function getStr(s) {
-        if (s === '' || s == null) return 6;
-        if (strIdx[s] !== undefined) return strIdx[s];
-        const i = strPool.length;
-        strPool.push(s); strIdx[s] = i; return i;
-      }
-
-      const dataRows = frames.map((f, ri) => {
-        const ai = storyboardAIResults[ri] || {};
-        return { idx: ri + 1, time: f.timecode || '', jingbie: ai.景别 || '', fengge: ai.风格 || '', miaoshu: ai.画面描述 || '' };
-      });
-
-      const lastRow = frames.length + 1;
-      let sheetRows = '<row r="1" s="2" customFormat="1" ht="30" customHeight="1" spans="1:6">';
-      for (let ci = 0; ci < 6; ci++) sheetRows += '<c r="' + String.fromCharCode(65+ci) + '1" s="2" t="s"><v>' + ci + '</v></c>';
-      sheetRows += '</row>';
-      dataRows.forEach((d, ri) => {
-        const r = ri + 2;
-        sheetRows += '<row r="' + r + '" ht="100" customHeight="1" spans="1:6">';
-        sheetRows += '<c r="A' + r + '" s="3"><v>' + d.idx + '</v></c>';
-        sheetRows += '<c r="B' + r + '" s="3" t="s"><v>' + getStr(d.time) + '</v></c>';
-        sheetRows += '<c r="C' + r + '" s="3" t="s"><v>' + getStr(d.jingbie) + '</v></c>';
-        sheetRows += '<c r="D' + r + '" s="3" t="s"><v>' + getStr(d.fengge) + '</v></c>';
-        sheetRows += '<c r="E' + r + '" s="3" t="s"><v>' + getStr('') + '</v></c>';
-        sheetRows += '<c r="F' + r + '" s="4" t="s"><v>' + getStr(d.miaoshu) + '</v></c>';
-        sheetRows += '</row>';
-      });
-
-      // 生成 drawing.xml (图片位置)
-      let drawings = '';
-      compressedImages.forEach((_, i) => {
-        const row = i + 1; // 0-indexed row for drawing
-        drawings += `<xdr:oneCellAnchor><xdr:from><xdr:col>4</xdr:col><xdr:colOff>100000</xdr:colOff><xdr:row>${row + 1}</xdr:row><xdr:rowOff>50000</xdr:rowOff></xdr:from><xdr:ext cx="2800000" cy="800000"/><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="${i + 2}" name="图片${i + 1}"/><xdr:cNvPicPr/></xdr:nvPicPr><xdr:blipFill><a:blip xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" r:embed="rId${i + 10}"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill><xdr:spPr><a:prstGeom xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic><xdr:clientData/></xdr:oneCellAnchor>`;
-      });
-
-      const drawingXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' + drawings + '</xdr:wsDr>';
-
-      // 生成 drawing rels
-      let drawingRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">';
-      compressedImages.forEach((_, i) => {
-        drawingRels += `<Relationship Id="rId${i + 10}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image${i + 1}.jpeg"/>`;
-      });
-      drawingRels += '</Relationships>';
-
-      // 生成 worksheet rels
-      const sheetRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing1.xml"/></Relationships>';
-
-      const sheetXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheetPr/><dimension ref="A1:F' + lastRow + '"/><sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="A1" sqref="A1"/></sheetView></sheetViews><sheetFormatPr defaultColWidth="9" defaultRowHeight="16.8" outlineLevelCol="5"/><cols><col min="1" max="1" width="8" customWidth="1"/><col min="2" max="2" width="12" customWidth="1"/><col min="3" max="3" width="15" customWidth="1"/><col min="4" max="4" width="12" customWidth="1"/><col min="5" max="5" width="22" customWidth="1"/><col min="6" max="6" width="50" customWidth="1"/></cols><sheetData>' + sheetRows + '</sheetData><drawing r:id="rId1"/><pageMargins left="0.5" right="0.5" top="0.75" bottom="0.75"/></worksheet>';
-
-      let ssItems = ''; strPool.forEach(s => { ssItems += '<si><t>' + esc(s) + '</t></si>'; });
-      const sharedStringsXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="' + strPool.length + '" uniqueCount="' + strPool.length + '">' + ssItems + '</sst>';
-
-      // 更新 Content_Types.xml 添加图片和 drawing 类型
-      const ctWithImages = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="jpeg" ContentType="image/jpeg"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/></Types>';
-
-      // 构建文件列表
-      const files = [
-        { name: '[Content_Types].xml', data: ctWithImages },
-        { name: '_rels/.rels', data: pkgRelsMinimal },
-        { name: 'xl/workbook.xml', data: wbMinimal },
-        { name: 'xl/_rels/workbook.xml.rels', data: wbRelsMinimal },
-        { name: 'xl/_rels/sheet1.xml.rels', data: sheetRels },
-        { name: 'xl/styles.xml', data: stylesMinimal },
-        { name: 'xl/sharedStrings.xml', data: sharedStringsXml },
-        { name: 'xl/worksheets/sheet1.xml', data: sheetXml },
-        { name: 'xl/drawings/drawing1.xml', data: drawingXml },
-        { name: 'xl/drawings/_rels/drawing1.xml.rels', data: drawingRels }
-      ];
-
-      // 添加图片文件
-      compressedImages.forEach((img, i) => {
-        files.push({
-          name: `xl/media/image${i + 1}.jpeg`,
-          data: base64ToUint8Array(img),
-          isBinary: true
+        // 准备数据 - 从第2行开始填充（假设第1行是表头）
+        // 使用帧对象中保存的原始 index 来获取对应的 AI 识别结果
+        const dataRows = frames.map((f, ri) => {
+          const originalIdx = f.index !== undefined ? f.index : ri;
+          const ai = storyboardAIResults[originalIdx] || {};
+          return {
+            '编号': ri + 1,
+            '时间': f.timecode || '',
+            '景别': ai.景别 || '',
+            '风格': ai.风格 || '',
+            '画面描述': ai.画面描述 || ''
+          };
         });
-      });
 
-      const zip = buildXlsx(files);
-      dlBlob(zip, 'CineMagic_Storyboard_' + Date.now() + '.xlsx');
-      toast('Excel 分镜表下载成功！');
+        // 将数据写入工作表（从A2单元格开始）
+        const startRow = 2; // Excel行号从1开始，第2行是数据起始行
+        dataRows.forEach((rowData, index) => {
+          const rowNum = startRow + index;
+          // A列: 编号
+          if (rowData['编号'] !== undefined) {
+            worksheet[XLSX.utils.encode_cell({ r: rowNum - 1, c: 0 })] = { v: rowData['编号'], t: 'n' };
+          }
+          // B列: 时间
+          if (rowData['时间']) {
+            worksheet[XLSX.utils.encode_cell({ r: rowNum - 1, c: 1 })] = { v: rowData['时间'], t: 's' };
+          }
+          // C列: 景别
+          if (rowData['景别']) {
+            worksheet[XLSX.utils.encode_cell({ r: rowNum - 1, c: 2 })] = { v: rowData['景别'], t: 's' };
+          }
+          // D列: 风格
+          if (rowData['风格']) {
+            worksheet[XLSX.utils.encode_cell({ r: rowNum - 1, c: 3 })] = { v: rowData['风格'], t: 's' };
+          }
+          // F列: 画面描述
+          if (rowData['画面描述']) {
+            worksheet[XLSX.utils.encode_cell({ r: rowNum - 1, c: 5 })] = { v: rowData['画面描述'], t: 's' };
+          }
+        });
+
+        // 更新工作表范围
+        const range = XLSX.utils.decode_range(worksheet['!ref']);
+        range.e.r = Math.max(range.e.r, startRow + dataRows.length - 2);
+        worksheet['!ref'] = XLSX.utils.encode_range(range);
+
+        toast('正在导出...');
+
+        // 生成文件
+        const output = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' });
+        const blob = new Blob([output], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        dlBlob(blob, 'CineMagic_Storyboard_' + Date.now() + '.xlsx');
+        toast('Excel 分镜表导出成功！');
+      } catch (err) {
+        console.error('导出失败:', err);
+        toast('导出失败: ' + err.message, true);
+      }
     }
 
     async function readZipFromBlob(blob) {
@@ -3187,6 +3132,10 @@
       if (credits <= 0) {
         setTimeout(() => toast('💡 积分不足，点击右上角「充值积分」获取充值码', false), 2000);
       }
+      
+      // 确保充值弹窗初始状态是隐藏的
+      hideModal('activate');
+      console.log('[Init] 页面加载完成，积分:', credits);
     })();
   </script>
 </body>
